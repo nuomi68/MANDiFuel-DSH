@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "cases": [
+    "D1",
+    "D2",
+    "D3",
+    "D4",
+    "D5"
+  ],
+  "files": [
+    {
+      "path": "examples/D1/prompt.txt",
+      "sha256": "1ecb17b91ccd196c13b416eeeead3a4fe2501fbe65ff2f5e05fe257c2562f427"
+    },
+    {
+      "path": "examples/D2/prompt.txt",
+      "sha256": "65fc704401c766cd795c3e2fa1b8dede3de5754f06cd5d42343e0523acb4a003"
+    },
+    {
+      "path": "examples/D3/followup.txt",
+      "sha256": "8f3f0a2251b5e998b1837d4a743af79f3eea45c8a2eae02933c9d89f3cb19b4e"
+    },
+    {
+      "path": "examples/D3/prompt.txt",
+      "sha256": "3ff083aa155cbfae225f6508cecf3c0a458e3936b07f3f1375474c396f07fec0"
+    },
+    {
+      "path": "examples/D4/prompt.txt",
+      "sha256": "243fd06cca69998a3c95a3910a36529eb4d776f4cf6006d221a694a789d36116"
+    },
+    {
+      "path": "examples/D5/prompt.txt",
+      "sha256": "31daa9b6842ba00a4013e381e88127bf4f18df28a37306f167b216d4bab8f75b"
+    },
+    {
+      "path": "examples/README.md",
+      "sha256": "b6eaa70d8ceaf9439f5affb3752f754d8a019faf2ef14bb0b5dcead17abe0211"
+    },
+    {
+      "path": "examples/run.py",
+      "sha256": "dc557495f5c34d1d38bb4cd974d9d471695e7cc6d77d43225fc5cf8eee6304b2"
+    }
+  ]
+}

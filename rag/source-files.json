@@ -1,0 +1,2336 @@
+{
+  "schema_version": 1,
+  "upstream": "https://gitlab.com/foam-for-nuclear/offbeat",
+  "upstream_commit": "80e84450a115b0c411e1bfa5d166379f6bf6c084",
+  "license": "GPL-3.0-or-later",
+  "upstream_license_sha256": "8b1ba204bb69a0ade2bfcf65ef294a920f6bb361b317dba43c7ef29d96332b9b",
+  "corpus_sha256": "92115f90198e1a1815529c02019a08ab92415cb3982fb0ce416f57307ccc78a6",
+  "card_count": 137,
+  "files": [
+    {
+      "case": "Cases/Verification/NaCoolantChannelModel/vsAnalytical",
+      "path": "constant/solverDict",
+      "sha256": "ae60215dc250844d5374a6d7804cbab71db524e0ae24e027bdf12739defdfdfe"
+    },
+    {
+      "case": "Cases/Verification/NaCoolantChannelModel/vsAnalytical",
+      "path": "Allrun",
+      "sha256": "c984eab4ed3ff8f3d6f3addfaa00580518b297e66b8275bcf9beb05a9bd29f56"
+    },
+    {
+      "case": "Cases/Verification/NaCoolantChannelModel/vsAnalytical",
+      "path": "system/blockMeshDict",
+      "sha256": "2c835037602913830df93cbece679b5695f9cacb821a36c9dafbe99559e01fde"
+    },
+    {
+      "case": "Cases/Verification/NaCoolantChannelModel/vsTRACE",
+      "path": "constant/solverDict",
+      "sha256": "4f89043e1d1793d37e3b4894b20e5440ec3c58c2f9e5c6c012a9db3d1d7fe282"
+    },
+    {
+      "case": "Cases/Verification/NaCoolantChannelModel/vsTRACE",
+      "path": "Allrun",
+      "sha256": "69b68d5bfd9c116c69b9745f938b9375036c207a5d936678b10bfcd0070e0c80"
+    },
+    {
+      "case": "Cases/Verification/NaCoolantChannelModel/vsTRACE",
+      "path": "rodMaker/rodDict",
+      "sha256": "e3d1bf0af2ef71a685770c2ef5a5071c174e4609499a2251dd39f1090b201b9d"
+    },
+    {
+      "case": "Cases/Verification/actinidesRedistribution",
+      "path": "constant/solverDict",
+      "sha256": "2c3ca3439c09ac6dd39afa07e88e4fd47836f52514400abb418c7797943e3048"
+    },
+    {
+      "case": "Cases/Verification/actinidesRedistribution",
+      "path": "Allrun",
+      "sha256": "fb292a1196024a215c65a0cdee9e8590a78d4fd4ce48925dbc002e61f8c3e583"
+    },
+    {
+      "case": "Cases/Verification/actinidesRedistribution",
+      "path": "system/sampleRadialProfile",
+      "sha256": "db84ecb6221c524bc7346bff135a2189b40a8e76b3b05529be521f730b2a4724"
+    },
+    {
+      "case": "Cases/Verification/actinidesRedistribution",
+      "path": "rodMaker/rodDict",
+      "sha256": "98aadbb3f474f02a43d52ffd1df3bbb3800fe4409e1e6666725ca26e8b064c06"
+    },
+    {
+      "case": "Cases/Verification/beamBending",
+      "path": "constant/solverDict",
+      "sha256": "c54094f418746c912d2a9598d316443823c70371c9a92b797c7d994a7e403e3a"
+    },
+    {
+      "case": "Cases/Verification/beamBending",
+      "path": "Allrun",
+      "sha256": "4f9bd1f38d6f894016c8ae27561d599c06ed5071cc1d32797b3caea54bd57ac2"
+    },
+    {
+      "case": "Cases/Verification/beamBending",
+      "path": "README",
+      "sha256": "0f00bb56705e52522d922a3ddb3c9d1ab5b10e30bb5170bf106f773c859dfb16"
+    },
+    {
+      "case": "Cases/Verification/beamBending",
+      "path": "system/blockMeshDict",
+      "sha256": "74a0599e7a5a5695be15c9eecdf91f198caa504cce556e82682a120666588830"
+    },
+    {
+      "case": "Cases/Verification/burnupFBR",
+      "path": "constant/solverDict",
+      "sha256": "611058267c39b4c490bca61f3c6d98bac0d03a70796bdd7b80cbb9580b96d2f6"
+    },
+    {
+      "case": "Cases/Verification/burnupFBR",
+      "path": "Allrun",
+      "sha256": "7f6e00ff933637cdfe9cc17c5ba7be1fc4eb640c623874cb6c2c1c17ed69a050"
+    },
+    {
+      "case": "Cases/Verification/burnupFBR",
+      "path": "rodDict",
+      "sha256": "5c8ef390cbdee7712c417ae4cbb93aa8fecff02d105b9158d77c3f38e4768b9b"
+    },
+    {
+      "case": "Cases/Verification/corrosion/fixedInnerHeatFlux",
+      "path": "constant/solverDict",
+      "sha256": "88b7dbe6c54773ce0ac3e105164265631ad79a44328b24413897b048bedd066d"
+    },
+    {
+      "case": "Cases/Verification/corrosion/fixedInnerHeatFlux",
+      "path": "Allrun",
+      "sha256": "c86bde947f54f53d2b980c8d8b1e9ee5c79bd844ce2cb3d21971e64793ee115b"
+    },
+    {
+      "case": "Cases/Verification/corrosion/fixedInnerHeatFlux",
+      "path": "system/blockMeshDict",
+      "sha256": "07cace0c20c2d03d790294b79e987d1e51f024b8693e546830208714e3969280"
+    },
+    {
+      "case": "Cases/Verification/corrosion/fixedInterfaceTemperature",
+      "path": "constant/solverDict",
+      "sha256": "0d74d870fba1f80f074d2fbe483f853354bc0b63c54fa246e0289dc5fe3bcedf"
+    },
+    {
+      "case": "Cases/Verification/corrosion/fixedInterfaceTemperature",
+      "path": "Allrun",
+      "sha256": "468664a2ab9b50a31e53443945dcb61173d5e7c5664feb823ce55a9cd5199c3b"
+    },
+    {
+      "case": "Cases/Verification/corrosion/fixedInterfaceTemperature",
+      "path": "system/blockMeshDict",
+      "sha256": "932362d14585eb930d210bb017ac76aa90bd20743d30a4851f6fe207eef102ab"
+    },
+    {
+      "case": "Cases/Verification/gapVolume",
+      "path": "constant/solverDict",
+      "sha256": "fd90ff9886564fb81b75bd4bcbff53f4037e42eac3d17d7e0665287e2389d121"
+    },
+    {
+      "case": "Cases/Verification/gapVolume",
+      "path": "Allrun",
+      "sha256": "24b6a53e09bc576186856a331894f88d146e1338f5509f27c4f3009992269e93"
+    },
+    {
+      "case": "Cases/Verification/gapVolume",
+      "path": "system/blockMeshDict",
+      "sha256": "df14748acf8de26274d98b9d580d6a82c1a72881fbcd8435592a5065b6fd12a5"
+    },
+    {
+      "case": "Cases/Verification/gapVolume1D",
+      "path": "constant/solverDict",
+      "sha256": "76b2a0ff2b902934f9ccfe43d122c2eeaea5d205a384469862bd42963ba434ef"
+    },
+    {
+      "case": "Cases/Verification/gapVolume1D",
+      "path": "Allrun",
+      "sha256": "24b6a53e09bc576186856a331894f88d146e1338f5509f27c4f3009992269e93"
+    },
+    {
+      "case": "Cases/Verification/gapVolume1D",
+      "path": "system/blockMeshDict",
+      "sha256": "2e5722ba0e0802ce49d9307d2393f7a8a05243d1741a8bf16811648fbf7195c9"
+    },
+    {
+      "case": "Cases/Verification/gapVolumeHeatedFuel",
+      "path": "constant/solverDict",
+      "sha256": "95e48d96a9444c62fe55213bcb19f6af3c5c021c4ca5c5beaae8eb0e7583e6ce"
+    },
+    {
+      "case": "Cases/Verification/gapVolumeHeatedFuel",
+      "path": "Allrun",
+      "sha256": "739dab8332a42d7d35b13b2a6ad84ca5e31a3830761585a3080773375ad688f0"
+    },
+    {
+      "case": "Cases/Verification/gapVolumeHeatedFuel",
+      "path": "system/blockMeshDict",
+      "sha256": "df14748acf8de26274d98b9d580d6a82c1a72881fbcd8435592a5065b6fd12a5"
+    },
+    {
+      "case": "Cases/Verification/gapVolumeHeatedFuel1D",
+      "path": "constant/solverDict",
+      "sha256": "d7f8078fc5d06cefc2e0be4e8f13677f0b921ef333ec384408fced10bb31eaf0"
+    },
+    {
+      "case": "Cases/Verification/gapVolumeHeatedFuel1D",
+      "path": "Allrun",
+      "sha256": "71226820b4e7d5b76cb1a5098b48247a111f647ed8a838172eed5c2c7b97558e"
+    },
+    {
+      "case": "Cases/Verification/gapVolumeHeatedFuel1D",
+      "path": "system/blockMeshDict",
+      "sha256": "2e5722ba0e0802ce49d9307d2393f7a8a05243d1741a8bf16811648fbf7195c9"
+    },
+    {
+      "case": "Cases/Verification/heatConservation",
+      "path": "constant/solverDict",
+      "sha256": "92e81136d3b7eda16181a3ee9934aebb7691984e0ff75da51d2514ff4c540ba9"
+    },
+    {
+      "case": "Cases/Verification/heatConservation",
+      "path": "Allrun",
+      "sha256": "c5e5b5479339771aa3ff8fb6bf21bbe24f1b3e69dd89543db7b3cec52a6ce3fd"
+    },
+    {
+      "case": "Cases/Verification/heatConservation",
+      "path": "system/blockMeshDict",
+      "sha256": "4163d6407a0221878b4ef0229001e110273a71342db1a4fab13433cc48715d4a"
+    },
+    {
+      "case": "Cases/Verification/hydrogenTransport/heatingCooling1",
+      "path": "constant/solverDict",
+      "sha256": "e5d4706564f29f8ff5eb77985fc46086e62cbf04ed268e7a82c332b596f25aa3"
+    },
+    {
+      "case": "Cases/Verification/hydrogenTransport/heatingCooling1",
+      "path": "0/T",
+      "sha256": "cb0bc0444ea941282280c02d0b49ee6f8eecdeeb0b6051890a90474684ac8223"
+    },
+    {
+      "case": "Cases/Verification/hydrogenTransport/heatingCooling1",
+      "path": "system/blockMeshDict",
+      "sha256": "79ecafd6b6ae17edbfd75ded04b5692038438686914d5552a7c4502a1c5e2cef"
+    },
+    {
+      "case": "Cases/Verification/hydrogenTransport/heatingCooling2",
+      "path": "constant/solverDict",
+      "sha256": "e5d4706564f29f8ff5eb77985fc46086e62cbf04ed268e7a82c332b596f25aa3"
+    },
+    {
+      "case": "Cases/Verification/hydrogenTransport/heatingCooling2",
+      "path": "0/T",
+      "sha256": "2966cf6271b48208ca8197897e2f32bbfee2e7153e2320b4b97b495d9673a233"
+    },
+    {
+      "case": "Cases/Verification/hydrogenTransport/heatingCooling2",
+      "path": "system/blockMeshDict",
+      "sha256": "79ecafd6b6ae17edbfd75ded04b5692038438686914d5552a7c4502a1c5e2cef"
+    },
+    {
+      "case": "Cases/Verification/hydrogenTransport/hydrogenIngress",
+      "path": "constant/solverDict",
+      "sha256": "d70aed5119715429e583bb80fdd83056f5cd3d86acc944b47b7aff7b53fadf39"
+    },
+    {
+      "case": "Cases/Verification/hydrogenTransport/hydrogenIngress",
+      "path": "Allrun",
+      "sha256": "32313d4d2a0f722dc49e39f9fa61ed0676d4ff279deebc7229beeaaa8f782876"
+    },
+    {
+      "case": "Cases/Verification/hydrogenTransport/hydrogenIngress",
+      "path": "system/blockMeshDict",
+      "sha256": "2a89c3fa27a42bf30558b19315b26526cedd69fce460aafe0779ed196008920c"
+    },
+    {
+      "case": "Cases/Verification/hydrogenTransport/hydrogenUptake",
+      "path": "constant/solverDict",
+      "sha256": "f21f627652630476d7ce0c89118a5796821417c30f10eab7cd178a3734de6b89"
+    },
+    {
+      "case": "Cases/Verification/hydrogenTransport/hydrogenUptake",
+      "path": "Allrun",
+      "sha256": "c878bd4845e631964a6b8f05c8c15875e5d215eab0dad26ae4ac6e5a5a468316"
+    },
+    {
+      "case": "Cases/Verification/hydrogenTransport/hydrogenUptake",
+      "path": "system/blockMeshDict",
+      "sha256": "07cace0c20c2d03d790294b79e987d1e51f024b8693e546830208714e3969280"
+    },
+    {
+      "case": "Cases/Verification/hydrogenTransport/laCroixBenchmark",
+      "path": "constant/solverDict",
+      "sha256": "4219d87e46228d6eee2ca53f83a456ca1a8e198a6c52f0379a098580b6f7e1cb"
+    },
+    {
+      "case": "Cases/Verification/hydrogenTransport/laCroixBenchmark",
+      "path": "Allrun",
+      "sha256": "0693bdf8899edee19a560bebe1db1c9c0c5075b9bba60d906057a781df51847e"
+    },
+    {
+      "case": "Cases/Verification/hydrogenTransport/laCroixBenchmark",
+      "path": "system/blockMeshDict",
+      "sha256": "557599d1d7de534a345d852f0094cefdf4f28241cfa18175c3c1f8dec29ad5ac"
+    },
+    {
+      "case": "Cases/Verification/hydrogenTransport/sawatzky",
+      "path": "constant/solverDict",
+      "sha256": "4219d87e46228d6eee2ca53f83a456ca1a8e198a6c52f0379a098580b6f7e1cb"
+    },
+    {
+      "case": "Cases/Verification/hydrogenTransport/sawatzky",
+      "path": "Allrun",
+      "sha256": "32313d4d2a0f722dc49e39f9fa61ed0676d4ff279deebc7229beeaaa8f782876"
+    },
+    {
+      "case": "Cases/Verification/hydrogenTransport/sawatzky",
+      "path": "system/blockMeshDict",
+      "sha256": "fa5dd13353975c18062ca4f04f0533506612f1efcd012fdc03ca7b61fa940ac9"
+    },
+    {
+      "case": "Cases/Verification/laserHeating",
+      "path": "constant/solverDict",
+      "sha256": "a535251bce5bdac266016e536776bab0a271460816566f77f8bd31ec8ce94e83"
+    },
+    {
+      "case": "Cases/Verification/laserHeating",
+      "path": "Allrun",
+      "sha256": "5a6466f4bc77001c1e2cad42524e81af4366e12743444ba68def7d6d11430083"
+    },
+    {
+      "case": "Cases/Verification/laserHeating",
+      "path": "system/blockMeshDict",
+      "sha256": "472701966fed3e7fcc6cc0552dddfeea0782d6e7f1cccfdf11bd7497600d5e1b"
+    },
+    {
+      "case": "Cases/Verification/multiMaterial/biMaterialBlock1",
+      "path": "constant/solverDict",
+      "sha256": "f275c479eb26a80da83fc2d1005183c1662ada224fa4a9c4f709e0203c9f339b"
+    },
+    {
+      "case": "Cases/Verification/multiMaterial/biMaterialBlock1",
+      "path": "Allrun",
+      "sha256": "b97439090268d641f29cf5c246877b76d3505b3eb3b1f7fc9143f9addd82cf69"
+    },
+    {
+      "case": "Cases/Verification/multiMaterial/biMaterialBlock1",
+      "path": "0/D",
+      "sha256": "d08fb4536f87602fe46ec69d38726f9b36de87586b9e426235cd89949512a5aa"
+    },
+    {
+      "case": "Cases/Verification/multiMaterial/biMaterialBlock1",
+      "path": "system/blockMeshDict",
+      "sha256": "fd2437be7525207570a051a5d86d55496f2d8b32e86ff7550e12c4744aeb4e7b"
+    },
+    {
+      "case": "Cases/Verification/multiMaterial/biMaterialBlock2",
+      "path": "constant/solverDict",
+      "sha256": "d01690129994d26bc2cac09e6e8dd9219bdc931c9d5b08a56df50b0aa97319a7"
+    },
+    {
+      "case": "Cases/Verification/multiMaterial/biMaterialBlock2",
+      "path": "Allrun",
+      "sha256": "b97439090268d641f29cf5c246877b76d3505b3eb3b1f7fc9143f9addd82cf69"
+    },
+    {
+      "case": "Cases/Verification/multiMaterial/biMaterialBlock2",
+      "path": "0/D",
+      "sha256": "4d7e34b0dc09469ce0e61d309a4a343e33e92f1d7803591fa90ba746b5843fe9"
+    },
+    {
+      "case": "Cases/Verification/multiMaterial/biMaterialBlock2",
+      "path": "system/blockMeshDict",
+      "sha256": "fd2437be7525207570a051a5d86d55496f2d8b32e86ff7550e12c4744aeb4e7b"
+    },
+    {
+      "case": "Cases/Verification/multiMaterial/biMaterialCylinder1",
+      "path": "constant/solverDict",
+      "sha256": "9fb83bc7fab5b81a05797e0daaa17a2ca98adc73a767b6c512fb21585b4732ba"
+    },
+    {
+      "case": "Cases/Verification/multiMaterial/biMaterialCylinder1",
+      "path": "Allrun",
+      "sha256": "b97439090268d641f29cf5c246877b76d3505b3eb3b1f7fc9143f9addd82cf69"
+    },
+    {
+      "case": "Cases/Verification/multiMaterial/biMaterialCylinder1",
+      "path": "0/D",
+      "sha256": "1b19c34a9e3ea5baa525723a5b30498b6e5835d05604fdca9b2bdaae19bee35a"
+    },
+    {
+      "case": "Cases/Verification/multiMaterial/biMaterialCylinder1",
+      "path": "system/blockMeshDict",
+      "sha256": "6b0bdb52126dfc75373023f0ee7830a5dfdd0ee9c3f7e7f4167220c3e88b3ccb"
+    },
+    {
+      "case": "Cases/Verification/multiMaterial/biMaterialCylinder1_frictionalContact",
+      "path": "constant/solverDict",
+      "sha256": "371bd97b9575ff9dd90d9992ceb4191c00024e135e469f3244afdca8808c2939"
+    },
+    {
+      "case": "Cases/Verification/multiMaterial/biMaterialCylinder1_frictionalContact",
+      "path": "Allrun",
+      "sha256": "9f6607c571a80ee41fbf35407bca1bea70fa6eebc48966f23b68c30d12f092d1"
+    },
+    {
+      "case": "Cases/Verification/multiMaterial/biMaterialCylinder1_frictionalContact",
+      "path": "0/D",
+      "sha256": "8a62f514eebbdaab0ab155d657f10528289b2baf99e833dd62970a596f330d30"
+    },
+    {
+      "case": "Cases/Verification/multiMaterial/biMaterialCylinder1_frictionalContact",
+      "path": "system/blockMeshDict",
+      "sha256": "4bbd8b18f0265eb720454ce4d6abfc4dd07571e029bf2c8d191e811eb6368e74"
+    },
+    {
+      "case": "Cases/Verification/multiMaterial/biMaterialCylinder2",
+      "path": "constant/solverDict",
+      "sha256": "65692d94683265e0f2b6998d161564dd51db0137fbb57871db8a537f1e927ff3"
+    },
+    {
+      "case": "Cases/Verification/multiMaterial/biMaterialCylinder2",
+      "path": "Allrun",
+      "sha256": "b97439090268d641f29cf5c246877b76d3505b3eb3b1f7fc9143f9addd82cf69"
+    },
+    {
+      "case": "Cases/Verification/multiMaterial/biMaterialCylinder2",
+      "path": "0/D",
+      "sha256": "157a7a96db4802ff38407f2a5f94b655537283eb29c1ff495375336fa33d5457"
+    },
+    {
+      "case": "Cases/Verification/multiMaterial/biMaterialCylinder2",
+      "path": "system/blockMeshDict",
+      "sha256": "6b0bdb52126dfc75373023f0ee7830a5dfdd0ee9c3f7e7f4167220c3e88b3ccb"
+    },
+    {
+      "case": "Cases/Verification/multiMaterial/biMaterialSkewBlock1",
+      "path": "constant/solverDict",
+      "sha256": "90d0c5ba09e6144d0167d1af32b62126515015ec45adc14a283d23c86da73fd0"
+    },
+    {
+      "case": "Cases/Verification/multiMaterial/biMaterialSkewBlock1",
+      "path": "Allrun",
+      "sha256": "fb004893f762b46b17bcbb667c52e9f7e00d50b2f4d1dd4e5cd16b20b9561627"
+    },
+    {
+      "case": "Cases/Verification/multiMaterial/biMaterialSkewBlock1",
+      "path": "0/D",
+      "sha256": "d08fb4536f87602fe46ec69d38726f9b36de87586b9e426235cd89949512a5aa"
+    },
+    {
+      "case": "Cases/Verification/multiMaterial/biMaterialSkewBlock1",
+      "path": "system/blockMeshDict",
+      "sha256": "e5944aad18fbcde88e904f600753d569330d9dd839c9e820c2d97959eeb67671"
+    },
+    {
+      "case": "Cases/Verification/multiMaterial/biMaterialSkewBlock2",
+      "path": "constant/solverDict",
+      "sha256": "1889b12227a82cb82a1689810ed3d684a7a789e3ce4352bb72b0a12b1d068503"
+    },
+    {
+      "case": "Cases/Verification/multiMaterial/biMaterialSkewBlock2",
+      "path": "Allrun",
+      "sha256": "fb004893f762b46b17bcbb667c52e9f7e00d50b2f4d1dd4e5cd16b20b9561627"
+    },
+    {
+      "case": "Cases/Verification/multiMaterial/biMaterialSkewBlock2",
+      "path": "0/D",
+      "sha256": "6d1ae81acddf24ab4cbf32d5fcdc12c96be19d506458149a924da619b5f392cd"
+    },
+    {
+      "case": "Cases/Verification/multiMaterial/biMaterialSkewBlock2",
+      "path": "system/blockMeshDict",
+      "sha256": "e5944aad18fbcde88e904f600753d569330d9dd839c9e820c2d97959eeb67671"
+    },
+    {
+      "case": "Cases/Verification/neutronics/cylindricalPellet/testDifferentEnrichments/baseCase",
+      "path": "constant/solverDict",
+      "sha256": "399a60b746b70e053f5c8dc5836b8dac130fba71c2915da2fa53acc4cf6da630"
+    },
+    {
+      "case": "Cases/Verification/neutronics/cylindricalPellet/testDifferentEnrichments/baseCase",
+      "path": "rodMaker/rodDict",
+      "sha256": "715bbec64e7378676d9882003c97d4136ab563f6ccb55aca60fc070ae2f6504d"
+    },
+    {
+      "case": "Cases/Verification/neutronics/cylindricalPellet/testDifferentRadii/baseCase",
+      "path": "constant/solverDict",
+      "sha256": "412ba48a9877e3ba1a47545d42c17ccb781b4321f4890191d676e11325f6a5a1"
+    },
+    {
+      "case": "Cases/Verification/neutronics/cylindricalPellet/testDifferentRadii/baseCase",
+      "path": "rodMaker/rodDict",
+      "sha256": "715bbec64e7378676d9882003c97d4136ab563f6ccb55aca60fc070ae2f6504d"
+    },
+    {
+      "case": "Cases/Verification/neutronics/hollowPellet/testDifferentEnrichments/baseCase",
+      "path": "constant/solverDict",
+      "sha256": "399a60b746b70e053f5c8dc5836b8dac130fba71c2915da2fa53acc4cf6da630"
+    },
+    {
+      "case": "Cases/Verification/neutronics/hollowPellet/testDifferentEnrichments/baseCase",
+      "path": "rodMaker/rodDict",
+      "sha256": "715bbec64e7378676d9882003c97d4136ab563f6ccb55aca60fc070ae2f6504d"
+    },
+    {
+      "case": "Cases/Verification/neutronics/hollowPellet/testDifferentRadii/baseCase",
+      "path": "constant/solverDict",
+      "sha256": "399a60b746b70e053f5c8dc5836b8dac130fba71c2915da2fa53acc4cf6da630"
+    },
+    {
+      "case": "Cases/Verification/neutronics/hollowPellet/testDifferentRadii/baseCase",
+      "path": "rodMaker/rodDict",
+      "sha256": "715bbec64e7378676d9882003c97d4136ab563f6ccb55aca60fc070ae2f6504d"
+    },
+    {
+      "case": "Cases/Verification/plateHole",
+      "path": "constant/solverDict",
+      "sha256": "93a1f74a41c31db9515142a7affd688cf354d6f23e9288dead3788500363ea25"
+    },
+    {
+      "case": "Cases/Verification/plateHole",
+      "path": "Allrun",
+      "sha256": "874174591e40f45240800899fc81e2a3b8f65e506d6e9380efb3b0cfc37901fc"
+    },
+    {
+      "case": "Cases/Verification/plateHole",
+      "path": "system/blockMeshDict",
+      "sha256": "1d85caf29d8195fc15fb588618801fdf416a96996a79d0a54ee91c0b6d8d145d"
+    },
+    {
+      "case": "Cases/Verification/porosity",
+      "path": "constant/solverDict",
+      "sha256": "9c7a600f268b5be1c59eeabffc663c7063501b5c277f55f3ee69aa97814b09b9"
+    },
+    {
+      "case": "Cases/Verification/porosity",
+      "path": "Allrun",
+      "sha256": "6ada8033fd29ced7fb795dfa3cc193d297c80e426ab966c1b39b174774188ea1"
+    },
+    {
+      "case": "Cases/Verification/porosity",
+      "path": "rodMaker/rodDict",
+      "sha256": "a347436e5924f53b40335611043d55b3448d65d613df92acea116f4e359214d1"
+    },
+    {
+      "case": "Cases/Verification/porosityDynamicMesh",
+      "path": "constant/solverDict",
+      "sha256": "838521a3253d4129e262084936a40d1d59fba48903981d5ef85013fb50dbe5ec"
+    },
+    {
+      "case": "Cases/Verification/porosityDynamicMesh",
+      "path": "Allrun",
+      "sha256": "072c797f388766a615aadda3b0357b79ac2974083f4d617158c58ce61881fe94"
+    },
+    {
+      "case": "Cases/Verification/porosityDynamicMesh",
+      "path": "rodMaker/rodDict",
+      "sha256": "555a0791753f5c516da9b3eb76e86b8a22774dbc95c8142e21f075a06e334523"
+    },
+    {
+      "case": "Cases/Verification/testBetaFraction",
+      "path": "constant/solverDict",
+      "sha256": "cb687a3be6d43ee88ae6818417f76cb5735622c76d6d753375434b3d6674a675"
+    },
+    {
+      "case": "Cases/Verification/testBetaFraction",
+      "path": "Allrun",
+      "sha256": "085b121a4893b3da5ab48bd82b58359a5e767efd70821d81d6eff085debab5da"
+    },
+    {
+      "case": "Cases/Verification/testBetaFraction",
+      "path": "0/T",
+      "sha256": "185f8d8ee92d53f2216f07e83268c4b117dfbd87febae33ab015303a08770a7e"
+    },
+    {
+      "case": "Cases/Verification/testBetaFraction",
+      "path": "system/probes",
+      "sha256": "566bff10788f0868600e02d5c8199d05a50e1e6f43021c24c6d04b4fb48d31aa"
+    },
+    {
+      "case": "Cases/Verification/testBetaFraction",
+      "path": "system/blockMeshDict",
+      "sha256": "0f8b302dbac1b00c4928838aac9c21efdd9dff61861ee33c89dc07d830ddc5db"
+    },
+    {
+      "case": "Cases/Verification/testUserParameters",
+      "path": "constant/solverDict",
+      "sha256": "640c689a31f08ba10ba8236c7285517cb305e323be0b98598c9211a654e6992f"
+    },
+    {
+      "case": "Cases/Verification/testUserParameters",
+      "path": "Allrun",
+      "sha256": "2df49945b335706b016a31beb07c241abf6075e2a5d77b010cd07422cac728f3"
+    },
+    {
+      "case": "Cases/Verification/testUserParameters",
+      "path": "rodDict",
+      "sha256": "60d843f531c772a9dbe3dd134608b7a2fd59fb625a55cf89f8f0c29b15a99d99"
+    },
+    {
+      "case": "Cases/Verification/thickCylinderExpansion",
+      "path": "constant/solverDict",
+      "sha256": "0bf132912944858aada825df717fb29bbb4c14089756902083f8db3b00e4eb9c"
+    },
+    {
+      "case": "Cases/Verification/thickCylinderExpansion",
+      "path": "Allrun",
+      "sha256": "55d6d25a6632b3a7b83c5e5f6fea38ed6e008f5799f983e228dd4cde022dd4aa"
+    },
+    {
+      "case": "Cases/Verification/thickCylinderExpansion",
+      "path": "rodMaker/rodDict",
+      "sha256": "db1d08b6ddd195701bc512438ad56087ea3baa187a7fac0a268d9074fb1d14f1"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_1",
+      "path": "constant/solverDict",
+      "sha256": "617696a3eca3277e1cf3d409654a08155bea4e667889f1b860a162d8489f3fc1"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_1",
+      "path": "Allrun",
+      "sha256": "7f0057cb63a71eeae814d3f716bcc008804bf3215cb89c77b742fe31371eaafc"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_1",
+      "path": "sphereDict",
+      "sha256": "f8ae53237d4d5e875291ea25238bff3a62752ffba1fcb7b69ee825faaa7af65c"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_10",
+      "path": "constant/solverDict",
+      "sha256": "39df000a42464663fcc3356584f6d9f7225e61b09b7cbd0683f3ee7977315393"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_10",
+      "path": "Allrun",
+      "sha256": "4cdaab0b599855f3c9f3011e24877f7a28f4caabdbe93b243eb7d39d018dccea"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_10",
+      "path": "sphereDict",
+      "sha256": "81f97781e1e3372370003864fbbaec1c4da2730da0f7665ea78f6fe2736ffdf6"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_11",
+      "path": "constant/solverDict",
+      "sha256": "169bcb3246f9f85da8b823a9995be2fc24e6b30af4607389bb3283802bf99bb8"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_11",
+      "path": "Allrun",
+      "sha256": "9c03efe63e3d6538badd2aed5a560897ed7d8925c686588f61406e0b6b061308"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_11",
+      "path": "sphereDict",
+      "sha256": "81f97781e1e3372370003864fbbaec1c4da2730da0f7665ea78f6fe2736ffdf6"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_13",
+      "path": "constant/solverDict",
+      "sha256": "bc16140b381dbe4d47af9849b5e246a48a8524ddfeb03ff3aaa9be8772a9d00a"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_13",
+      "path": "Allrun",
+      "sha256": "6ead393b077e2066a3f7811cb0c04919287a83bdfa11c4abc15ea1f5857efb3b"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_13",
+      "path": "sphereDict",
+      "sha256": "e461f9f79d693980a4f7490d840d5f9fab9f187743a8db5fa93f551c8ed86e8c"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_2",
+      "path": "constant/solverDict",
+      "sha256": "5208dccd03d21c5b373a240e0694aad08e4b89edfeb604bb4827d4d3fac16cca"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_2",
+      "path": "Allrun",
+      "sha256": "7f91da747947dbb5194bca66f91819f690b55a829d812c864c0e41f708f4bd5f"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_2",
+      "path": "sphereDict",
+      "sha256": "a77a9e61d24635908f2c240f414f06cac31cb5df7ad02f91735eba185f9affd9"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_3",
+      "path": "constant/solverDict",
+      "sha256": "70f3f0ce95d5bd975a51d648d013abe92a789258be115da9f9ef17026696a7ba"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_3",
+      "path": "Allrun",
+      "sha256": "c9fcabfc89b15a2453cc9250fa531ccf9724a3fbda897d1e25d6e1378a109eda"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_3",
+      "path": "sphereDict",
+      "sha256": "83a58bd1d71c1858fb5739ee053241bfbacef3068270a942d54b3f239a1a1e7c"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_4a",
+      "path": "constant/solverDict",
+      "sha256": "e7886906b7a7ba7cbeed0a8a6403388baa4280a62e8549e37a5da339fd0798e1"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_4a",
+      "path": "Allrun",
+      "sha256": "8a1b5bb7e073cc9f2611a8075f78708fcf12593300d910405d457a98246b48ea"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_4a",
+      "path": "sphereDict",
+      "sha256": "83a58bd1d71c1858fb5739ee053241bfbacef3068270a942d54b3f239a1a1e7c"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_4b",
+      "path": "constant/solverDict",
+      "sha256": "27c419d6c852c79c0ec5f12605ed93975c94e2086efd25229e17b05aeac8185b"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_4b",
+      "path": "Allrun",
+      "sha256": "06dee81ae468e305a429b776bc54d2d9946e21e28e60a8481d41c588c5189911"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_4b",
+      "path": "sphereDict",
+      "sha256": "83a58bd1d71c1858fb5739ee053241bfbacef3068270a942d54b3f239a1a1e7c"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_4c",
+      "path": "constant/solverDict",
+      "sha256": "26bc5d5eaf2679bccd1e4885ca5d7a011f9a62ef311838d690b1045c9be7bb0b"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_4c",
+      "path": "Allrun",
+      "sha256": "64d21232d2aa83c2dba9eae08fa31cb398cd436c5a8fed88fe62e7264d7d8926"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_4c",
+      "path": "sphereDict",
+      "sha256": "83a58bd1d71c1858fb5739ee053241bfbacef3068270a942d54b3f239a1a1e7c"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_4d",
+      "path": "constant/solverDict",
+      "sha256": "fe05af629a710ecc2262ce12a97e215ff2f11faf602d00cb823e387844928bf1"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_4d",
+      "path": "Allrun",
+      "sha256": "58d3aabe72b216a4fce90d288c2638d3f4d48680d027b08b7dbc0192fb7e5287"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_4d",
+      "path": "sphereDict",
+      "sha256": "83a58bd1d71c1858fb5739ee053241bfbacef3068270a942d54b3f239a1a1e7c"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_5",
+      "path": "constant/solverDict",
+      "sha256": "6c5b3aae31331b7bf8c5b3e56605ed732c15900f2d03e4803d62d3f4153546ba"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_5",
+      "path": "Allrun",
+      "sha256": "46ffb69a25724ebd8994d913c243725f7e3e0e123c8fd777b1619de0ad19a990"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_5",
+      "path": "sphereDict",
+      "sha256": "827d01eb677763ce238f27bb40cfb68569bc22f0a4fc882f0b78355f63f07b87"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_6",
+      "path": "constant/solverDict",
+      "sha256": "6c5b3aae31331b7bf8c5b3e56605ed732c15900f2d03e4803d62d3f4153546ba"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_6",
+      "path": "Allrun",
+      "sha256": "ae0b59ab02977b63ee7ee675e649705b9cd00d163dfc6205d29986175c7255b4"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_6",
+      "path": "sphereDict",
+      "sha256": "81be20805ff5208c9efcad9cc5dbee805a5b5ac6e3fd4ada774a27c1caf8d00d"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_7",
+      "path": "constant/solverDict",
+      "sha256": "db14421f60b7c7fd37939a44224b67e591cc73d00b01a8087e580865103f553a"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_7",
+      "path": "Allrun",
+      "sha256": "6f087e9a0fe0bc89d95452fd1a805df0fb8abb4d9e8cfbe9b11b10e89ae5617f"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_7",
+      "path": "sphereDict",
+      "sha256": "81be20805ff5208c9efcad9cc5dbee805a5b5ac6e3fd4ada774a27c1caf8d00d"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_8",
+      "path": "constant/solverDict",
+      "sha256": "9c31d943a51c722f7851eeb0ae9b5f813292101aedfa02026f7cd4cfc62ea157"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_8",
+      "path": "Allrun",
+      "sha256": "c3a94eab4bb4089e7776bc1244e16e3a9308c8b42cd30ead10e62b4e57c0da84"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_8",
+      "path": "sphereDict",
+      "sha256": "81be20805ff5208c9efcad9cc5dbee805a5b5ac6e3fd4ada774a27c1caf8d00d"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_9",
+      "path": "constant/solverDict",
+      "sha256": "89dcd600bae99bd48182f96009f122c809cccb9ddc25bf5a1640104a988ab706"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_9",
+      "path": "Allrun",
+      "sha256": "2096aa4b3c4b47bb7af964bbfb5b29c3db84fa638f7815601c598b80d40c8baa"
+    },
+    {
+      "case": "Cases/Verification/trisoBenchmarks/case_9",
+      "path": "sphereDict",
+      "sha256": "0ccb4c337159d581358923335dbc745904cb86d3b2f3989a0bc91784b72cf447"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_1a",
+      "path": "constant/solverDict",
+      "sha256": "b1b58a028245a0a8d43a8b17ee891299eb12ca3a300013271f16602251d0665f"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_1a",
+      "path": "Allrun",
+      "sha256": "d8e162cf40de49d6ca235413d1faf5c069f8cb1e5c4efa69640c461955a0d765"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_1a",
+      "path": "0/T",
+      "sha256": "53e503231c924842786aede39524906dfb8051ed562d216b3533ef79ba0d878a"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_1a",
+      "path": "system/blockMeshDict",
+      "sha256": "f7b16896a1ec0b39ef4aceafb5e01b24554f9095b98800d9ab6dcdf5ca6b0ea2"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_1b",
+      "path": "constant/solverDict",
+      "sha256": "8e5a89f01c932fd811b91c20abff3c537351155097d0a812321500402033d9b4"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_1b",
+      "path": "Allrun",
+      "sha256": "67c8f6bea7964a86c363f3522cb38256f09d966e4885813a24eae790eb97594e"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_1b",
+      "path": "0/T",
+      "sha256": "64ab15c98df04cf17dc22f4c64677649ea7094001fb79c876293e3321a814ea4"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_1b",
+      "path": "system/blockMeshDict",
+      "sha256": "f7b16896a1ec0b39ef4aceafb5e01b24554f9095b98800d9ab6dcdf5ca6b0ea2"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_2a",
+      "path": "constant/solverDict",
+      "sha256": "8a5945f01bbaa461ae16731d9cb5dfb075ce67271f050dfd6439a8b0342e83f8"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_2a",
+      "path": "Allrun",
+      "sha256": "51ae4c37ad574ea9ee47d79bd20bfea9ba39d85272ef911ebeffe225f1799d9d"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_2a",
+      "path": "0/T",
+      "sha256": "53e503231c924842786aede39524906dfb8051ed562d216b3533ef79ba0d878a"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_2a",
+      "path": "system/blockMeshDict",
+      "sha256": "bff495a386aa4d2f5fa95b52a46197c51b211a1df2bbe93d288e7fb40eb0ccea"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_2b",
+      "path": "constant/solverDict",
+      "sha256": "6e72c790cbe53135306c41d618130617e9240a4458eed7327632f7bd46779b20"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_2b",
+      "path": "Allrun",
+      "sha256": "16033043ba8ffe79a7d447f4bf93462378292e461b39b522c068ef2f7ed83a70"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_2b",
+      "path": "0/T",
+      "sha256": "64ab15c98df04cf17dc22f4c64677649ea7094001fb79c876293e3321a814ea4"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_2b",
+      "path": "system/blockMeshDict",
+      "sha256": "bff495a386aa4d2f5fa95b52a46197c51b211a1df2bbe93d288e7fb40eb0ccea"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_3a",
+      "path": "constant/solverDict",
+      "sha256": "b7e48de768e92f2f7f7066b6114582b901ea372841a193641586ef988b87b401"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_3a",
+      "path": "Allrun",
+      "sha256": "d12186fe7e266656fc2f6aab639db5c84b6d9b70766f31379f031e18d14fe455"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_3a",
+      "path": "0/T",
+      "sha256": "64ab15c98df04cf17dc22f4c64677649ea7094001fb79c876293e3321a814ea4"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_3a",
+      "path": "sphereDict",
+      "sha256": "5f56f5c94d5f2e7c2b6604a4ff956147bca2412cf33a7c90a5c707d1a3dff32e"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_3b",
+      "path": "constant/solverDict",
+      "sha256": "b7e48de768e92f2f7f7066b6114582b901ea372841a193641586ef988b87b401"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_3b",
+      "path": "Allrun",
+      "sha256": "241f2317288738cfea6ffae3d8957b05aab87fa57b6a90d97abfc96f37cdef58"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_3b",
+      "path": "0/T",
+      "sha256": "4be07d1470dfd2cd40ce470c442215c5f8162c19da6eae0e92afc9bd3422816c"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_3b",
+      "path": "sphereDict",
+      "sha256": "5f56f5c94d5f2e7c2b6604a4ff956147bca2412cf33a7c90a5c707d1a3dff32e"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_3c",
+      "path": "constant/solverDict",
+      "sha256": "1b8a5771be62abcb31e63e9a11ef1706b1fee01c9616cddd0442f0a7c5d36ef0"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_3c",
+      "path": "Allrun",
+      "sha256": "b85705d49521ae6cc528a2453f60b8ab1e8bab96dc2b57c4994d64c3d8823dba"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_3c",
+      "path": "0/T",
+      "sha256": "2980f68f4c1f74d9da817cc754072e38c6a352f5fe21406be184241d78783d52"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_3c",
+      "path": "sphereDict",
+      "sha256": "5f56f5c94d5f2e7c2b6604a4ff956147bca2412cf33a7c90a5c707d1a3dff32e"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_3d",
+      "path": "constant/solverDict",
+      "sha256": "25dc4408bc117033ff17cd3a1da4bf1616fa8b07e32b1826ca818389819de442"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_3d",
+      "path": "Allrun",
+      "sha256": "56fe2daefba327577ad45352151938e614fa332e0b330bcc754ce25d5874dfe4"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_3d",
+      "path": "0/T",
+      "sha256": "c5570348d30feefe4d6012cbb0b25e479ad422f7ce210915bb8d18bf5f1d870f"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_3d",
+      "path": "sphereDict",
+      "sha256": "5f56f5c94d5f2e7c2b6604a4ff956147bca2412cf33a7c90a5c707d1a3dff32e"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_3e",
+      "path": "constant/solverDict",
+      "sha256": "fb5774cefaceebfaad2ab27f905dfb495b80cd4a013a7aec554accea97419b13"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_3e",
+      "path": "Allrun",
+      "sha256": "01e2ca0f5798b4fd9ff8e4a5c0c06758c2851cbd39057ab5ffacaa9f2a1998bd"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_3e",
+      "path": "0/T",
+      "sha256": "c5570348d30feefe4d6012cbb0b25e479ad422f7ce210915bb8d18bf5f1d870f"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_3e",
+      "path": "sphereDict",
+      "sha256": "5f56f5c94d5f2e7c2b6604a4ff956147bca2412cf33a7c90a5c707d1a3dff32e"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_4a",
+      "path": "constant/solverDict",
+      "sha256": "421662e79370e77904cbe6127858b7f10b42309f5b2e8a8ff2dbf494f690f7ba"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_4a",
+      "path": "Allrun",
+      "sha256": "5155de97065263aaeb234cb2dd74ea27c75f4e063838d6f3bf65a3cb57194294"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_4a",
+      "path": "0/T",
+      "sha256": "696a5db4ad9218ab1de8ad42129e21af446bafeefb2920716ba9c63b1eb7fdb3"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_4a",
+      "path": "sphereDict",
+      "sha256": "5f56f5c94d5f2e7c2b6604a4ff956147bca2412cf33a7c90a5c707d1a3dff32e"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_4b",
+      "path": "constant/solverDict",
+      "sha256": "421662e79370e77904cbe6127858b7f10b42309f5b2e8a8ff2dbf494f690f7ba"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_4b",
+      "path": "Allrun",
+      "sha256": "abad3243c9791f6e591cff5f1daae8851b91c27b37f7bdd5d97d2e252f6664d5"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_4b",
+      "path": "0/T",
+      "sha256": "696a5db4ad9218ab1de8ad42129e21af446bafeefb2920716ba9c63b1eb7fdb3"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_4b",
+      "path": "sphereDict",
+      "sha256": "5f56f5c94d5f2e7c2b6604a4ff956147bca2412cf33a7c90a5c707d1a3dff32e"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_4c",
+      "path": "constant/solverDict",
+      "sha256": "421662e79370e77904cbe6127858b7f10b42309f5b2e8a8ff2dbf494f690f7ba"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_4c",
+      "path": "Allrun",
+      "sha256": "c4141217eb64f9ebff3729f74bfc2d9039999ec4e9e3d405e9cd04a518a71a9e"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_4c",
+      "path": "0/T",
+      "sha256": "696a5db4ad9218ab1de8ad42129e21af446bafeefb2920716ba9c63b1eb7fdb3"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_4c",
+      "path": "sphereDict",
+      "sha256": "5f56f5c94d5f2e7c2b6604a4ff956147bca2412cf33a7c90a5c707d1a3dff32e"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_4d",
+      "path": "constant/solverDict",
+      "sha256": "de84416331110bf0f9d37a3e257e1f3b05da63e79363e900c94dbb45c8ee0f1b"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_4d",
+      "path": "Allrun",
+      "sha256": "c2cd632a0ff1e29adced744e60f8d503bd73c59e3e1585e45dc3f6a9be78b007"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_4d",
+      "path": "0/T",
+      "sha256": "696a5db4ad9218ab1de8ad42129e21af446bafeefb2920716ba9c63b1eb7fdb3"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_4d",
+      "path": "sphereDict",
+      "sha256": "5f56f5c94d5f2e7c2b6604a4ff956147bca2412cf33a7c90a5c707d1a3dff32e"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_5a",
+      "path": "constant/solverDict",
+      "sha256": "19f38ad636b69d52ea128e47f50c551ae5993645b2aade125be0a69a0f41734b"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_5a",
+      "path": "Allrun",
+      "sha256": "dc52102e1e96616f19e4915a7dc098c65478cc1118555eca5a305b1c273aa79c"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_5a",
+      "path": "0/T",
+      "sha256": "4782e1f2485a2c74cec2e4ba690c062c9863e1e70335ad8cc0a5220f18fc7f74"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_5a",
+      "path": "sphereDict",
+      "sha256": "5f56f5c94d5f2e7c2b6604a4ff956147bca2412cf33a7c90a5c707d1a3dff32e"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_5b",
+      "path": "constant/solverDict",
+      "sha256": "19f38ad636b69d52ea128e47f50c551ae5993645b2aade125be0a69a0f41734b"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_5b",
+      "path": "Allrun",
+      "sha256": "f07adb3dee4ac8b806c14694dca3834dd0e0049d475b875341298b2ff23d37ef"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_5b",
+      "path": "0/T",
+      "sha256": "810b2b550cbe0f63649c8c55e951d1e6dd9245c5960fcd50867aaa50f27b2c2d"
+    },
+    {
+      "case": "Cases/Verification/trisoFpDiffusion/case_5b",
+      "path": "sphereDict",
+      "sha256": "5f56f5c94d5f2e7c2b6604a4ff956147bca2412cf33a7c90a5c707d1a3dff32e"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/gapVolume1Dsphere",
+      "path": "constant/solverDict",
+      "sha256": "09e2755baccdbf7c277ee4fd77d26e749498817b9b4622359d107be525fbc41a"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/gapVolume1Dsphere",
+      "path": "Allrun",
+      "sha256": "ba867af7e723c6a172c66fe64e005cb68ccff119714fc60e402aa96b78acd2d3"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/gapVolume1Dsphere",
+      "path": "README",
+      "sha256": "96b06683c6730a3e9469f41cd61aa4fb2fd64fd1c739b1f6e18000f89227c1d0"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/gapVolume1Dsphere",
+      "path": "sphereDict",
+      "sha256": "e4c1958335b958cf58fd45ebb2efa36be897d5913b6ce83df6357f4a36bc20b8"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/hollowsphere_1D",
+      "path": "constant/solverDict",
+      "sha256": "92abe1b57db91ea60fe205f3c7b6ba4ba91ac7a5038828593fe8bb7ceeaab77d"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/hollowsphere_1D",
+      "path": "Allrun",
+      "sha256": "b04bf33b14b032ac83a22ba599c88aa14a63807a83e498d99df783c1f920639d"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/hollowsphere_1D",
+      "path": "system/blockMeshDict",
+      "sha256": "a8e2931cfae7609f4e709f1794370778522b9cc18c828830c76a6d81735c5f6e"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/sphere_1D",
+      "path": "constant/solverDict",
+      "sha256": "ad88f88f15e199bcb369e6e4d5894e908e3ed3da940b1c0819b55782e39e17d9"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/sphere_1D",
+      "path": "Allrun",
+      "sha256": "bb9e1c05c742151411c11f76370717c7a6a0c05e523b1c383e1e33d34369337b"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/sphere_1D",
+      "path": "system/blockMeshDict",
+      "sha256": "680bf5a87393a6daaa169bea2f4471b7c18a88667b426f4c2b78e0679b732f02"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/sphere_vhgr",
+      "path": "constant/solverDict",
+      "sha256": "aaf503769cfad3fd771d6205d1f42c58d2a8c797999c3d1d533682719231706a"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/sphere_vhgr",
+      "path": "Allrun",
+      "sha256": "b13e208367a15c2cdbc4ddd1f8f3701788ae7d2a2e4482c3a9da517a692d3f04"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/sphere_vhgr",
+      "path": "system/blockMeshDict",
+      "sha256": "680bf5a87393a6daaa169bea2f4471b7c18a88667b426f4c2b78e0679b732f02"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testBuffer_E_nu",
+      "path": "constant/solverDict",
+      "sha256": "60e8e17e4d79bc43c9dde4367560ce56532abbad105b6ee1adc9d5907e2cd337"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testBuffer_E_nu",
+      "path": "Allrun",
+      "sha256": "026cdfcdc6b5ec1bcfad24d9afc4b416acd562f5d7fcab1a40eef07df275f8ab"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testBuffer_E_nu",
+      "path": "system/blockMeshDict",
+      "sha256": "2af8048427b1393f96a150a0cf810ff2bff4e350e57f08eb4db45f8124c009b7"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testBuffer_alpha",
+      "path": "constant/solverDict",
+      "sha256": "abc3bbca0312985f516c740ce23cdb761ff161c82c7d3f35ba6d73e601583f57"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testBuffer_alpha",
+      "path": "Allrun",
+      "sha256": "fc38fb811b33c6955a8062003ca9354921b2333352331739fd8fcd0f2ed3d6f7"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testBuffer_alpha",
+      "path": "system/blockMeshDict",
+      "sha256": "0cf2ca4e11edc5e127627d6cc49b020a9c37d71ec7c85e17091146052891d1de"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testBuffer_creep",
+      "path": "constant/solverDict",
+      "sha256": "b8dfa20e151c0f2d2b3de7d8913b531fcb71260403b2c26ab43674f0272703e9"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testBuffer_creep",
+      "path": "Allrun",
+      "sha256": "152842d8ae6a809934965f7e8a1a59be9634afa21f70556122e801f0c338c230"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testBuffer_creep",
+      "path": "README",
+      "sha256": "a68bb4a224d682e9dde37138ed0aa522eadcbf89e409252af4f39993592546c3"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testBuffer_creep",
+      "path": "system/blockMeshDict",
+      "sha256": "bd567157c8e7c2eb8fda4c0bace67d94936179a9eaaf135c79b0bb7fc3393eb7"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testBuffer_k",
+      "path": "constant/solverDict",
+      "sha256": "e26e32fa50cecf75d5c354e08da2a0fc8312df7b35d1159631d1222a965de1d5"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testBuffer_k",
+      "path": "Allrun",
+      "sha256": "596d9ae03133380142c148e27be73477ac3cf4845dae73d3445a021afb4758c8"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testBuffer_k",
+      "path": "system/blockMeshDict",
+      "sha256": "2af8048427b1393f96a150a0cf810ff2bff4e350e57f08eb4db45f8124c009b7"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testBuffer_swelling",
+      "path": "constant/solverDict",
+      "sha256": "a9e2d8bf64a00b7d203008a2eb62cfc4c4504bf5d3db092177ded1955b0b3c0a"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testBuffer_swelling",
+      "path": "Allrun",
+      "sha256": "c45e5fd838f235208e59990cb2d58431a699a57b64834628cb2823ac45fdccd6"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testBuffer_swelling",
+      "path": "system/blockMeshDict",
+      "sha256": "2af8048427b1393f96a150a0cf810ff2bff4e350e57f08eb4db45f8124c009b7"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testPyC_E_nu",
+      "path": "constant/solverDict",
+      "sha256": "a9e0fa5a86c4c7794bd223fa267cb4afb266b5d6260f110377a469ed2447aaf6"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testPyC_E_nu",
+      "path": "Allrun",
+      "sha256": "fe9adca1147ec88694d492a967d2816663ee50474fad35886a2aa26fa50fb220"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testPyC_E_nu",
+      "path": "system/blockMeshDict",
+      "sha256": "2af8048427b1393f96a150a0cf810ff2bff4e350e57f08eb4db45f8124c009b7"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testPyC_alpha",
+      "path": "constant/solverDict",
+      "sha256": "f4c8fa535ca53b62eb1fb55ec93e92707a1420fdcabaeac2ee96166d65a9116f"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testPyC_alpha",
+      "path": "Allrun",
+      "sha256": "181c9e9c575d99399f977c6f5a71b20e046d36c8835524fe2ef364401816faca"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testPyC_alpha",
+      "path": "README",
+      "sha256": "57b28cd4d07f8a75116519c8e045c15cd7418f261902cbc7805ed003432cc68a"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testPyC_alpha",
+      "path": "system/blockMeshDict",
+      "sha256": "0cf2ca4e11edc5e127627d6cc49b020a9c37d71ec7c85e17091146052891d1de"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testPyC_alpha_spherical",
+      "path": "constant/solverDict",
+      "sha256": "d962d7232e67612a0605efd90c834a2a176f1215c236c72485c9c77ab936593d"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testPyC_alpha_spherical",
+      "path": "Allrun",
+      "sha256": "baf04b01ba5990d7244d11e0eb351a2e41fa188f06011500e76217040b0702d2"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testPyC_alpha_spherical",
+      "path": "README",
+      "sha256": "89d47bfba634e1bdbada683b3fb0e5b1d12fdf82627b084f869283aa2f53f6c3"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testPyC_alpha_spherical",
+      "path": "system/blockMeshDict",
+      "sha256": "6a956e33c14685cea80bdcafcf46bf0bfed3acfff0fef4a2032e692c9596a99f"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testPyC_creep",
+      "path": "constant/solverDict",
+      "sha256": "3629458be660f504d69540ad9a964926c3ef8d12224cf17fe5496f141bd54103"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testPyC_creep",
+      "path": "Allrun",
+      "sha256": "bbbced467893164771d284d21149436e8703d99c34fc6c1ab135a1c2b06db1bc"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testPyC_creep",
+      "path": "README",
+      "sha256": "1776c4f659a0c12da051d046cb0ba49ee976e1a0cc19b0f8401e7e5aa071530c"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testPyC_creep",
+      "path": "system/blockMeshDict",
+      "sha256": "bd567157c8e7c2eb8fda4c0bace67d94936179a9eaaf135c79b0bb7fc3393eb7"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testPyC_swelling",
+      "path": "constant/solverDict",
+      "sha256": "e4964e3983d8661203b7b3039456f699aff97182349a548657dda463a4d10d7f"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testPyC_swelling",
+      "path": "Allrun",
+      "sha256": "01903cd9d18ea0456e53ac28d47afe57e059954e468102831921e4688dcd66ee"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testPyC_swelling",
+      "path": "README",
+      "sha256": "1aed4dbf8a5cd4729fd6d93a347f2da3b124432e30e3daacec127fd64cc6eeab"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testPyC_swelling",
+      "path": "system/blockMeshDict",
+      "sha256": "0cf2ca4e11edc5e127627d6cc49b020a9c37d71ec7c85e17091146052891d1de"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testSiC_creep",
+      "path": "constant/solverDict",
+      "sha256": "26c49934ee06a06adce528eb13d718475fc66a17a04e44d40700ca5a6c636103"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testSiC_creep",
+      "path": "Allrun",
+      "sha256": "3c504ab79b8df01620c05968779416e4481b6ec31185bfe0c0ef843243a4de0a"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testSiC_creep",
+      "path": "README",
+      "sha256": "592dd1a914c8a9c9947e1835916a22353047496144aaa4efa5e7363da5fa5e8c"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testSiC_creep",
+      "path": "system/blockMeshDict",
+      "sha256": "bd567157c8e7c2eb8fda4c0bace67d94936179a9eaaf135c79b0bb7fc3393eb7"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testSiC_k_Cp_E_alpha",
+      "path": "constant/solverDict",
+      "sha256": "34f5daaad4d718b6eff157f63d4ef8bbcef9e422d2746bc4954fc2262317d73e"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testSiC_k_Cp_E_alpha",
+      "path": "Allrun",
+      "sha256": "88db25d17ce81adf4acb3d11fce144ad3f494aa76060dc570409fa73de85f5cd"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testSiC_k_Cp_E_alpha",
+      "path": "README",
+      "sha256": "f3537fae6b6382ab0a274c1a3da6397c3bfb60b14e5393673724c6dd6092cfbd"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testSiC_k_Cp_E_alpha",
+      "path": "system/blockMeshDict",
+      "sha256": "2af8048427b1393f96a150a0cf810ff2bff4e350e57f08eb4db45f8124c009b7"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testSwellingMATPRO",
+      "path": "constant/solverDict",
+      "sha256": "67bff2d15c3deca700f735e3f2d40fa5107e608492a7d1aac399d43cdf8b7436"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testSwellingMATPRO",
+      "path": "Allrun",
+      "sha256": "900d52187659ab57a98bfc199cf270a7d8fd4ef07405c1917bb18ba7f2464148"
+    },
+    {
+      "case": "Cases/Verification/trisoModulesTest/testSwellingMATPRO",
+      "path": "system/blockMeshDict",
+      "sha256": "0cf2ca4e11edc5e127627d6cc49b020a9c37d71ec7c85e17091146052891d1de"
+    },
+    {
+      "case": "Cases/Verification/volumeConservationLargeStrain",
+      "path": "constant/solverDict",
+      "sha256": "0bce2e16f81ca8e48e1394663caa0f3a6d0e3eb7237f7119fdd6d9d744ce8a8f"
+    },
+    {
+      "case": "Cases/Verification/volumeConservationLargeStrain",
+      "path": "Allrun",
+      "sha256": "43118e5afceff5a8763fa239364e18ad6466c373825e5a4a8c43894d46c11c20"
+    },
+    {
+      "case": "Cases/Verification/volumeConservationLargeStrain",
+      "path": "rodMaker/rodDict",
+      "sha256": "db1d08b6ddd195701bc512438ad56087ea3baa187a7fac0a268d9074fb1d14f1"
+    },
+    {
+      "case": "Cases/Verification/waterCoolantChannel/Case_ABWR",
+      "path": "constant/solverDict",
+      "sha256": "48a0abf1b7f7dcda2e26a9927a0b5364a413c93bab3c094ff55a62bcd78f9fb6"
+    },
+    {
+      "case": "Cases/Verification/waterCoolantChannel/Case_ABWR",
+      "path": "Allrun",
+      "sha256": "74fbbc1f462783cd36574f07796b6aad4711e1b9d37cf88daaa523c82c89d1af"
+    },
+    {
+      "case": "Cases/Verification/waterCoolantChannel/Case_ABWR",
+      "path": "rodDict",
+      "sha256": "645cdfd9a4abbdd75ea816a48ef97a456275b59debbc991d9dcfa79cccfd99fc"
+    },
+    {
+      "case": "Cases/Verification/waterCoolantChannel/Case_AP1000",
+      "path": "constant/solverDict",
+      "sha256": "5475fbe89a7236da6b16d25a4fce49afa0ae93184f23225f910ed0d1e3fe938e"
+    },
+    {
+      "case": "Cases/Verification/waterCoolantChannel/Case_AP1000",
+      "path": "Allrun",
+      "sha256": "74fbbc1f462783cd36574f07796b6aad4711e1b9d37cf88daaa523c82c89d1af"
+    },
+    {
+      "case": "Cases/Verification/waterCoolantChannel/Case_AP1000",
+      "path": "rodDict",
+      "sha256": "46dfaacfbff686380bd44bce5db2da88910d8c3eb377bc29d15112da76827225"
+    },
+    {
+      "case": "Cases/Verification/waterCoolantChannel/Case_BWR4",
+      "path": "constant/solverDict",
+      "sha256": "8e6b4bdbe1365cf19487fb2e3443d17797eae76880c5459a661df9aa9ebb3911"
+    },
+    {
+      "case": "Cases/Verification/waterCoolantChannel/Case_BWR4",
+      "path": "Allrun",
+      "sha256": "74fbbc1f462783cd36574f07796b6aad4711e1b9d37cf88daaa523c82c89d1af"
+    },
+    {
+      "case": "Cases/Verification/waterCoolantChannel/Case_BWR4",
+      "path": "rodDict",
+      "sha256": "cdf9647374c788ec1b3b89bb90a6fe214a3bd1f3eeacdc8d6830471d5f5f6203"
+    },
+    {
+      "case": "Cases/Verification/waterCoolantChannel/Case_VVER440",
+      "path": "constant/solverDict",
+      "sha256": "8f2918b7b62c735bbad795e53dbfda445509bd3e4e0b00f4484b206f437b8700"
+    },
+    {
+      "case": "Cases/Verification/waterCoolantChannel/Case_VVER440",
+      "path": "Allrun",
+      "sha256": "7cd2e3fc516dd36a25076220040a594d7e447d3d34182fe705892cfd37cb99c6"
+    },
+    {
+      "case": "Cases/Verification/waterCoolantChannel/Case_VVER440",
+      "path": "rodDict",
+      "sha256": "dd31ae7f4697a0d8d492ceaa3709118adf1b4fc9fed632f729fbf25410cb7aa4"
+    },
+    {
+      "case": "Cases/restart/baseCase",
+      "path": "constant/solverDict",
+      "sha256": "88d324f423c09137acc4d8c4036685595486d4485941c27c475b3bc6b88c0445"
+    },
+    {
+      "case": "Cases/restart/baseCase",
+      "path": "Allrun",
+      "sha256": "8873bd0eac5d2ac29a0129a0689ecfcd5063ff50e463294744fd7449a1f9f7f9"
+    },
+    {
+      "case": "Cases/restart/baseCase",
+      "path": "rodDict",
+      "sha256": "d752fe91ca60dbb765ee4462a0857575bf5bdd32233160fe3659cd21885a40b1"
+    },
+    {
+      "case": "Cases/testCases/damageModel/isotropicCracking_1D",
+      "path": "constant/solverDict",
+      "sha256": "f38d079d395de784ad4418b5ba47326bf824bb36d85eebdf4265805cfa717426"
+    },
+    {
+      "case": "Cases/testCases/damageModel/isotropicCracking_1D",
+      "path": "Allrun",
+      "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c"
+    },
+    {
+      "case": "Cases/testCases/damageModel/isotropicCracking_1D",
+      "path": "rodDict",
+      "sha256": "c77e8b0689df79b627cc5dd5690b8d43036d8bd1b36409e5f9de881034bb9e3c"
+    },
+    {
+      "case": "Cases/testCases/damageModel/isotropicCracking_2D",
+      "path": "constant/solverDict",
+      "sha256": "dc33304ff1eacaaef6921532b0793976b1f11795d419026c46ca2cbca3be56ec"
+    },
+    {
+      "case": "Cases/testCases/damageModel/isotropicCracking_2D",
+      "path": "Allrun",
+      "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c"
+    },
+    {
+      "case": "Cases/testCases/damageModel/isotropicCracking_2D",
+      "path": "rodDict",
+      "sha256": "8d8eebd9a79b57835c30a146c363560b03de9e0e8cc79b5ee315a73224633466"
+    },
+    {
+      "case": "Cases/testCases/damageModel/mazars_1D",
+      "path": "constant/solverDict",
+      "sha256": "c2b79333eef6e55cfe6b22ac45d80e092567d02172fb46943801fed3bc4c4ace"
+    },
+    {
+      "case": "Cases/testCases/damageModel/mazars_1D",
+      "path": "Allrun",
+      "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c"
+    },
+    {
+      "case": "Cases/testCases/damageModel/mazars_1D",
+      "path": "rodDict",
+      "sha256": "c77e8b0689df79b627cc5dd5690b8d43036d8bd1b36409e5f9de881034bb9e3c"
+    },
+    {
+      "case": "Cases/testCases/damageModel/mazars_2D",
+      "path": "constant/solverDict",
+      "sha256": "a9a09f8716cfb6c7abf493bc885d2979dda8c88f23a7a7180e514a39a96ae354"
+    },
+    {
+      "case": "Cases/testCases/damageModel/mazars_2D",
+      "path": "Allrun",
+      "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c"
+    },
+    {
+      "case": "Cases/testCases/damageModel/mazars_2D",
+      "path": "rodDict",
+      "sha256": "8d8eebd9a79b57835c30a146c363560b03de9e0e8cc79b5ee315a73224633466"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case1",
+      "path": "constant/solverDict",
+      "sha256": "068be0203e93c2fc8236972de57a3d5e4cbdb836dc750a1aae5f050daba3fa6d"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case1",
+      "path": "Allrun",
+      "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case1",
+      "path": "README.md",
+      "sha256": "49c6cb5a28d7ee49ce2a7048760dcb751b08c3ec9232e0150448f6570a00af4e"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case1",
+      "path": "rodDict",
+      "sha256": "4ec344bc453122d3208ebbf40500cfb072439934b4cef9bef0beee77e44de1a1"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case1_solved",
+      "path": "constant/solverDict",
+      "sha256": "9b3dfc15bd83d220edcc049990e916a082c2a9ad79331995a870e04b07241972"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case1_solved",
+      "path": "Allrun",
+      "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case1_solved",
+      "path": "README.md",
+      "sha256": "49c6cb5a28d7ee49ce2a7048760dcb751b08c3ec9232e0150448f6570a00af4e"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case1_solved",
+      "path": "rodDict",
+      "sha256": "c77e8b0689df79b627cc5dd5690b8d43036d8bd1b36409e5f9de881034bb9e3c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case1a_solved",
+      "path": "constant/solverDict",
+      "sha256": "f13a371512f30c354f7b4c4c0373ff31f35f09a5f7c99d866c9d30bad39e45e2"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case1a_solved",
+      "path": "Allrun",
+      "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case1a_solved",
+      "path": "README.md",
+      "sha256": "7905a03e2dd82ea0743e83cfa05ce8a7fde2325997aab92969103ce1897d269f"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case1a_solved",
+      "path": "rodDict",
+      "sha256": "c77e8b0689df79b627cc5dd5690b8d43036d8bd1b36409e5f9de881034bb9e3c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case1b_solved",
+      "path": "constant/solverDict",
+      "sha256": "9b3dfc15bd83d220edcc049990e916a082c2a9ad79331995a870e04b07241972"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case1b_solved",
+      "path": "Allrun",
+      "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case1b_solved",
+      "path": "README.md",
+      "sha256": "7905a03e2dd82ea0743e83cfa05ce8a7fde2325997aab92969103ce1897d269f"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case1b_solved",
+      "path": "rodDict",
+      "sha256": "c77e8b0689df79b627cc5dd5690b8d43036d8bd1b36409e5f9de881034bb9e3c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case1c_solved",
+      "path": "constant/solverDict",
+      "sha256": "9b3dfc15bd83d220edcc049990e916a082c2a9ad79331995a870e04b07241972"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case1c_solved",
+      "path": "Allrun",
+      "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case1c_solved",
+      "path": "README.md",
+      "sha256": "7905a03e2dd82ea0743e83cfa05ce8a7fde2325997aab92969103ce1897d269f"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case1c_solved",
+      "path": "rodDict",
+      "sha256": "b3fab246ef818a655cdfbb529ef5c24b9bd3c414e133ba054abfe7f116206f37"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case2",
+      "path": "constant/solverDict",
+      "sha256": "6b12c5f6c1dc699076c08ef8ef019e1fedcceb457f12434d2181c9ff60c09f6e"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case2",
+      "path": "Allrun",
+      "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case2",
+      "path": "README.md",
+      "sha256": "3041a3a4ef1e68c636c91a9a9e2cf93418edc696ccd92ac0c9bf24f59232be68"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case2",
+      "path": "rodDict",
+      "sha256": "c77e8b0689df79b627cc5dd5690b8d43036d8bd1b36409e5f9de881034bb9e3c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case2_solved",
+      "path": "constant/solverDict",
+      "sha256": "9f30c5ea30d625ee668d406a264c5bfcb673da304177e52769b6eef554f9de9e"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case2_solved",
+      "path": "Allrun",
+      "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case2_solved",
+      "path": "README.md",
+      "sha256": "3041a3a4ef1e68c636c91a9a9e2cf93418edc696ccd92ac0c9bf24f59232be68"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case2_solved",
+      "path": "rodDict",
+      "sha256": "c77e8b0689df79b627cc5dd5690b8d43036d8bd1b36409e5f9de881034bb9e3c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case3",
+      "path": "constant/solverDict",
+      "sha256": "94ec91b4008ecca3dbabf1cc824434d189003db7d0a045f2d0fc2676e453c58c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case3",
+      "path": "Allrun",
+      "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case3",
+      "path": "README.md",
+      "sha256": "af0359770fce4631f7ffc2e83ba1afcd741a2f3e1c2e24f70d98e23a55dfa44f"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case3",
+      "path": "rodDict",
+      "sha256": "c77e8b0689df79b627cc5dd5690b8d43036d8bd1b36409e5f9de881034bb9e3c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case3a_solved",
+      "path": "constant/solverDict",
+      "sha256": "58d32521c0a4e86356719bcf4f857296cde88c254ed3c2466720fd1c11302214"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case3a_solved",
+      "path": "Allrun",
+      "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case3a_solved",
+      "path": "rodDict",
+      "sha256": "c77e8b0689df79b627cc5dd5690b8d43036d8bd1b36409e5f9de881034bb9e3c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case4",
+      "path": "constant/solverDict",
+      "sha256": "7df0bbd5cf0769192b051ce3d4d5e80e6e3afca73c38853fbc32363b9e561ba9"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case4",
+      "path": "Allrun",
+      "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case4",
+      "path": "README.md",
+      "sha256": "23b3bdd7e6d4a8220a953c5bd275aac7e149dc646884e41e8615bf39b33f9324"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case4",
+      "path": "rodDict",
+      "sha256": "c77e8b0689df79b627cc5dd5690b8d43036d8bd1b36409e5f9de881034bb9e3c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case4_solved",
+      "path": "constant/solverDict",
+      "sha256": "d31d920fd8501b9e17fb28d1c70835603541ec8476d956ab7de64c6d9c488c73"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case4_solved",
+      "path": "Allrun",
+      "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case4_solved",
+      "path": "README.md",
+      "sha256": "23b3bdd7e6d4a8220a953c5bd275aac7e149dc646884e41e8615bf39b33f9324"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case4_solved",
+      "path": "rodDict",
+      "sha256": "c77e8b0689df79b627cc5dd5690b8d43036d8bd1b36409e5f9de881034bb9e3c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case5",
+      "path": "constant/solverDict",
+      "sha256": "6fc41d7e56d2e0ed40ffd3ce9e29ae0489bf839623e01443abe964cbd1bdc3a1"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case5",
+      "path": "Allrun",
+      "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case5",
+      "path": "README.md",
+      "sha256": "b881963b3aad6ec252b94522d91ead76d4e1be9ecb608ddb9ccb8ccff9aaa6f0"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case5",
+      "path": "rodDict",
+      "sha256": "c77e8b0689df79b627cc5dd5690b8d43036d8bd1b36409e5f9de881034bb9e3c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case5_solved",
+      "path": "constant/solverDict",
+      "sha256": "67c8b8f4431094a166b9ed449e2698fe0279ffaccb23ddf08a16c2bc45129d84"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case5_solved",
+      "path": "Allrun",
+      "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case5_solved",
+      "path": "README.md",
+      "sha256": "b881963b3aad6ec252b94522d91ead76d4e1be9ecb608ddb9ccb8ccff9aaa6f0"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case5_solved",
+      "path": "rodDict",
+      "sha256": "c77e8b0689df79b627cc5dd5690b8d43036d8bd1b36409e5f9de881034bb9e3c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case6",
+      "path": "constant/solverDict",
+      "sha256": "520c1b68df5a2d51f2f0b825659eb4ed1c4a5e8d2cb3353c9b0e8e1fbf3fc9a5"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case6",
+      "path": "Allrun",
+      "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case6",
+      "path": "README.md",
+      "sha256": "4952d7a07bd23b37c4003d2ecd8a1f1e661917aa48a03527d53fb45953299d32"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case6",
+      "path": "rodDict",
+      "sha256": "c77e8b0689df79b627cc5dd5690b8d43036d8bd1b36409e5f9de881034bb9e3c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case6_solved",
+      "path": "constant/solverDict",
+      "sha256": "2e69d39af5488b584c695524d52890a9788e345ffbde4aac20baf4b6bcb014c9"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case6_solved",
+      "path": "Allrun",
+      "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case6_solved",
+      "path": "README.md",
+      "sha256": "4952d7a07bd23b37c4003d2ecd8a1f1e661917aa48a03527d53fb45953299d32"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case6_solved",
+      "path": "rodDict",
+      "sha256": "c77e8b0689df79b627cc5dd5690b8d43036d8bd1b36409e5f9de881034bb9e3c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case7",
+      "path": "constant/solverDict",
+      "sha256": "d6605b6aa1de63e20ae043f0049a30ebf9c708c03a8ac01820d39975a00b8380"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case7",
+      "path": "Allrun",
+      "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case7",
+      "path": "rodDict",
+      "sha256": "83e9af47accdb6b52cf52ed17bf5b7d36803dba5c87b17317d84a5d7356bfe75"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case7_solved",
+      "path": "constant/solverDict",
+      "sha256": "7418f0be97d7f37f8dc941cc18fca3ef45c3195b2e75f6ca10fb1b87754e0fd2"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case7_solved",
+      "path": "Allrun",
+      "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case7_solved",
+      "path": "rodDict",
+      "sha256": "e92486864272c9fbd5b7120ed230b26ec0c20dd7bb0f4a80362e1f82fc9f1198"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case7a_solved",
+      "path": "constant/solverDict",
+      "sha256": "7418f0be97d7f37f8dc941cc18fca3ef45c3195b2e75f6ca10fb1b87754e0fd2"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case7a_solved",
+      "path": "Allrun",
+      "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case7a_solved",
+      "path": "rodDict",
+      "sha256": "e92486864272c9fbd5b7120ed230b26ec0c20dd7bb0f4a80362e1f82fc9f1198"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case8",
+      "path": "constant/solverDict",
+      "sha256": "a0db7a6f95ca8aba61211933b1a1af0d694f28b58498235ed4350f348d4c1dbe"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case8",
+      "path": "Allrun",
+      "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case8",
+      "path": "rodDict",
+      "sha256": "328f733809f7c96f8205a2656ecc2a27667abab508e501b427ed90ed520042c1"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case8_solved",
+      "path": "constant/solverDict",
+      "sha256": "a0db7a6f95ca8aba61211933b1a1af0d694f28b58498235ed4350f348d4c1dbe"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case8_solved",
+      "path": "Allrun",
+      "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case8_solved",
+      "path": "rodDict",
+      "sha256": "be0dd96d6196b465d32b725a054a65821088cba6a431b1bc33e7b3538f5df0c2"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case9_solved",
+      "path": "constant/solverDict",
+      "sha256": "ae914320e6c9dfc5c9404461ed310bb1f6c80ff175f65da3b8c60d5ccb1bf49d"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case9_solved",
+      "path": "Allrun",
+      "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c"
+    },
+    {
+      "case": "Cases/testCases/exerciseOFFBEAT/case9_solved",
+      "path": "rodDict",
+      "sha256": "023e6159d87df6d8e11ad2ccad6dd906aab03595804af84582f9bc59fc2d183c"
+    },
+    {
+      "case": "Cases/testCases/generic_PUZRY",
+      "path": "constant/solverDict",
+      "sha256": "cbea71f869963db70ce366fa3989471c5731190edf9a559ec65525200d0af519"
+    },
+    {
+      "case": "Cases/testCases/generic_PUZRY",
+      "path": "Allrun",
+      "sha256": "e9dcf1c2d524dc9d7615e8438a5ff26cbcc1666963f0490c095828b7646e9d07"
+    },
+    {
+      "case": "Cases/testCases/generic_PUZRY",
+      "path": "README.md",
+      "sha256": "ac7eed5f1e614cfe3ea04c27c3a10fa9390737a979d0aa1b0c833a60544c0be1"
+    },
+    {
+      "case": "Cases/testCases/generic_PUZRY",
+      "path": "system/blockMeshDict",
+      "sha256": "afd0578e1faf12a7053cec5f57b3fc8eab7400161eeb9daf126230b788550c2f"
+    },
+    {
+      "case": "Cases/testCases/generic_TRISO_1D",
+      "path": "constant/solverDict",
+      "sha256": "fa8e8a696589d919207067fd633d40e8121d031cd922578c9695b24517b132d9"
+    },
+    {
+      "case": "Cases/testCases/generic_TRISO_1D",
+      "path": "Allrun",
+      "sha256": "182b19022b52ac022d8f9a49a8b5c8e7aebde6505001b546657f543f1450fffa"
+    },
+    {
+      "case": "Cases/testCases/generic_TRISO_1D",
+      "path": "README.md",
+      "sha256": "f29f1ab491db48a28d7847399cba1b987744c9da47bb853270de479d9f4eaaa9"
+    },
+    {
+      "case": "Cases/testCases/generic_TRISO_1D",
+      "path": "sphereDict",
+      "sha256": "e461f9f79d693980a4f7490d840d5f9fab9f187743a8db5fa93f551c8ed86e8c"
+    },
+    {
+      "case": "Cases/testCases/generic_mox_1D",
+      "path": "constant/solverDict",
+      "sha256": "41517c7b7d29049062bebed63f873c88c4c53ca817f0889ca1335f320596324b"
+    },
+    {
+      "case": "Cases/testCases/generic_mox_1D",
+      "path": "Allrun",
+      "sha256": "7f6e00ff933637cdfe9cc17c5ba7be1fc4eb640c623874cb6c2c1c17ed69a050"
+    },
+    {
+      "case": "Cases/testCases/generic_mox_1D",
+      "path": "rodDict",
+      "sha256": "5ca4cdd195f18106982b9e503bcc02b80777f2547827079af278d9299f365390"
+    },
+    {
+      "case": "Cases/testCases/generic_pwr_1D",
+      "path": "constant/solverDict",
+      "sha256": "c8c9bcaf20b2ec6afdeaad38c32cdf1e0856418c6da8f8e231458c396a23edf5"
+    },
+    {
+      "case": "Cases/testCases/generic_pwr_1D",
+      "path": "Allrun",
+      "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c"
+    },
+    {
+      "case": "Cases/testCases/generic_pwr_1D",
+      "path": "rodDict",
+      "sha256": "a859bcd0a9718ab74fde422aba855e6a9b58126546027e37fb9bd36b535e75ec"
+    },
+    {
+      "case": "Cases/testCases/generic_pwr_1D_newSCIANTIXinput",
+      "path": "constant/solverDict",
+      "sha256": "a1c3eab7492478f39433ade2a7e3bf0b9a022c68d5a02b03e273a6a288d17bdf"
+    },
+    {
+      "case": "Cases/testCases/generic_pwr_1D_newSCIANTIXinput",
+      "path": "Allrun",
+      "sha256": "fb7d13a4e25ed6b79bf6299f1ba781e41cf7bf1e4e7660863dc2974b1564599e"
+    },
+    {
+      "case": "Cases/testCases/generic_pwr_1D_newSCIANTIXinput",
+      "path": "rodDict",
+      "sha256": "a859bcd0a9718ab74fde422aba855e6a9b58126546027e37fb9bd36b535e75ec"
+    },
+    {
+      "case": "Cases/testCases/generic_pwr_2D_rTheta",
+      "path": "constant/solverDict",
+      "sha256": "e3bdad656cd6f5c343f4835934314ebd3e611b24f9d00a8ef8811277f6de2f30"
+    },
+    {
+      "case": "Cases/testCases/generic_pwr_2D_rTheta",
+      "path": "Allrun",
+      "sha256": "267e39e7eb0efa2ea22bc9f73339667bac2007a18d4390b32d72f5b2abc17bd1"
+    },
+    {
+      "case": "Cases/testCases/generic_pwr_2D_rTheta",
+      "path": "system/blockMeshDict",
+      "sha256": "0d8629ecf4f39b693f2947c2bf653aba04dd3f1cfa029b983a099389e7836bb0"
+    },
+    {
+      "case": "Cases/testCases/generic_pwr_2D_rz",
+      "path": "constant/solverDict",
+      "sha256": "51949d18904f0f795fe366da7d42229573e797fb24aa790c31968524dc3774c1"
+    },
+    {
+      "case": "Cases/testCases/generic_pwr_2D_rz",
+      "path": "Allrun",
+      "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c"
+    },
+    {
+      "case": "Cases/testCases/generic_pwr_2D_rz",
+      "path": "rodDict",
+      "sha256": "db53e01235f74bc396005ed6b7443d44e6ef831f7ac5dc246d83a1585b49aa12"
+    },
+    {
+      "case": "Cases/testCases/generic_pwr_2D_rz_3pellets",
+      "path": "constant/solverDict",
+      "sha256": "122e8ad03d294a04ba1df2798afd27c87724ce3cfb5a9f6131602a16d8a70e0e"
+    },
+    {
+      "case": "Cases/testCases/generic_pwr_2D_rz_3pellets",
+      "path": "Allrun",
+      "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c"
+    },
+    {
+      "case": "Cases/testCases/generic_pwr_2D_rz_3pellets",
+      "path": "rodDict",
+      "sha256": "bb85475c1f48abbece92f608653a40fdc7dcb0383c75fc87d1be6f52817f3f62"
+    },
+    {
+      "case": "Cases/testCases/generic_rodlet_2D_rz",
+      "path": "constant/solverDict",
+      "sha256": "f00565562b7ed0fe4f0473385823f2fcc2da03aa0a8b1e2f5aa133b25ee5bf19"
+    },
+    {
+      "case": "Cases/testCases/generic_rodlet_2D_rz",
+      "path": "Allrun",
+      "sha256": "88f265779812fd2cde1eb1002614b2b00c1360c9e9517b469be3819eba58fde7"
+    },
+    {
+      "case": "Cases/testCases/generic_rodlet_2D_rz",
+      "path": "rodDict",
+      "sha256": "ee5fdbb63eb85076730569798e250fba86477f133817425ddc7020fe1ebdf0cc"
+    },
+    {
+      "case": "Cases/testCases/graphite_stringer",
+      "path": "constant/solverDict",
+      "sha256": "19f05c15e3a3331835e2c19d90d46696e6ce2351ec20a12699cad569a53fa787"
+    },
+    {
+      "case": "Cases/testCases/graphite_stringer",
+      "path": "Allrun",
+      "sha256": "081a6472c40dcc8fc057a522d0770040eba27f4ee76961f5cd193846a32d15a9"
+    },
+    {
+      "case": "Cases/testCases/graphite_stringer",
+      "path": "README.md",
+      "sha256": "b78597c6bf86ea1d95edb8d535c5dd5196bea172b2cd51c5320b463bac2a88a8"
+    },
+    {
+      "case": "Cases/testCases/hotBiMaterialCylinder",
+      "path": "constant/solverDict",
+      "sha256": "357892fcb5266852581d6da285af12fca1f8e9d7c3b6f70bb1db30e73152161e"
+    },
+    {
+      "case": "Cases/testCases/hotBiMaterialCylinder",
+      "path": "Allrun",
+      "sha256": "edddefaf1920c956e125f91b47d1d1d8098b6f9b9924426e12b66ba624303253"
+    },
+    {
+      "case": "Cases/testCases/hotBiMaterialCylinder",
+      "path": "README.md",
+      "sha256": "2c03bfa6e1325e67fd0315bded3b179871e9d0777e083e86363b2a91df9ef603"
+    },
+    {
+      "case": "Cases/testCases/hotBiMaterialCylinder",
+      "path": "system/blockMeshDict",
+      "sha256": "6b0bdb52126dfc75373023f0ee7830a5dfdd0ee9c3f7e7f4167220c3e88b3ccb"
+    },
+    {
+      "case": "Cases/testCases/hotBiMaterialPlate",
+      "path": "constant/solverDict",
+      "sha256": "476129490156a44e1ed53bdc12e04c2fbaaa18fca811b320e7b8729ad553575b"
+    },
+    {
+      "case": "Cases/testCases/hotBiMaterialPlate",
+      "path": "Allrun",
+      "sha256": "e9dcf1c2d524dc9d7615e8438a5ff26cbcc1666963f0490c095828b7646e9d07"
+    },
+    {
+      "case": "Cases/testCases/hotBiMaterialPlate",
+      "path": "README.md",
+      "sha256": "265ff10403cef4a775cfa96a35afba193186b186f84bcbb955561531f60476db"
+    },
+    {
+      "case": "Cases/testCases/hotBiMaterialPlate",
+      "path": "system/blockMeshDict",
+      "sha256": "ccd247d54185979f471b0823c56f5a3b597bf2110f0fa251df9026e6f0881d62"
+    },
+    {
+      "case": "Cases/testCases/porosity/powerRamp_1D",
+      "path": "constant/solverDict",
+      "sha256": "18c10979282fd9ab643d1dead1806532e04e3a9376b20cb5c077f34f8b7f02c6"
+    },
+    {
+      "case": "Cases/testCases/porosity/powerRamp_1D",
+      "path": "Allrun",
+      "sha256": "5b3c2011ae7b0ceb38b4db7db85f7cdd2a719344206875721f12ee2b8774e9be"
+    },
+    {
+      "case": "Cases/testCases/porosity/powerRamp_1D",
+      "path": "README.md",
+      "sha256": "1e4cba13cfaac053c63283c75f5ad422406910417233db959a10ab1c3148503b"
+    },
+    {
+      "case": "Cases/testCases/porosity/powerRamp_1D",
+      "path": "rodMaker/rodDict",
+      "sha256": "558e5b71b7900787d97e608fa6f8ada15a3a151382493587b42f4cf91031fc50"
+    },
+    {
+      "case": "Cases/testCases/porosity/testCase2DrTheta",
+      "path": "constant/solverDict",
+      "sha256": "3ef13c29a1f6ba10a83effffd2d7ab80597dbd13a84b48ec4aeda754187de5a9"
+    },
+    {
+      "case": "Cases/testCases/porosity/testCase2DrTheta",
+      "path": "Allrun",
+      "sha256": "43b8e73101c98df85752bf843e7adbff09f4d01c66a78e485aa44dff60c67f1b"
+    },
+    {
+      "case": "Cases/testCases/porosity/testCase2DrTheta",
+      "path": "system/blockMeshDict",
+      "sha256": "2fc5099feadb7a18dcb3ea8339480ccb498d57331b47946666fdaf6338b584b5"
+    },
+    {
+      "case": "Cases/testCases/porosity/testCaseBISON/onlyFuel",
+      "path": "constant/solverDict",
+      "sha256": "6d3663b1630110ee60e99e3a4cf2b18732361ae257857b81fbac4a8c394622b7"
+    },
+    {
+      "case": "Cases/testCases/porosity/testCaseBISON/onlyFuel",
+      "path": "Allrun",
+      "sha256": "43b8e73101c98df85752bf843e7adbff09f4d01c66a78e485aa44dff60c67f1b"
+    },
+    {
+      "case": "Cases/testCases/porosity/testCaseBISON/onlyFuel",
+      "path": "rodMaker/rodDict",
+      "sha256": "558e5b71b7900787d97e608fa6f8ada15a3a151382493587b42f4cf91031fc50"
+    },
+    {
+      "case": "Cases/testCases/smearedCrackingExample",
+      "path": "constant/solverDict",
+      "sha256": "d39ba18646bd2f22b5ac6ac569e7184d0b219ebfa8c6c32410a4fd6b2f53dee8"
+    },
+    {
+      "case": "Cases/testCases/smearedCrackingExample",
+      "path": "Allrun",
+      "sha256": "35d35074fa4901e1f41c2c776785422ef7a882d58e40258bc13c5e50312305fe"
+    },
+    {
+      "case": "Cases/testCases/smearedCrackingExample",
+      "path": "system/blockMeshDict",
+      "sha256": "5d7873ee09ae88b43d579a9117f6cb3db9d50841fa136ff5344fbcec20bcca8f"
+    },
+    {
+      "case": "Cases/testCases/test_coolantChannel/generic_bwr_1D_DNB",
+      "path": "constant/solverDict",
+      "sha256": "18125327ba5e42d707aa1e556988cec9d4f2c632811dc544fba66c2a0775e3c9"
+    },
+    {
+      "case": "Cases/testCases/test_coolantChannel/generic_bwr_1D_DNB",
+      "path": "Allrun",
+      "sha256": "583c81578a803cb9efd6e940710254c0f096b4040ce56986cbe6964950d94315"
+    },
+    {
+      "case": "Cases/testCases/test_coolantChannel/generic_bwr_1D_DNB",
+      "path": "rodDict",
+      "sha256": "cdf9647374c788ec1b3b89bb90a6fe214a3bd1f3eeacdc8d6830471d5f5f6203"
+    },
+    {
+      "case": "Cases/testCases/test_coolantChannel/generic_bwr_1D_enthalpyModel",
+      "path": "constant/solverDict",
+      "sha256": "3ff3416cc2819f8ca64c82ee9797cb91d90639be84cde5eb058978e39947e0f7"
+    },
+    {
+      "case": "Cases/testCases/test_coolantChannel/generic_bwr_1D_enthalpyModel",
+      "path": "Allrun",
+      "sha256": "583c81578a803cb9efd6e940710254c0f096b4040ce56986cbe6964950d94315"
+    },
+    {
+      "case": "Cases/testCases/test_coolantChannel/generic_bwr_1D_enthalpyModel",
+      "path": "rodDict",
+      "sha256": "2cdffcfe7dfef747db4eebdb820f823d8d4c9d8b008d4ca7af77dbe56f33f542"
+    },
+    {
+      "case": "Cases/testCases/test_coolantChannel/generic_bwr_1D_enthalpyModel_parallel",
+      "path": "constant/solverDict",
+      "sha256": "3ff3416cc2819f8ca64c82ee9797cb91d90639be84cde5eb058978e39947e0f7"
+    },
+    {
+      "case": "Cases/testCases/test_coolantChannel/generic_bwr_1D_enthalpyModel_parallel",
+      "path": "Allrun",
+      "sha256": "0572ff8d85ca2dd896b5539e0ee07edca5bf82dd6e7c41bfe780134a51dc9360"
+    },
+    {
+      "case": "Cases/testCases/test_coolantChannel/generic_bwr_1D_enthalpyModel_parallel",
+      "path": "rodDict",
+      "sha256": "2cdffcfe7dfef747db4eebdb820f823d8d4c9d8b008d4ca7af77dbe56f33f542"
+    },
+    {
+      "case": "Cases/testCases/test_coolantChannel/generic_bwr_2D_RIA_stagnantFlow",
+      "path": "constant/solverDict",
+      "sha256": "78a5952428d8b936ef5f1bb6fbff3227416b89f4c4405e8212d714b4609b8dc4"
+    },
+    {
+      "case": "Cases/testCases/test_coolantChannel/generic_bwr_2D_RIA_stagnantFlow",
+      "path": "Allrun",
+      "sha256": "583c81578a803cb9efd6e940710254c0f096b4040ce56986cbe6964950d94315"
+    },
+    {
+      "case": "Cases/testCases/test_coolantChannel/generic_bwr_2D_RIA_stagnantFlow",
+      "path": "constant/lists/lhrTimes",
+      "sha256": "92e5f954f67f5786549840496b82092ea91f0f39b41409cbd4c7f3b490aaaa29"
+    },
+    {
+      "case": "Cases/testCases/test_coolantChannel/generic_bwr_2D_RIA_stagnantFlow",
+      "path": "constant/lists/lhrValues",
+      "sha256": "a17626cad396964ea4d50ea1896fc6f6e8cf0e7dc467bed50923c9e65f10f8af"
+    },
+    {
+      "case": "Cases/testCases/test_coolantChannel/generic_bwr_2D_RIA_stagnantFlow",
+      "path": "constant/lists/systemPressure",
+      "sha256": "4129db29d51a90d8a044e89888232478ee9a71ee1f2a86501f9828f3c00770be"
+    },
+    {
+      "case": "Cases/testCases/test_coolantChannel/generic_bwr_2D_RIA_stagnantFlow",
+      "path": "system/enthalpyVolAverage",
+      "sha256": "72214d7a9767518f8482b4a95346f3a9470e67579d88acb13fcba1721b9e7991"
+    },
+    {
+      "case": "Cases/testCases/test_coolantChannel/generic_bwr_2D_RIA_stagnantFlow",
+      "path": "rodDict",
+      "sha256": "a6a56846ab549fa6ed46966a49b99a3b1e9fbf7be5f94ad5a381c3f25779aed7"
+    },
+    {
+      "case": "Cases/testCases/test_coolantChannel/generic_pwr_1D_coolantTemperature",
+      "path": "constant/solverDict",
+      "sha256": "6f3f7c34096af1a0b39e41ff8e82c465175d259ce7b85c25e2a8c0f8ea7b5d2f"
+    },
+    {
+      "case": "Cases/testCases/test_coolantChannel/generic_pwr_1D_coolantTemperature",
+      "path": "Allrun",
+      "sha256": "62c7df67a9dcfe2c2da239b6784fd30793c827853677e63636c682512eaabfba"
+    },
+    {
+      "case": "Cases/testCases/test_coolantChannel/generic_pwr_1D_coolantTemperature",
+      "path": "rodDict",
+      "sha256": "a859bcd0a9718ab74fde422aba855e6a9b58126546027e37fb9bd36b535e75ec"
+    },
+    {
+      "case": "Cases/testCases/test_coolantChannel/generic_pwr_1D_enthalpyModel",
+      "path": "constant/solverDict",
+      "sha256": "4ed42bfd9a7e37b3d974c62cc957caaa4ad282839c53d8ce0663d9c97b5a64db"
+    },
+    {
+      "case": "Cases/testCases/test_coolantChannel/generic_pwr_1D_enthalpyModel",
+      "path": "Allrun",
+      "sha256": "583c81578a803cb9efd6e940710254c0f096b4040ce56986cbe6964950d94315"
+    },
+    {
+      "case": "Cases/testCases/test_coolantChannel/generic_pwr_1D_enthalpyModel",
+      "path": "rodDict",
+      "sha256": "a859bcd0a9718ab74fde422aba855e6a9b58126546027e37fb9bd36b535e75ec"
+    },
+    {
+      "case": "Cases/testCases/test_createTuFields",
+      "path": "system/TuOFFBEATdict",
+      "sha256": "f0ad5e1e8f9a1d40bf87a570ff7074540e528d96031925726bfc42269d803149"
+    },
+    {
+      "case": "Cases/testCases/test_createTuFields",
+      "path": "Allrun",
+      "sha256": "0a726accadf314e0dc4d2f1f64e2339b2f4041660c72f6489d9b87664554ca14"
+    },
+    {
+      "case": "Cases/testCases/test_createTuFields",
+      "path": "README.md",
+      "sha256": "4eca011e25d761748210c1920f7959ccaf331014b6092537d1cb64b15fcd55c4"
+    },
+    {
+      "case": "Cases/testCases/test_createTuFields",
+      "path": "system/blockMeshDict",
+      "sha256": "246309e96f65ae247dcc1c2d55998927aaa9425e2703a83d3fe597b7468d5507"
+    }
+  ]
+}

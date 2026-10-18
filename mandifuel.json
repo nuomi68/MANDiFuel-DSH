@@ -1,0 +1,13 @@
+{
+  "name": "mandifuel",
+  "version": "0.4.0-alpha.8",
+  "runtime": "deepseek-dsh",
+  "platform": "linux",
+  "skills": "skills",
+  "protocol": "STUDY_PROTOCOL.md",
+  "entrypoints": {
+    "web": "scripts/start-dsh.sh web",
+    "headless": "scripts/start-dsh.sh headless"
+  },
+  "license": "GPL-3.0-or-later"
+}

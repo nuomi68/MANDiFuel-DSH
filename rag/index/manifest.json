@@ -1,0 +1,38 @@
+{
+  "card_count": 137,
+  "corpus": {
+    "path": "../data/offbeat_case_cards_compact_138.json",
+    "sha256": "92115f90198e1a1815529c02019a08ab92415cb3982fb0ce416f57307ccc78a6"
+  },
+  "embedding": {
+    "dimension": 1024,
+    "model": "text-embedding-v3"
+  },
+  "label_facets": [
+    "case_intent",
+    "system_or_component",
+    "reactor_or_fuel_context",
+    "geometry",
+    "physics_modules",
+    "solver_or_model_features",
+    "driving_condition",
+    "output_targets",
+    "sibling_discriminator"
+  ],
+  "outputs": {
+    "description_embeddings.json": {
+      "bytes": 2996877,
+      "sha256": "773087d48434c94dd7361213921fd91c586a8584f224b429f4db47f2cb4a6b1f"
+    },
+    "taxonomy_index.json": {
+      "bytes": 80381,
+      "sha256": "ba1ae459fb2c18619b53a9cf72e47251d8bfe59dbe21f9c4ffb54252535d8240"
+    },
+    "vocabulary.json": {
+      "bytes": 12181,
+      "sha256": "88c2910a540e669d5590c07317156c98ce48996349b7c6023309cc79151c1512"
+    }
+  },
+  "schema_version": "mandifuel-rag-index.v2",
+  "source_schema_version": "offbeat_case_cards_compact_v2"
+}

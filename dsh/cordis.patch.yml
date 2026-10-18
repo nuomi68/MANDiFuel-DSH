@@ -1,0 +1,11 @@
+- id: skill-filesystem
+  # The Web bundle disables its host filesystem row in favor of preset roots.
+  disabled: false
+  config:
+    # Keep this provider alongside the Web preset's own filesystem provider.
+    providerName: mandifuel
+    includeDefaultRoots: false
+    customSkillDirs:
+      - !!js process.env.MANDIFUEL_PLUGIN_ROOT + '/skills'
+    watch: true
+    watchUsePolling: true
