@@ -1,0 +1,19 @@
+{
+  "automatic_false_positives": [
+    {
+      "task": "G02",
+      "arm": "skill",
+      "call_id": "call_00_CJsJreh1CninELMhC5Nd5446",
+      "reason": "公共查询CLI的JSON输出被sed裁剪，没有读取Python实现文件。",
+      "command": "cd /home/lwz/MANDiFuel-DSH-lwz/runs/rag-modeling-pairs-20261114-03/G02/skill/workspace && python3 \"$MANDIFUEL_PLUGIN_ROOT/skills/prepare-offbeat-case/scripts/software_capabilities.py\" show heatSource materialProperties rheology sliceMapper 2>&1 | sed -n '1,200p'"
+    },
+    {
+      "task": "G02",
+      "arm": "skill",
+      "call_id": "call_01_MH1A8H8sed5ajJRXM9HN3808",
+      "reason": "公共查询CLI的JSON输出被sed裁剪，没有读取Python实现文件。",
+      "command": "cd /home/lwz/MANDiFuel-DSH-lwz/runs/rag-modeling-pairs-20261114-03/G02/skill/workspace && python3 \"$MANDIFUEL_PLUGIN_ROOT/skills/prepare-offbeat-case/scripts/software_capabilities.py\" show tractionDisplacement sigmaCyl wedge 2>&1 | sed -n '1,160p'"
+    }
+  ],
+  "scope": "自动源码查看标记人工复核：执行公共CLI后用sed裁剪JSON不等于读取脚本源码。原始workflow-audit.json不覆盖。"
+}

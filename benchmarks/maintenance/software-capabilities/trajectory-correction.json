@@ -1,0 +1,22 @@
+{
+  "修正时间_北京时间": "2026-11-14T15:00:46.445905+08:00",
+  "动作原名": "Rerun extraction without list_scopes",
+  "原中文": "移除不存在的接口调用后重新提取",
+  "修正中文": "跳过触发空边界解析异常的范围查询后重新提取",
+  "原因": "list_scopes确实由public result_api.py导出；实际失败为constant/polyMesh/boundary中的0面defaultFaces触发OpenFOAMParseError。函数缺失的旧中文判断不成立。",
+  "修改范围": "只修改派生中文动作映射并重生成2份单行轨迹及汇总；保留原始调用、返回、执行状态与数值证据。",
+  "翻译字典修正前SHA256": "0bc5a051db22a77075b2f7560344d160beb3658dd0d0a5606907cb9a389e4cf0",
+  "翻译字典修正后SHA256": "64eb7062714fc7b4e03e7c8653d361bae830d49ac1561264e37ac2b95af05e43",
+  "保留文件SHA256": {
+    "runs/recovery-c08-pairs-20261114-01/C08/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-recovery-c08-pairs-20261114-01-C08-bare-workspace--/session-ccbfd345-5ccf-4b74-b08e-8d7692784b15/session.jsonl": "2a55579a7fc2b64398b7f3162611b6ec2bb1df1eb34662fa0f78898bdb9da2ee",
+    "runs/recovery-c08-pairs-20261114-01/C08/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-recovery-c08-pairs-20261114-01-C08-skill-workspace--/session-1f314d65-96c7-47b7-921c-fc99d21c824c/session.jsonl": "e09737dd8b8b72590a40e72541e014a2624d43e3326f41bccd59d03752afdc50",
+    "runs/recovery-c08-pairs-20261114-01/comparison.json": "ac13abb6367647ebab6f2b4476e3b19cc42be031154d616afb49bc66ab8fd763",
+    "runs/recovery-c08-pairs-20261114-01/verification.json": "1c436c51177bd9fa0880609caf5247f7a4f5a9dfd34af1d1965280a39352aa5f",
+    "runs/recovery-c08-pairs-20261114-01/integrity.json": "45c3eed70bd04c62bd8bac39bcaf749f09d397ad181beb1523e501fe53093326",
+    "runs/recovery-c08-pairs-20261114-01/数值独立复核/复核数据.json": "f5f9eaf0ce5c1d1290c18053079c1fd7877d711ffb8a4847e9d29f9e3868a5c9"
+  },
+  "核对原始文件未变": true,
+  "工具事件数": 163,
+  "DSH启动": 0,
+  "OFFBEAT启动": 0
+}

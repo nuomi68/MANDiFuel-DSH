@@ -1,0 +1,12 @@
+{
+  "scope": "独立核对器兼容性修正；未改参与者输入、结果、轨迹和题面。",
+  "old_evaluator_sha256": "74e7d60490deebd6e374c70d867b4440e4c9816ca1ec8a20ce0fb158efa7628a",
+  "new_evaluator_sha256": "d68b168901314a55c77f975cb3a387bfa2b183cd39cb2df94cfd487c4d22fc5c",
+  "changes": [
+    "按实际楔网格角度推导sec(theta)-1几何约定差异容差；避免将轴截面半径与角点欧氏距离差误判成尺寸错误，容差上限0.5%，正常小楔实际约0.003%~0.031%。物理参考响应3%门槛不变。",
+    "检索原文接受JSON内容的.txt/.out等文件，不要求.json后缀。",
+    "交付覆盖识别标准sigma_t切向应力列，以及whole kernel整球核体积换算。"
+  ],
+  "participants_rerun": false,
+  "organizer_solver_starts": 0
+}

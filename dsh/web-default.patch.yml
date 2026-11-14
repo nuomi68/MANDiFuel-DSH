@@ -1,0 +1,5 @@
+# Use the host's maintained preset; the launcher supplies the shared protocol
+# and the independent MANDiFuel Skill provider for every session.
+- id: agent-presets
+  config:
+    default: standard

@@ -1,0 +1,36 @@
+{
+  "catalog_sha256": "d83c42ca29209b641f72daaf8bea8244c82b349074277178f2cb9e123a4cd29b",
+  "coverage": {
+    "rag_cards": 137,
+    "input_cases_parsed": 136,
+    "excluded_utility_directories": [
+      "Cases/testCases/test_createTuFields"
+    ],
+    "normal_execution_records": 18,
+    "selector_families": 13,
+    "selector_values": 48,
+    "material_models": 10,
+    "confirmed_material_selectors": 8,
+    "property_families": 20,
+    "property_values": 70,
+    "boundary_entries": 53,
+    "field_entries": 29,
+    "controls": 19,
+    "parameter_bindings": 25,
+    "operations": 10,
+    "rules": 13,
+    "public_apis": 8
+  },
+  "generated_files": {
+    "skills/prepare-offbeat-case/references/software-capabilities.md": "e6ff0ed309ae53b20bb500cc96a15073ba8f1f548b1cec4ad763ae519c80b91f",
+    "skills/prepare-offbeat-case/references/software-capabilities/boundaries.md": "87d3f5ff76380492260e9fdccda3f915aa79be64c10448b40700b6d6696f553f",
+    "skills/prepare-offbeat-case/references/software-capabilities/catalog.json": "d83c42ca29209b641f72daaf8bea8244c82b349074277178f2cb9e123a4cd29b",
+    "skills/prepare-offbeat-case/references/software-capabilities/dependencies-and-operations.md": "a3c3db690b592056c1ca014012a1440aafb6f09b999faadc4cbd3a213d73fb73",
+    "skills/prepare-offbeat-case/references/software-capabilities/fields-and-units.md": "61e5893044fa60c241377fc47e72ad122463c10e30927acefe5cc4ddd78b48fb",
+    "skills/prepare-offbeat-case/references/software-capabilities/materials-and-geometry.md": "7d30181edc10714f0b5cefd6770eda8be03f1fdb9b6b479eea5b21920ebf4807",
+    "skills/prepare-offbeat-case/references/software-capabilities/models.md": "61bb5c22b49404a227d5e8378aeeba38330002e99d50c98ea571d3da50ad5b18",
+    "skills/prepare-offbeat-case/references/software-capabilities/public-tools.md": "8cb053acdf49e26524459dd735c6e7f5578ad32838fff2840ff3b4fa9e9152f6",
+    "skills/prepare-offbeat-case/references/software-capabilities/time-and-execution.md": "c9507044bfc642b1bcf8c7c2fbbb581851e5b80f411af77496958df341b9ecca"
+  },
+  "OFFBEAT_starts": 0
+}

@@ -1,0 +1,9 @@
+{
+  "time_beijing": "2026-11-14T12:06:56.836365+08:00",
+  "change": "C02数据表列名匹配接受下划线单位后缀，例如u_r_m、sigma_rr_Pa、sigma_tt_Pa；物理输入、实际场和覆盖要求不变。",
+  "before_sha256": "93d292cdc6ba96b585df39006bf15fee4f0a4117bd9712da0795336a46bfdf2c",
+  "after_sha256": "8d095f60c0d17bb16efabc2d5603e9f1ff9c3f19c9dfc86353e17853b61c82d6",
+  "inspection_state": "此时仅看过六组预检/启动元数据，未读取本轮模型轨迹或结果内容。",
+  "frozen_original": "runs/generalization-pairs-20261114-01/definition/generalization_checks.py",
+  "launch_or_product_changed": false
+}

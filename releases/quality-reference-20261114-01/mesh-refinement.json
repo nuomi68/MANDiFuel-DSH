@@ -1,0 +1,21 @@
+{
+  "purpose": "一次固定物理参数的20到80径向单元加密，仅诊断边界应力/应变误差收敛，不加入原六会话成绩。",
+  "changes": [
+    {
+      "file": "constant/solverDict",
+      "entry": "heatSourceOptions/timePoints",
+      "value": "( 0 10 20 )"
+    },
+    {
+      "file": "constant/solverDict",
+      "entry": "heatSourceOptions/lhgr",
+      "value": "( 0 0 0 )"
+    },
+    {
+      "file": "system/blockMeshDict",
+      "entry": "blocks",
+      "value": "( hex ( 0 1 2 3 4 5 6 7 ) buffer ( 80 1 1 ) simpleGrading ( 1 1 1 ) )"
+    }
+  ],
+  "model_requests": 0
+}

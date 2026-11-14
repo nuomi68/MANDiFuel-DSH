@@ -1,0 +1,800 @@
+{
+  "modified_tasks": {
+    "G01": {
+      "reference_kind": "同参数圆柱稳态导热解析式",
+      "formula": "Tci=Tw+q*ln(rco/rci)/(2*pi*kc); Tfs=Tci+q/(2*pi*rf*h); Tf(r)=Tfs+q/(4*pi*kf)*(1-r^2/rf^2)",
+      "arms": {
+        "bare": {
+          "rows": [
+            {
+              "group": "modified",
+              "arm": "bare",
+              "case": "G01-fine",
+              "quantity": "hottest_cell_temperature",
+              "unit": "K",
+              "reference": 1156.875470581512,
+              "actual": 1156.751872,
+              "signed_error": -0.12359858151194203,
+              "relative_error_percent": -0.010683827659498588,
+              "r_m": 6.83212e-05
+            },
+            {
+              "group": "modified",
+              "arm": "bare",
+              "case": "G01-fine",
+              "quantity": "fuelOuter_temperature",
+              "unit": "K",
+              "reference": 759.0985978717013,
+              "actual": 759.1392057,
+              "signed_error": 0.04060782829878917,
+              "relative_error_percent": 0.005349480082382195
+            },
+            {
+              "group": "modified",
+              "arm": "bare",
+              "case": "G01-fine",
+              "quantity": "cladInner_temperature",
+              "unit": "K",
+              "reference": 629.7043351953636,
+              "actual": 629.7351016,
+              "signed_error": 0.030766404636437983,
+              "relative_error_percent": 0.004885849265575218
+            },
+            {
+              "group": "modified",
+              "arm": "bare",
+              "case": "G01-fine",
+              "quantity": "cladOuter_temperature",
+              "unit": "K",
+              "reference": 610,
+              "actual": 610.0,
+              "signed_error": 0.0,
+              "relative_error_percent": 0.0
+            }
+          ],
+          "max_profile_error_K": 0.12359858151194203,
+          "result_root": "/home/lwz/MANDiFuel-DSH-lwz/runs/rag-modeling-pairs-20261114-03/G01/bare/workspace/cases/fine"
+        },
+        "skill": {
+          "rows": [
+            {
+              "group": "modified",
+              "arm": "skill",
+              "case": "G01-fine",
+              "quantity": "hottest_cell_temperature",
+              "unit": "K",
+              "reference": 1156.875470581512,
+              "actual": 1156.7,
+              "signed_error": -0.17547058151194506,
+              "relative_error_percent": -0.015167629185165753,
+              "r_m": 6.83212e-05
+            },
+            {
+              "group": "modified",
+              "arm": "skill",
+              "case": "G01-fine",
+              "quantity": "fuelOuter_temperature",
+              "unit": "K",
+              "reference": 759.0985978717013,
+              "actual": 759.124,
+              "signed_error": 0.025402128298765092,
+              "relative_error_percent": 0.003346354264121355
+            },
+            {
+              "group": "modified",
+              "arm": "skill",
+              "case": "G01-fine",
+              "quantity": "cladInner_temperature",
+              "unit": "K",
+              "reference": 629.7043351953636,
+              "actual": 629.733,
+              "signed_error": 0.028664804636377994,
+              "relative_error_percent": 0.004552105334876698
+            },
+            {
+              "group": "modified",
+              "arm": "skill",
+              "case": "G01-fine",
+              "quantity": "cladOuter_temperature",
+              "unit": "K",
+              "reference": 610,
+              "actual": 610.0,
+              "signed_error": 0.0,
+              "relative_error_percent": 0.0
+            }
+          ],
+          "max_profile_error_K": 0.17547058151194506,
+          "result_root": "/home/lwz/MANDiFuel-DSH-lwz/runs/rag-modeling-pairs-20261114-03/G01/skill/workspace/cases/mesh40-12"
+        }
+      }
+    },
+    "G02": {
+      "reference_kind": "同参数球壳Lame解析解",
+      "arms": {
+        "bare": {
+          "rows": [
+            {
+              "group": "modified",
+              "arm": "bare",
+              "case": "G02-40MPa-inner",
+              "quantity": "u_r_m",
+              "unit": "m",
+              "reference": 2.4077192982456134e-07,
+              "actual": 2.40774615142e-07,
+              "signed_error": 2.6853174386719964e-12,
+              "relative_error_percent": 0.0011152950597807041
+            },
+            {
+              "group": "modified",
+              "arm": "bare",
+              "case": "G02-40MPa-inner",
+              "quantity": "sigma_r_Pa",
+              "unit": "Pa",
+              "reference": -40000000.0,
+              "actual": -39999999.9999,
+              "signed_error": 0.00010000169277191162,
+              "relative_error_percent": 2.5000423192977906e-10
+            },
+            {
+              "group": "modified",
+              "arm": "bare",
+              "case": "G02-40MPa-inner",
+              "quantity": "sigma_t_Pa",
+              "unit": "Pa",
+              "reference": 34605263.15789473,
+              "actual": 34193256.8542,
+              "signed_error": -412006.3036947325,
+              "relative_error_percent": -1.1905885582053108
+            },
+            {
+              "group": "modified",
+              "arm": "bare",
+              "case": "G02-40MPa-outer",
+              "quantity": "u_r_m",
+              "unit": "m",
+              "reference": 1.3715789473684204e-07,
+              "actual": 1.37158060098e-07,
+              "signed_error": 1.6536115795072138e-13,
+              "relative_error_percent": 0.00012056262475302025
+            },
+            {
+              "group": "modified",
+              "arm": "bare",
+              "case": "G02-40MPa-outer",
+              "quantity": "sigma_r_Pa",
+              "unit": "Pa",
+              "reference": -4999999.999999998,
+              "actual": -4999999.99985,
+              "signed_error": 0.00014999788254499435,
+              "relative_error_percent": 2.9999576508998883e-09
+            },
+            {
+              "group": "modified",
+              "arm": "bare",
+              "case": "G02-40MPa-outer",
+              "quantity": "sigma_t_Pa",
+              "unit": "Pa",
+              "reference": 17105263.15789473,
+              "actual": 17187529.5323,
+              "signed_error": 82266.37440526858,
+              "relative_error_percent": 0.4809418811384934
+            },
+            {
+              "group": "modified",
+              "arm": "bare",
+              "case": "G02-80MPa-inner",
+              "quantity": "u_r_m",
+              "unit": "m",
+              "reference": 5.327017543859649e-07,
+              "actual": 5.32707684143e-07,
+              "signed_error": 5.929757035181162e-12,
+              "relative_error_percent": 0.001113147645255323
+            },
+            {
+              "group": "modified",
+              "arm": "bare",
+              "case": "G02-80MPa-inner",
+              "quantity": "sigma_r_Pa",
+              "unit": "Pa",
+              "reference": -80000000.0,
+              "actual": -80000000.0003,
+              "signed_error": -0.00030000507831573486,
+              "relative_error_percent": -3.750063478946686e-10
+            },
+            {
+              "group": "modified",
+              "arm": "bare",
+              "case": "G02-80MPa-inner",
+              "quantity": "sigma_t_Pa",
+              "unit": "Pa",
+              "reference": 79868421.05263157,
+              "actual": 78985619.9249,
+              "signed_error": -882801.1277315766,
+              "relative_error_percent": -1.1053193691532097
+            },
+            {
+              "group": "modified",
+              "arm": "bare",
+              "case": "G02-80MPa-outer",
+              "quantity": "u_r_m",
+              "unit": "m",
+              "reference": 3.190526315789473e-07,
+              "actual": 3.1905306392e-07,
+              "signed_error": 4.3234105271290477e-13,
+              "relative_error_percent": 0.00013550775324224997
+            },
+            {
+              "group": "modified",
+              "arm": "bare",
+              "case": "G02-80MPa-outer",
+              "quantity": "sigma_r_Pa",
+              "unit": "Pa",
+              "reference": -5000000.0,
+              "actual": -5000000.00033,
+              "signed_error": -0.0003300001844763756,
+              "relative_error_percent": -6.600003689527512e-09
+            },
+            {
+              "group": "modified",
+              "arm": "bare",
+              "case": "G02-80MPa-outer",
+              "quantity": "sigma_t_Pa",
+              "unit": "Pa",
+              "reference": 42368421.05263157,
+              "actual": 42544750.3097,
+              "signed_error": 176329.25706842542,
+              "relative_error_percent": 0.41618085519255693
+            }
+          ],
+          "radial_cells": [
+            80,
+            80
+          ],
+          "max_cell_profile_error_percent": {
+            "radial_displacement": 0.0008385749412061391,
+            "radial_stress": 0.0010789326615538385,
+            "tangential_stress": 0.0024417338330238185
+          }
+        },
+        "skill": {
+          "rows": [
+            {
+              "group": "modified",
+              "arm": "skill",
+              "case": "G02-40MPa-inner",
+              "quantity": "u_r_m",
+              "unit": "m",
+              "reference": 2.4077192982456134e-07,
+              "actual": 2.407e-07,
+              "signed_error": -7.192982456135783e-11,
+              "relative_error_percent": -0.029874672107238397
+            },
+            {
+              "group": "modified",
+              "arm": "skill",
+              "case": "G02-40MPa-inner",
+              "quantity": "sigma_r_Pa",
+              "unit": "Pa",
+              "reference": -40000000.0,
+              "actual": -40000000.0,
+              "signed_error": 0.0,
+              "relative_error_percent": 0.0
+            },
+            {
+              "group": "modified",
+              "arm": "skill",
+              "case": "G02-40MPa-inner",
+              "quantity": "sigma_t_Pa",
+              "unit": "Pa",
+              "reference": 34605263.15789473,
+              "actual": 34047900.0,
+              "signed_error": -557363.1578947306,
+              "relative_error_percent": -1.6106311787072065
+            },
+            {
+              "group": "modified",
+              "arm": "skill",
+              "case": "G02-40MPa-outer",
+              "quantity": "u_r_m",
+              "unit": "m",
+              "reference": 1.3715789473684204e-07,
+              "actual": 1.37097e-07,
+              "signed_error": -6.089473684203639e-11,
+              "relative_error_percent": -0.04439754412888304
+            },
+            {
+              "group": "modified",
+              "arm": "skill",
+              "case": "G02-40MPa-outer",
+              "quantity": "sigma_r_Pa",
+              "unit": "Pa",
+              "reference": -4999999.999999998,
+              "actual": -5000000.0,
+              "signed_error": -1.862645149230957e-09,
+              "relative_error_percent": -3.7252902984619156e-14
+            },
+            {
+              "group": "modified",
+              "arm": "skill",
+              "case": "G02-40MPa-outer",
+              "quantity": "sigma_t_Pa",
+              "unit": "Pa",
+              "reference": 17105263.15789473,
+              "actual": 17209200.0,
+              "signed_error": 103936.84210526943,
+              "relative_error_percent": 0.6076307692308062
+            },
+            {
+              "group": "modified",
+              "arm": "skill",
+              "case": "G02-80MPa-inner",
+              "quantity": "u_r_m",
+              "unit": "m",
+              "reference": 5.327017543859649e-07,
+              "actual": 5.32551e-07,
+              "signed_error": -1.5075438596484964e-10,
+              "relative_error_percent": -0.02829996047950346
+            },
+            {
+              "group": "modified",
+              "arm": "skill",
+              "case": "G02-80MPa-inner",
+              "quantity": "sigma_r_Pa",
+              "unit": "Pa",
+              "reference": -80000000.0,
+              "actual": -80000000.0,
+              "signed_error": 0.0,
+              "relative_error_percent": 0.0
+            },
+            {
+              "group": "modified",
+              "arm": "skill",
+              "case": "G02-80MPa-inner",
+              "quantity": "sigma_t_Pa",
+              "unit": "Pa",
+              "reference": 79868421.05263157,
+              "actual": 78675200.0,
+              "signed_error": -1193221.052631572,
+              "relative_error_percent": -1.4939835255354115
+            },
+            {
+              "group": "modified",
+              "arm": "skill",
+              "case": "G02-80MPa-outer",
+              "quantity": "u_r_m",
+              "unit": "m",
+              "reference": 3.190526315789473e-07,
+              "actual": 3.18924e-07,
+              "signed_error": -1.2863157894728302e-10,
+              "relative_error_percent": -0.04031672715272811
+            },
+            {
+              "group": "modified",
+              "arm": "skill",
+              "case": "G02-80MPa-outer",
+              "quantity": "sigma_r_Pa",
+              "unit": "Pa",
+              "reference": -5000000.0,
+              "actual": -5000000.0,
+              "signed_error": 0.0,
+              "relative_error_percent": 0.0
+            },
+            {
+              "group": "modified",
+              "arm": "skill",
+              "case": "G02-80MPa-outer",
+              "quantity": "sigma_t_Pa",
+              "unit": "Pa",
+              "reference": 42368421.05263157,
+              "actual": 42591900.0,
+              "signed_error": 223478.9473684281,
+              "relative_error_percent": 0.5274658385093335
+            }
+          ],
+          "radial_cells": [
+            60,
+            60
+          ],
+          "max_cell_profile_error_percent": {
+            "radial_displacement": 0.03151258215565877,
+            "radial_stress": 0.14384029545341054,
+            "tangential_stress": 0.03653730175338589
+          }
+        }
+      }
+    },
+    "M01": {
+      "reference_kind": "恒D、零源、均匀初值、完美吸收球体扩散级数",
+      "arms": {
+        "bare": {
+          "rows": [
+            {
+              "group": "modified",
+              "arm": "bare",
+              "case": "M01-60cells",
+              "quantity": "release_fraction",
+              "unit": "1",
+              "reference": 0.24650639159141152,
+              "actual": 0.24594671415903835,
+              "signed_error": -0.0005596774323731735,
+              "relative_error_percent": -0.22704378120176624,
+              "radial_cells": 60
+            },
+            {
+              "group": "modified",
+              "arm": "bare",
+              "case": "M01-120cells",
+              "quantity": "release_fraction",
+              "unit": "1",
+              "reference": 0.24650639159141152,
+              "actual": 0.2462843048824538,
+              "signed_error": -0.00022208670895773608,
+              "relative_error_percent": -0.0900936919014451,
+              "radial_cells": 120
+            }
+          ],
+          "effective_D_m2_s": 2.5e-14,
+          "T_K": 1650,
+          "sourceCs_mol_m3_s": 0
+        },
+        "skill": {
+          "rows": [
+            {
+              "group": "modified",
+              "arm": "skill",
+              "case": "M01-70cells",
+              "quantity": "release_fraction",
+              "unit": "1",
+              "reference": 0.24650639159141152,
+              "actual": 0.2460664555593045,
+              "signed_error": -0.0004399360321070134,
+              "relative_error_percent": -0.17846840776291706,
+              "radial_cells": 70
+            }
+          ],
+          "effective_D_m2_s": 2.5e-14,
+          "T_K": 1650,
+          "sourceCs_mol_m3_s": 0
+        }
+      }
+    }
+  },
+  "original_cases": {
+    "case_1a": {
+      "row": {
+        "group": "original",
+        "arm": "retained-bare-reference",
+        "case": "case_1a",
+        "quantity": "Cs_release_fraction",
+        "unit": "1",
+        "reference": 0.4673,
+        "actual": 0.4670343722821404,
+        "signed_error": -0.0002656277178595956,
+        "relative_error_percent": -0.05684308107416983
+      },
+      "printed_release_fraction": 0.467034,
+      "normal": true,
+      "event_id": "75c91a42e66b41b2bc0af14ae1a721a1",
+      "source_physical_inputs_match": {
+        "constant/solverDict": true,
+        "0/T": true,
+        "system/blockMeshDict": true,
+        "system/fvSchemes": true,
+        "system/fvSolution": true,
+        "system/controlDict": true
+      },
+      "reference_path": "/home/lwz/offbeat/Cases/Verification/trisoFpDiffusion/case_1a/Allrun",
+      "reference_sha256": "d8e162cf40de49d6ca235413d1faf5c069f8cb1e5c4efa69640c461955a0d765",
+      "parameters": {
+        "R_m": 0.00025,
+        "T_K": 1473.15,
+        "C0": 1.0,
+        "end_s": 720000,
+        "deltaT_s": 3600
+      },
+      "comparison_limit": "这是保留的原版参考运行，不是本次Skill新题的0.2460665与0.4673直接相减。"
+    },
+    "hollowsphere_1D": {
+      "original_unchanged_attempt_normal": false,
+      "unchanged_attempt_error": "时变零功率表末点10s与endTime相等，查询下一标记越界；未把已写出10s当正常完成。",
+      "reference_path": "/home/lwz/offbeat/Cases/Verification/trisoModulesTest/hollowsphere_1D/Allrun",
+      "reference_sha256": "b04bf33b14b032ac83a22ba599c88aa14a63807a83e498d99df783c1f920639d",
+      "parameters": {
+        "a_m": 0.0002,
+        "b_m": 0.0003,
+        "E_Pa": 10000000000.0,
+        "nu": 0.3,
+        "pi_Pa": 100000000.0,
+        "po_Pa": 200000000.0,
+        "end_s": 10
+      },
+      "attempts": [
+        {
+          "attempt": "original20-compatibility-repaired",
+          "event_id": "c94db74767c94c9c876a717184029d5d",
+          "normal": true,
+          "rows": [
+            {
+              "group": "original",
+              "arm": "original20-compatibility-repaired",
+              "case": "hollowsphere_1D-inner",
+              "quantity": "sigma_t_Pa",
+              "unit": "Pa",
+              "reference": -313157895.0,
+              "actual": -308360000.0,
+              "signed_error": 4797895.0,
+              "relative_error_percent": 1.5321009230822682
+            },
+            {
+              "group": "original",
+              "arm": "original20-compatibility-repaired",
+              "case": "hollowsphere_1D-inner",
+              "quantity": "sigma_r_Pa",
+              "unit": "Pa",
+              "reference": -100000000.0,
+              "actual": -100000000.0,
+              "signed_error": 0.0,
+              "relative_error_percent": 0.0
+            },
+            {
+              "group": "original",
+              "arm": "original20-compatibility-repaired",
+              "case": "hollowsphere_1D-inner",
+              "quantity": "epsilon_t",
+              "unit": "1",
+              "reference": -0.018921,
+              "actual": -0.0185852,
+              "signed_error": 0.0003358000000000007,
+              "relative_error_percent": 1.7747476349030213
+            },
+            {
+              "group": "original",
+              "arm": "original20-compatibility-repaired",
+              "case": "hollowsphere_1D-inner",
+              "quantity": "epsilon_r",
+              "unit": "1",
+              "reference": 0.008789,
+              "actual": 0.00850157,
+              "signed_error": -0.00028743,
+              "relative_error_percent": -3.2703379224030034
+            },
+            {
+              "group": "original",
+              "arm": "original20-compatibility-repaired",
+              "case": "hollowsphere_1D-inner",
+              "quantity": "u_r_m",
+              "unit": "m",
+              "reference": -3.784211e-06,
+              "actual": -3.7852e-06,
+              "signed_error": -9.890000000004068e-10,
+              "relative_error_percent": -0.02613490632526587
+            },
+            {
+              "group": "original",
+              "arm": "original20-compatibility-repaired",
+              "case": "hollowsphere_1D-outer",
+              "quantity": "sigma_t_Pa",
+              "unit": "Pa",
+              "reference": -263157895.0,
+              "actual": -264175000.0,
+              "signed_error": -1017105.0,
+              "relative_error_percent": -0.3864998996135001
+            },
+            {
+              "group": "original",
+              "arm": "original20-compatibility-repaired",
+              "case": "hollowsphere_1D-outer",
+              "quantity": "sigma_r_Pa",
+              "unit": "Pa",
+              "reference": -200000000.0,
+              "actual": -200000000.0,
+              "signed_error": 0.0,
+              "relative_error_percent": 0.0
+            },
+            {
+              "group": "original",
+              "arm": "original20-compatibility-repaired",
+              "case": "hollowsphere_1D-outer",
+              "quantity": "epsilon_t",
+              "unit": "1",
+              "reference": -0.012421,
+              "actual": -0.0124922,
+              "signed_error": -7.120000000000043e-05,
+              "relative_error_percent": -0.5732227678930878
+            },
+            {
+              "group": "original",
+              "arm": "original20-compatibility-repaired",
+              "case": "hollowsphere_1D-outer",
+              "quantity": "epsilon_r",
+              "unit": "1",
+              "reference": -0.004211,
+              "actual": -0.00414951,
+              "signed_error": 6.148999999999998e-05,
+              "relative_error_percent": 1.4602232248871996
+            },
+            {
+              "group": "original",
+              "arm": "original20-compatibility-repaired",
+              "case": "hollowsphere_1D-outer",
+              "quantity": "u_r_m",
+              "unit": "m",
+              "reference": -3.726316e-06,
+              "actual": -3.72682e-06,
+              "signed_error": -5.040000000003597e-10,
+              "relative_error_percent": -0.013525422964675024
+            }
+          ]
+        },
+        {
+          "attempt": "refined80-same-physics",
+          "event_id": "da36e22dc59f4d1f9153d0e565eceb17",
+          "normal": true,
+          "rows": [
+            {
+              "group": "original",
+              "arm": "refined80-same-physics",
+              "case": "hollowsphere_1D-inner",
+              "quantity": "sigma_t_Pa",
+              "unit": "Pa",
+              "reference": -313157895.0,
+              "actual": -311930000.0,
+              "signed_error": 1227895.0,
+              "relative_error_percent": 0.3921009240402513
+            },
+            {
+              "group": "original",
+              "arm": "refined80-same-physics",
+              "case": "hollowsphere_1D-inner",
+              "quantity": "sigma_r_Pa",
+              "unit": "Pa",
+              "reference": -100000000.0,
+              "actual": -100000000.0,
+              "signed_error": 0.0,
+              "relative_error_percent": 0.0
+            },
+            {
+              "group": "original",
+              "arm": "refined80-same-physics",
+              "case": "hollowsphere_1D-inner",
+              "quantity": "epsilon_t",
+              "unit": "1",
+              "reference": -0.018921,
+              "actual": -0.0188351,
+              "signed_error": 8.589999999999987e-05,
+              "relative_error_percent": 0.453992917921885
+            },
+            {
+              "group": "original",
+              "arm": "refined80-same-physics",
+              "case": "hollowsphere_1D-inner",
+              "quantity": "epsilon_r",
+              "unit": "1",
+              "reference": 0.008789,
+              "actual": 0.00871583,
+              "signed_error": -7.316999999999914e-05,
+              "relative_error_percent": -0.8325179201274222
+            },
+            {
+              "group": "original",
+              "arm": "refined80-same-physics",
+              "case": "hollowsphere_1D-inner",
+              "quantity": "u_r_m",
+              "unit": "m",
+              "reference": -3.784211e-06,
+              "actual": -3.78417e-06,
+              "signed_error": 4.0999999999649444e-11,
+              "relative_error_percent": 0.0010834490994199174
+            },
+            {
+              "group": "original",
+              "arm": "refined80-same-physics",
+              "case": "hollowsphere_1D-outer",
+              "quantity": "sigma_t_Pa",
+              "unit": "Pa",
+              "reference": -263157895.0,
+              "actual": -263405000.0,
+              "signed_error": -247105.0,
+              "relative_error_percent": -0.0938998999061001
+            },
+            {
+              "group": "original",
+              "arm": "refined80-same-physics",
+              "case": "hollowsphere_1D-outer",
+              "quantity": "sigma_r_Pa",
+              "unit": "Pa",
+              "reference": -200000000.0,
+              "actual": -200000000.0,
+              "signed_error": 0.0,
+              "relative_error_percent": 0.0
+            },
+            {
+              "group": "original",
+              "arm": "refined80-same-physics",
+              "case": "hollowsphere_1D-outer",
+              "quantity": "epsilon_t",
+              "unit": "1",
+              "reference": -0.012421,
+              "actual": -0.0124383,
+              "signed_error": -1.7299999999999607e-05,
+              "relative_error_percent": -0.13928025118750187
+            },
+            {
+              "group": "original",
+              "arm": "refined80-same-physics",
+              "case": "hollowsphere_1D-outer",
+              "quantity": "epsilon_r",
+              "unit": "1",
+              "reference": -0.004211,
+              "actual": -0.00419571,
+              "signed_error": 1.529000000000027e-05,
+              "relative_error_percent": 0.36309665162669835
+            },
+            {
+              "group": "original",
+              "arm": "refined80-same-physics",
+              "case": "hollowsphere_1D-outer",
+              "quantity": "u_r_m",
+              "unit": "m",
+              "reference": -3.726316e-06,
+              "actual": -3.72625e-06,
+              "signed_error": 6.599999999970426e-11,
+              "relative_error_percent": 0.001771186340603005
+            }
+          ]
+        }
+      ],
+      "compatibility_patch": {
+        "reason": "原版0..10零线功率表在终点查询下一标记越界，原样尝试失败；只添加区间外的20s零载荷尾点，保留0..10s物理历程、几何、材料和压力。",
+        "before": {
+          "heatSourceOptions/timePoints": "( 0 10 )",
+          "heatSourceOptions/lhgr": "( 0 0 )"
+        },
+        "changes": [
+          {
+            "file": "constant/solverDict",
+            "entry": "heatSourceOptions/timePoints",
+            "value": "( 0 10 20 )"
+          },
+          {
+            "file": "constant/solverDict",
+            "entry": "heatSourceOptions/lhgr",
+            "value": "( 0 0 0 )"
+          }
+        ],
+        "independent_from_previous_DSH_experiment": true
+      },
+      "refinement_patch": {
+        "purpose": "一次固定物理参数的20到80径向单元加密，仅诊断边界应力/应变误差收敛，不加入原六会话成绩。",
+        "changes": [
+          {
+            "file": "constant/solverDict",
+            "entry": "heatSourceOptions/timePoints",
+            "value": "( 0 10 20 )"
+          },
+          {
+            "file": "constant/solverDict",
+            "entry": "heatSourceOptions/lhgr",
+            "value": "( 0 0 0 )"
+          },
+          {
+            "file": "system/blockMeshDict",
+            "entry": "blocks",
+            "value": "( hex ( 0 1 2 3 4 5 6 7 ) buffer ( 80 1 1 ) simpleGrading ( 1 1 1 ) )"
+          }
+        ],
+        "model_requests": 0
+      },
+      "comparison_limit": "原版未声明统一通过公差。仅报告各物理量误差；兼容修复算例与不改卡复现分开。"
+    },
+    "case1_solved": {
+      "reference_kind": "本地教程有工况数据与MATLAB grader说明，没有本地公开固定温度答案表。",
+      "reference_path": "/home/lwz/offbeat/Cases/testCases/exerciseOFFBEAT/case1_solved/README.md",
+      "comparison_limit": "本次G01改变了尺寸、功率、h、壁温等，采用同参数解析式核对；未宣称原版全年瞬态官方答案已复现。"
+    }
+  },
+  "new_review_solver_starts": 3,
+  "new_DSH_sessions": 0,
+  "scope": "改编题的解析参照与原始样例的固定答案分开；原版复核不计入此前六次会话成本。",
+  "prior_experiment_unchanged": true
+}

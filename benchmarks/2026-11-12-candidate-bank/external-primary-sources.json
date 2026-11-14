@@ -1,0 +1,129 @@
+{
+  "checked_date": "2026-11-12",
+  "timezone": "Asia/Shanghai",
+  "sources": [
+    {
+      "id": "S1",
+      "title": "BISON：ECAR 131 Verification Problems",
+      "url": "https://mooseframework.inl.gov/bison/verification/ECAR_131/ECAR_131.html",
+      "publisher": "INL / BISON",
+      "verified": "已打开公开原始文档",
+      "scope": "含平壁/圆柱对流、内热源、辐射及其他传热验证。",
+      "caution": "网页部分公式符号、单位上标由数学排版呈现；正式取参数须核对原式和完整单位，不从抓取纯文本直接抄数。"
+    },
+    {
+      "id": "S2",
+      "title": "BISON：ECAR 202 Verification Problems",
+      "url": "https://mooseframework.inl.gov/bison/verification/ECAR_202/ECAR_202.html",
+      "publisher": "INL / BISON",
+      "verified": "已打开公开原始文档",
+      "scope": "热约束应力与厚壁圆筒验证。",
+      "caution": "统一单位并明确轴向约束；文档中的BISON误差不能直接作为OFFBEAT容差。"
+    },
+    {
+      "id": "S3",
+      "title": "BISON：Spherical Shell",
+      "url": "https://mooseframework.inl.gov/bison/verification/Mechanics/spherical_shell/spherical_shell.html",
+      "publisher": "INL / BISON",
+      "verified": "已读取公开原始文档",
+      "scope": "CRP-6的前三个单层或双层涂层弹性球壳问题。",
+      "caution": "本地C02采用不同压力，是同家族改编，不声称参数等同；双层问题还须完整材料参数。"
+    },
+    {
+      "id": "S4",
+      "title": "BISON：Coupled Thermomechanics Bar Problem",
+      "url": "https://mooseframework.inl.gov/bison/verification/Thermomechanics/bar/bar.html",
+      "publisher": "INL / BISON",
+      "verified": "已打开公开原始文档",
+      "scope": "位移与边界热流相互反馈的热机耦合杆。",
+      "caution": "现有OFFBEAT输入能否表达该反馈尚未确认，不能当作即用算例。"
+    },
+    {
+      "id": "S5",
+      "title": "BISON：In pile long lived or stable isotopes",
+      "url": "https://mooseframework.inl.gov/bison/verification/TRISO_diffusion/InPileStable.html",
+      "publisher": "INL / BISON",
+      "verified": "已打开公开原始文档",
+      "scope": "堆内长寿命或稳定核素扩散的验证题源。",
+      "caution": "含生成源问题不能直接拿无源扩散释放曲线作答案；须核对OFFBEAT源项与边界支持。"
+    },
+    {
+      "id": "S6",
+      "title": "BISON：Verification",
+      "url": "https://mooseframework.inl.gov/bison/assessment/verification.html",
+      "publisher": "INL / BISON",
+      "verified": "已打开公开原始文档",
+      "scope": "验证方法和公开问题索引。",
+      "caution": "这里只用作题源导航和验证方法依据，不把其他代码的验证自动视为本项目已验证。"
+    }
+  ],
+  "leads": [
+    {
+      "id": "E01",
+      "title": "平壁对流降温",
+      "source_id": "S1",
+      "description": "源题#1/#2；比较绝热面与对流面的瞬态温度。",
+      "benchmark_value": "独立导热解和时间离散误差。",
+      "remaining_work": "需建立矩形热学输入并核对完整单位。"
+    },
+    {
+      "id": "E02",
+      "title": "圆柱对流降温",
+      "source_id": "S1",
+      "description": "源题#3；比较中心与外表面温度随时间的变化。",
+      "benchmark_value": "柱坐标瞬态解，区分中心外推与存储单元。",
+      "remaining_work": "需定义单实体圆柱、对流边界和采样位置。"
+    },
+    {
+      "id": "E03",
+      "title": "平壁内热源稳态",
+      "source_id": "S1",
+      "description": "源题#4/#5；验证温度剖面和体热源积分。",
+      "benchmark_value": "独立解析剖面和总体能量核算。",
+      "remaining_work": "需冻结SI参数及实际热源输入。"
+    },
+    {
+      "id": "E04",
+      "title": "同心圆柱间辐射",
+      "source_id": "S1",
+      "description": "源题#8；比较两侧通量与总热量。",
+      "benchmark_value": "区分通量密度与总量，考虑两侧面积。",
+      "remaining_work": "纯辐射耦合接口和可用边界尚待核对。"
+    },
+    {
+      "id": "E05",
+      "title": "两端受约束的热应力",
+      "source_id": "S2",
+      "description": "以原热应变应力题为来源，检查温升后的约束反力和应力。",
+      "benchmark_value": "热膨胀、约束与符号的独立关系。",
+      "remaining_work": "统一单位，明确侧向自由条件；与厚壁圆筒题分开。"
+    },
+    {
+      "id": "E06",
+      "title": "TRISO单层与双层球壳",
+      "source_id": "S3",
+      "description": "公开CRP-6案例1—3的涂层弹性问题。",
+      "benchmark_value": "球壳应力、材料界面与独立解析参考。",
+      "remaining_work": "单层较容易；双层要补齐材料和界面条件。"
+    },
+    {
+      "id": "E07",
+      "title": "有生成源的球形核素扩散",
+      "source_id": "S5",
+      "description": "从公开堆内稳定核素扩散验证题定稿。",
+      "benchmark_value": "源项、库存与外释放同时闭合。",
+      "remaining_work": "当前无源C06不能直接替代；源项实现待核对。"
+    },
+    {
+      "id": "E08",
+      "title": "位移反馈热流的热机耦合杆",
+      "source_id": "S4",
+      "description": "公开耦合杆题，温度和位移相互影响。",
+      "benchmark_value": "真正的双向耦合，而非先热后力单向计算。",
+      "remaining_work": "现有输入不一定能直接表达，作为后续拓展线索。"
+    }
+  ],
+  "counting_note": "8条公开题源线索与28个本地候选可能同家族，不叠加宣称为36种独立物理基准。",
+  "offbeat_starts": 0,
+  "model_calls": 0
+}

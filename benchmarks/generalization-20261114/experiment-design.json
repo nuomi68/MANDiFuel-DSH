@@ -1,0 +1,45 @@
+{
+  "created_at_beijing": "2026-11-14T12:03:10.516899+08:00",
+  "task_ids": [
+    "C02",
+    "C08",
+    "F01"
+  ],
+  "arms": [
+    "bare",
+    "skill"
+  ],
+  "model": "deepseek-official/deepseek-v4-flash",
+  "task_selection": "未参与前轮C06契约固化：球壳力学、双区域瞬态能量、三孔径固定点扫描。均不命中Cs专用契约。",
+  "treatment": "当前完整Skill配置（含运行助手身份、协议、公开工具）对裸DSH；不在实验中修改产品。",
+  "same_conditions": [
+    "题面逐字投放",
+    "相同源输入与计算配方",
+    "各题相同OFFBEAT启动预算",
+    "相同模型和1800秒会话上限",
+    "任务工具离线",
+    "源只读，组间及旧运行内容隔离"
+  ],
+  "solver_caps": {
+    "C02": 2,
+    "C08": 2,
+    "F01": 4
+  },
+  "no_injection": [
+    "历史轨迹",
+    "已知数值答案",
+    "额外指定求解步骤或工作流",
+    "C06专用任务提示"
+  ],
+  "primary_checks": "按generalization_checks.py：真实执行与题面输入、实际终态场、所需数据表和单位/物理对象覆盖。字段/边界值另做证据复核；不以模型说完成判定成功。",
+  "cost_measures": [
+    "模型/工具/求解/交付总墙钟",
+    "工具调用与模型轮次",
+    "非缓存输入/缓存读取/输出/totalTokens",
+    "真实OFFBEAT启动与失败",
+    "源码及环境探测/联网尝试"
+  ],
+  "limits": "每题一次配对、六会话共享主机/API；完成范围相同才描述成本变化，不把更早失败当加速；这评估完整当前配置，未隔离单条规则因果作用。",
+  "check_code_sha256": "93d292cdc6ba96b585df39006bf15fee4f0a4117bd9712da0795336a46bfdf2c",
+  "organizer_physics_solves": 0
+}

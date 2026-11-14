@@ -1,0 +1,188 @@
+{
+  "tasks": {
+    "G01": {
+      "bare": {
+        "status": "checked",
+        "numeric_values_checked": 156,
+        "errors": [],
+        "files": [
+          {
+            "file": "results/profile_full_fine.csv",
+            "numeric_values_checked": 52
+          },
+          {
+            "file": "results/profile_coarse.csv",
+            "numeric_values_checked": 26
+          },
+          {
+            "file": "results/profile_full_coarse.csv",
+            "numeric_values_checked": 26
+          },
+          {
+            "file": "results/profile_fine.csv",
+            "numeric_values_checked": 52
+          }
+        ]
+      },
+      "skill": {
+        "status": "checked",
+        "numeric_values_checked": 78,
+        "errors": [],
+        "files": [
+          {
+            "file": "results/profiles/mesh20-6-clad.csv",
+            "numeric_values_checked": 6
+          },
+          {
+            "file": "results/profiles/mesh20-6-fuel.csv",
+            "numeric_values_checked": 20
+          },
+          {
+            "file": "results/profiles/mesh40-12-fuel.csv",
+            "numeric_values_checked": 40
+          },
+          {
+            "file": "results/profiles/mesh40-12-clad.csv",
+            "numeric_values_checked": 12
+          }
+        ]
+      }
+    },
+    "G02": {
+      "bare": {
+        "status": "checked",
+        "numeric_values_checked": 2640,
+        "errors": [],
+        "files": [
+          {
+            "file": "results/sens_ip40_n60_w2.0/radial_profile.csv",
+            "numeric_values_checked": 180
+          },
+          {
+            "file": "results/sens_ip40_n60_w1.0/radial_profile.csv",
+            "numeric_values_checked": 180
+          },
+          {
+            "file": "results/sens_ip40_n40_w0.5/radial_profile.csv",
+            "numeric_values_checked": 120
+          },
+          {
+            "file": "results/sens_ip40_n60_w0.5/radial_profile.csv",
+            "numeric_values_checked": 180
+          },
+          {
+            "file": "results/sens_ip40_n120_w0.5/radial_profile.csv",
+            "numeric_values_checked": 360
+          },
+          {
+            "file": "results/caseB_ip80_po5_n80_w0.5/radial_profile.csv",
+            "numeric_values_checked": 240
+          },
+          {
+            "file": "results/sens_ip40_n80_w1.0/radial_profile.csv",
+            "numeric_values_checked": 240
+          },
+          {
+            "file": "results/sens_ip40_n80_w0.5/radial_profile.csv",
+            "numeric_values_checked": 240
+          },
+          {
+            "file": "results/sens_ip40_n60_w0.25/radial_profile.csv",
+            "numeric_values_checked": 180
+          },
+          {
+            "file": "results/sens_ip40_n40_w1.0/radial_profile.csv",
+            "numeric_values_checked": 120
+          },
+          {
+            "file": "results/caseA_ip40_po5_n80_w0.5/radial_profile.csv",
+            "numeric_values_checked": 240
+          },
+          {
+            "file": "results/sens_ip40_n120_w1.0/radial_profile.csv",
+            "numeric_values_checked": 360
+          }
+        ]
+      },
+      "skill": {
+        "status": "checked",
+        "numeric_values_checked": 360,
+        "errors": [],
+        "files": [
+          {
+            "file": "results/pi40_radial_profile.csv",
+            "numeric_values_checked": 180
+          },
+          {
+            "file": "results/pi80_radial_profile.csv",
+            "numeric_values_checked": 180
+          }
+        ]
+      }
+    },
+    "M01": {
+      "bare": {
+        "status": "checked",
+        "numeric_values_checked": 726,
+        "errors": [],
+        "files": [
+          {
+            "file": "case/results/radial_profiles_selected.csv",
+            "numeric_values_checked": 60
+          },
+          {
+            "file": "case/results/inventory_release_history.csv",
+            "numeric_values_checked": 93
+          },
+          {
+            "file": "case/results/radial_profile_30000_vs_analytic.csv",
+            "numeric_values_checked": 60
+          },
+          {
+            "file": "case/results/radial_profile_30000.csv",
+            "numeric_values_checked": 60
+          },
+          {
+            "file": "case_mesh120/results/radial_profiles_selected.csv",
+            "numeric_values_checked": 120
+          },
+          {
+            "file": "case_mesh120/results/inventory_release_history.csv",
+            "numeric_values_checked": 93
+          },
+          {
+            "file": "case_mesh120/results/radial_profile_30000_vs_analytic.csv",
+            "numeric_values_checked": 120
+          },
+          {
+            "file": "case_mesh120/results/radial_profile_30000.csv",
+            "numeric_values_checked": 120
+          }
+        ]
+      },
+      "skill": {
+        "status": "checked",
+        "numeric_values_checked": 230,
+        "errors": [],
+        "files": [
+          {
+            "file": "delivery/cs_release_history.csv",
+            "numeric_values_checked": 90
+          },
+          {
+            "file": "delivery/cs_radial_profile_30000.csv",
+            "numeric_values_checked": 70
+          },
+          {
+            "file": "case/results/cs_radial_profile.csv",
+            "numeric_values_checked": 70
+          }
+        ]
+      }
+    }
+  },
+  "numeric_values_checked": 4190,
+  "organizer_solver_starts": 0,
+  "retained_inputs_modified": false,
+  "scope": "实际单元剖面及Cs库存/释放历史与原生场匹配；只检查报告声明的数值对象，单元中心不当成边界面值；附加解析列不作为求解结果。"
+}

@@ -1,0 +1,16 @@
+{
+  "Assemble delivery: inputs, roots, logs, status, scripts, report": "整理交付：输入、结果根目录、日志、状态、脚本和报告",
+  "Bind and batch-edit rodDict radii + solverDict cold dims with readback": "绑定并批量修改 rodDict 半径及 solverDict 冷态尺寸，然后回读确认",
+  "Classify task and record plan/evidence in workspace": "分类任务，并在工作区记录计划和证据",
+  "Create B_restart and run continuation 788400→1576800 (launch 3)": "创建 B_restart，执行 788400→1576800 秒续算，计划为第 3 次启动",
+  "Extract final T, D and history-variable tables for both branches": "提取两分支的终态 T、D 及历史变量表",
+  "Isolate source-case into target-case": "将 source-case 复制为隔离的 target-case",
+  "Prepare independent cases A (0→1576800) and B (0→788400) from source-case": "从 source-case 准备独立 A 算例（0→1576800 秒）和 B 算例（0→788400 秒）",
+  "Record classification/source/budget note (prepare)": "记录输入准备类任务的分类、来源和预算",
+  "Regenerate system/blockMeshDict from updated rodDict": "使用更新后的 rodDict 重新生成 system/blockMeshDict",
+  "Run branch A via public executor (launch 1)": "通过公共执行器运行 A 分支，计划为第 1 次启动",
+  "Run branch B first half via public executor (launch 2)": "通过公共执行器运行 B 分支前半段，计划为第 2 次启动",
+  "Validate mesh with blockMesh in scratch copy (no OFFBEAT)": "在临时副本中使用 blockMesh 检查网格，不运行 OFFBEAT",
+  "Verify B handover state and archive 788400 state files": "检查 B 分支交接状态并归档 788400 秒状态文件",
+  "Write prepare.json and modified-parameter values, final verify": "写出 prepare.json 和修改后的参数值，完成最终核对"
+}

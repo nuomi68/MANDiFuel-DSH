@@ -1,0 +1,96 @@
+{
+  "passed": true,
+  "candidate_count": 28,
+  "main_candidates": 26,
+  "free_controls": 2,
+  "workflow_counts": {
+    "prepare": 3,
+    "case": 9,
+    "fixed-study": 6,
+    "sampling-study": 2,
+    "adaptive-study": 2,
+    "results": 4,
+    "free": 2
+  },
+  "prompt_files": 29,
+  "used_source_cases": 21,
+  "used_reference_files_verified": 77,
+  "source_inventory": {
+    "cards": 137,
+    "case_directories_found": 137,
+    "selected_reference_files_checked": 465,
+    "reference_file_hash_mismatches": 0
+  },
+  "offbeat_starts": 0,
+  "rag_api_calls": 0,
+  "numeric_validation": "not performed",
+  "model_validation": "not performed",
+  "errors": [],
+  "relative_links_checked": 34,
+  "external_primary_sources": 6,
+  "external_topic_leads": 8,
+  "solve_manifest_tasks": 19,
+  "auxiliary_tasks": 10,
+  "prompt_policy_check": {
+    "passed": true,
+    "updated_candidate_prompts": 28,
+    "new_existing_kth_prompt": 1,
+    "solve_manifest_tasks": 19,
+    "auxiliary_tasks": 10,
+    "no_evaluation_framing_in_prompts": true,
+    "manifest_excludes_organizer_fields": true,
+    "historical_kth_preserved": true,
+    "dsh_runs": 0,
+    "offbeat_starts": 0,
+    "errors": [],
+    "relative_links_checked": 32,
+    "task_json_representation": "complete_actor_prompt"
+  },
+  "tested_dsh_model_calls": 0,
+  "prompt_diversification": {
+    "passed": true,
+    "prompts": 29,
+    "writer_model_configurations": 8,
+    "reasoning_efforts": [
+      "high",
+      "low",
+      "medium",
+      "xhigh"
+    ],
+    "cross_model_semantic_reviews": "passed, 29 covered",
+    "solve_tasks": 19,
+    "auxiliary_tasks": 10,
+    "prompt_hashes": "passed",
+    "task_json_matches": "passed",
+    "references_checked": 34,
+    "kth_output_fields": "passed",
+    "diversity": {
+      "before": {
+        "prompt_count": 29,
+        "unique_final_paragraphs": 2,
+        "largest_identical_final_paragraph_group": 28,
+        "sentences_30_chars_shared_by_3_or_more": 3,
+        "characters_total": 12329,
+        "characters_min": 295,
+        "characters_max": 1233,
+        "has_markdown_table": 0,
+        "last_character_not_sentence_punctuation": 0
+      },
+      "after": {
+        "prompt_count": 29,
+        "unique_final_paragraphs": 29,
+        "largest_identical_final_paragraph_group": 1,
+        "sentences_30_chars_shared_by_3_or_more": 0,
+        "characters_total": 10752,
+        "characters_min": 69,
+        "characters_max": 1426,
+        "has_markdown_table": 3,
+        "last_character_not_sentence_punctuation": 3
+      },
+      "note": "重复度是文本结构指标，不代表数值正确性或求解性能；正式题和口语题均保留。"
+    },
+    "tested_dsh_runs": 0,
+    "offbeat_starts": 0,
+    "errors": []
+  }
+}

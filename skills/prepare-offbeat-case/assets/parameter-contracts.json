@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "contracts": {
+    "fpdiffusion-cs-constant-v1": {
+      "scope": "已验证的单 UO2 材料区、byZone/byList 单 FpDiffusion、单 Cs 组分；d1=D，q1=d2=q2=0。其他组合不覆盖。",
+      "selectors": {"elementTransport": "byList", "materialProperties": "byZone"},
+      "owner": "constant/solverDict:materials/<zone>/fissionProductsTransport/Cs",
+      "field": "diffCs",
+      "field_dimensions": [0, 2, -1, 0, 0, 0, 0],
+      "unit": "m²/s",
+      "provenance": "2026-11-14：原生 OFFBEAT 留存输入与 50 个正时间实际 diffCs 场交叉确认；不是由初始场赋值推断。仅记录已测安装兼容范围，运行后仍必须验证实际场。"
+    }
+  }
+}

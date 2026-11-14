@@ -1,0 +1,20 @@
+{
+  "reason": "原版0..10零线功率表在终点查询下一标记越界，原样尝试失败；只添加区间外的20s零载荷尾点，保留0..10s物理历程、几何、材料和压力。",
+  "before": {
+    "heatSourceOptions/timePoints": "( 0 10 )",
+    "heatSourceOptions/lhgr": "( 0 0 )"
+  },
+  "changes": [
+    {
+      "file": "constant/solverDict",
+      "entry": "heatSourceOptions/timePoints",
+      "value": "( 0 10 20 )"
+    },
+    {
+      "file": "constant/solverDict",
+      "entry": "heatSourceOptions/lhgr",
+      "value": "( 0 0 0 )"
+    }
+  ],
+  "independent_from_previous_DSH_experiment": true
+}

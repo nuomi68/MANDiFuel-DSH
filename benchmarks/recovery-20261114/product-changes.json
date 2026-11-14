@@ -1,0 +1,72 @@
+[
+  {
+    "path": "README.md",
+    "before_sha256": "2182851c59981de52037e6384775daafdb176df01f8fcb626bbd41bb72fc3ce8",
+    "after_sha256": "9f0ed89e4545e41e886aad69764a45edc910e1da54c33b6c5a5722a5626e28f7"
+  },
+  {
+    "path": "STUDY_PROTOCOL.md",
+    "before_sha256": "cd4e9fae9ca8ee3cdd50b2f6fb2363c9934470fac4eec64ac82d4e8603c4b01c",
+    "after_sha256": "4680b45cff4ce840c6a1d081f1394140533e5b230e8074f1ce20b622611ab70e"
+  },
+  {
+    "path": "artifact-manifest.json",
+    "before_sha256": "589feb564aab994959ac12294a3c8aeca34771b9d7f9cc0c60061f5b41e8fdf2",
+    "after_sha256": "9bd11b568a9a6f1ce2bcd5ac8487f35dd037e29578b64f948be6c43bb824f937"
+  },
+  {
+    "path": "dsh/run-assistant-persona.md",
+    "before_sha256": "aa779cbc7848c325c620a18e3b1b6b81f8bc64be85fdaf0e15ac707ce48ccd81",
+    "after_sha256": "7980e30e65a88e8210b77d15d7e1d055b5090e229bc5463cc9430dea34b73f9e"
+  },
+  {
+    "path": "lib/mandifuel_run/case.py",
+    "before_sha256": "df8d8bf1c6a2063a949addda0c53e66b2c3c3a77dfaf75249cbfc0f713b6afa1",
+    "after_sha256": "c3487961d97d2d03b7245e69ed59b45a476f940d9c4499a24ea5053d409aec3e"
+  },
+  {
+    "path": "skills/conduct-offbeat-study/SKILL.md",
+    "before_sha256": "66d969e77f3b0906ee9c913bdec9b87635b4a3193d78cd5c62d81562ca539df3",
+    "after_sha256": "65e321041a25c00d16e03abd7c0a2597ed6c800f8d80ebe16a2b30203bead0b1"
+  },
+  {
+    "path": "skills/orchestrate-offbeat-study/SKILL.md",
+    "before_sha256": "e3bd2d97b72e19c72ad0e71df8891364e559770a653afcf6341a0ddfa6d5b8f7",
+    "after_sha256": "4e24bab279d79b601a7eb39dd9593bd5d03cf2aaddb04d648ba4a98c23d51fb5"
+  },
+  {
+    "path": "skills/execute-offbeat-case/SKILL.md",
+    "before_sha256": "11c9e4af5d15fc202abff8ef142e248e5bfe88a545fd2c46af0128cca8116e2b",
+    "after_sha256": "1679bedca2e54c143e3696e96598a2877f314fe3ba2eb416ef85f0e9142297cd"
+  },
+  {
+    "path": "skills/prepare-offbeat-case/SKILL.md",
+    "before_sha256": "fa446f01192f16aeff28befd9a13e18fe122ad1c078e1da5a654449ab6ff557b",
+    "after_sha256": "c8b34af86068dd105c2edd643b8fa17f8edbcad055c2acd145121758ff8db8c6"
+  },
+  {
+    "path": "skills/conduct-offbeat-study/references/sweeps-and-candidates.md",
+    "before_sha256": "90446bc6146c9c1150aa3def7aafe045f09ba49e00f0dc77164bab8d6558d3f4",
+    "after_sha256": "02b0ed7f0173e9b9a268fb7b53e362745d8e03ac0fc5dd06343d4bae565c0308"
+  },
+  {
+    "path": "skills/conduct-offbeat-study/references/optimization.md",
+    "before_sha256": "f6c0ce268731a2f74a612ed48bd5b16e62f0327a364f0cf306eb389b46e8d575",
+    "after_sha256": "39fb24dedc4659b9e0134458735b649f7c1929f8b535594ca76007afc376fbd7"
+  },
+  {
+    "path": "skills/execute-offbeat-case/references/time-and-restart.md",
+    "before_sha256": "cb882fca77eb160ac56abf327b9378df7209b84a879024a22a01ced0bc93b9b9",
+    "after_sha256": "8eb9bd9afce28c1435d8b884f31a6ac2d8ff20238949b196aff13bd14af9fdb9"
+  },
+  {
+    "path": "skills/execute-offbeat-case/references/input-recovery.md",
+    "before_sha256": null,
+    "after_sha256": "37ce3dd6d35e6859e4197417ee8830a7f831a9b8ca72e7dc1d6c5a2f7391e268"
+  },
+  {
+    "path": "skills/prepare-offbeat-case/references/parameter-plan.md",
+    "before_sha256": "2d7893cc9ced84ab4bf033438e26706ede7d15d9bc872819cd3c637eba14f9af",
+    "after_sha256": "820c2b6c2dc736aba0cc9ebec6d2b3ba5542743403aac5aeb6ac827a64728bab"
+  }
+]

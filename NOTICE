@@ -1,0 +1,19 @@
+MANDiFuel DSH
+Copyright (C) 2026 MANDiFuel contributors
+
+Original project code, Skills, documentation and original corpus curation are
+licensed under the GNU General Public License, version 3 or (at your option)
+any later version (SPDX: GPL-3.0-or-later). See LICENSE for the complete terms
+and disclaimer of warranty, including merchantability and fitness.
+
+The case-card corpus describes examples from the foam-for-nuclear project /
+OFFBEAT contributors. OFFBEAT is licensed under GPL-3.0-or-later. Upstream
+copyright and license notices remain applicable to incorporated material.
+No ownership of upstream material is claimed.
+Upstream: https://gitlab.com/foam-for-nuclear/offbeat
+License: https://gitlab.com/foam-for-nuclear/offbeat/-/blob/develop/LICENSE
+
+Stored description vectors are generated numerical data, not model weights.
+No rights to external models, services or trademarks are granted here.
+Preserve LICENSE, NOTICE, THIRD_PARTY_NOTICES.md and rag/PROVENANCE.md when
+redistributing this package.

@@ -1,0 +1,303 @@
+{
+  "passed": true,
+  "checks": [
+    {
+      "check": "all_six_sessions_finished",
+      "passed": true
+    },
+    {
+      "check": "frozen_plugin_unchanged",
+      "passed": true
+    },
+    {
+      "check": "shared_RAG_library_manuals_unchanged",
+      "passed": true
+    },
+    {
+      "check": "launch_definitions_unchanged",
+      "passed": true
+    },
+    {
+      "check": "organizer_targets_unchanged",
+      "passed": true
+    },
+    {
+      "check": "same_RAG_query_implementation",
+      "passed": true
+    },
+    {
+      "check": "G01_same_effective_prompt",
+      "passed": true
+    },
+    {
+      "check": "G01/bare_isolation",
+      "passed": true
+    },
+    {
+      "check": "G01/bare_no_preselected_inputs",
+      "passed": true
+    },
+    {
+      "check": "G01/bare_prompt_identical",
+      "passed": true
+    },
+    {
+      "check": "G01/bare_boot",
+      "passed": true
+    },
+    {
+      "check": "G01/bare_toolchain",
+      "passed": true
+    },
+    {
+      "check": "G01/bare_wrapper_unchanged",
+      "passed": true
+    },
+    {
+      "check": "G01/bare_all_solver_evidence_retained",
+      "passed": true
+    },
+    {
+      "check": "G01/bare_no_solve_count_cap",
+      "passed": true
+    },
+    {
+      "check": "G01/bare_same_model_route",
+      "passed": true
+    },
+    {
+      "check": "G01/bare_no_skill_tool",
+      "passed": true
+    },
+    {
+      "check": "G01/bare_no_observed_sensitive_exposure",
+      "passed": true
+    },
+    {
+      "check": "G01/skill_isolation",
+      "passed": true
+    },
+    {
+      "check": "G01/skill_no_preselected_inputs",
+      "passed": true
+    },
+    {
+      "check": "G01/skill_prompt_identical",
+      "passed": true
+    },
+    {
+      "check": "G01/skill_boot",
+      "passed": true
+    },
+    {
+      "check": "G01/skill_toolchain",
+      "passed": true
+    },
+    {
+      "check": "G01/skill_wrapper_unchanged",
+      "passed": true
+    },
+    {
+      "check": "G01/skill_all_solver_evidence_retained",
+      "passed": true
+    },
+    {
+      "check": "G01/skill_no_solve_count_cap",
+      "passed": true
+    },
+    {
+      "check": "G01/skill_same_model_route",
+      "passed": true
+    },
+    {
+      "check": "G01/skill_no_observed_sensitive_exposure",
+      "passed": true
+    },
+    {
+      "check": "G02_same_effective_prompt",
+      "passed": true
+    },
+    {
+      "check": "G02/bare_isolation",
+      "passed": true
+    },
+    {
+      "check": "G02/bare_no_preselected_inputs",
+      "passed": true
+    },
+    {
+      "check": "G02/bare_prompt_identical",
+      "passed": true
+    },
+    {
+      "check": "G02/bare_boot",
+      "passed": true
+    },
+    {
+      "check": "G02/bare_toolchain",
+      "passed": true
+    },
+    {
+      "check": "G02/bare_wrapper_unchanged",
+      "passed": true
+    },
+    {
+      "check": "G02/bare_all_solver_evidence_retained",
+      "passed": true
+    },
+    {
+      "check": "G02/bare_no_solve_count_cap",
+      "passed": true
+    },
+    {
+      "check": "G02/bare_same_model_route",
+      "passed": true
+    },
+    {
+      "check": "G02/bare_no_skill_tool",
+      "passed": true
+    },
+    {
+      "check": "G02/bare_no_observed_sensitive_exposure",
+      "passed": true
+    },
+    {
+      "check": "G02/skill_isolation",
+      "passed": true
+    },
+    {
+      "check": "G02/skill_no_preselected_inputs",
+      "passed": true
+    },
+    {
+      "check": "G02/skill_prompt_identical",
+      "passed": true
+    },
+    {
+      "check": "G02/skill_boot",
+      "passed": true
+    },
+    {
+      "check": "G02/skill_toolchain",
+      "passed": true
+    },
+    {
+      "check": "G02/skill_wrapper_unchanged",
+      "passed": true
+    },
+    {
+      "check": "G02/skill_all_solver_evidence_retained",
+      "passed": true
+    },
+    {
+      "check": "G02/skill_no_solve_count_cap",
+      "passed": true
+    },
+    {
+      "check": "G02/skill_same_model_route",
+      "passed": true
+    },
+    {
+      "check": "G02/skill_no_observed_sensitive_exposure",
+      "passed": true
+    },
+    {
+      "check": "M01_same_effective_prompt",
+      "passed": true
+    },
+    {
+      "check": "M01/bare_isolation",
+      "passed": true
+    },
+    {
+      "check": "M01/bare_no_preselected_inputs",
+      "passed": true
+    },
+    {
+      "check": "M01/bare_prompt_identical",
+      "passed": true
+    },
+    {
+      "check": "M01/bare_boot",
+      "passed": true
+    },
+    {
+      "check": "M01/bare_toolchain",
+      "passed": true
+    },
+    {
+      "check": "M01/bare_wrapper_unchanged",
+      "passed": true
+    },
+    {
+      "check": "M01/bare_all_solver_evidence_retained",
+      "passed": true
+    },
+    {
+      "check": "M01/bare_no_solve_count_cap",
+      "passed": true
+    },
+    {
+      "check": "M01/bare_same_model_route",
+      "passed": true
+    },
+    {
+      "check": "M01/bare_no_skill_tool",
+      "passed": true
+    },
+    {
+      "check": "M01/bare_no_observed_sensitive_exposure",
+      "passed": true
+    },
+    {
+      "check": "M01/skill_isolation",
+      "passed": true
+    },
+    {
+      "check": "M01/skill_no_preselected_inputs",
+      "passed": true
+    },
+    {
+      "check": "M01/skill_prompt_identical",
+      "passed": true
+    },
+    {
+      "check": "M01/skill_boot",
+      "passed": true
+    },
+    {
+      "check": "M01/skill_toolchain",
+      "passed": true
+    },
+    {
+      "check": "M01/skill_wrapper_unchanged",
+      "passed": true
+    },
+    {
+      "check": "M01/skill_all_solver_evidence_retained",
+      "passed": true
+    },
+    {
+      "check": "M01/skill_no_solve_count_cap",
+      "passed": true
+    },
+    {
+      "check": "M01/skill_same_model_route",
+      "passed": true
+    },
+    {
+      "check": "M01/skill_no_observed_sensitive_exposure",
+      "passed": true
+    },
+    {
+      "check": "all_selected_sessions_same_source_library",
+      "passed": true
+    },
+    {
+      "check": "no_sensitive_exposure",
+      "passed": true
+    }
+  ],
+  "scope": "实验输入、同等检索、空目标起点、隔离、冻结、路由和执行证据；任务结果及物理误差另外列出。",
+  "organizer_solver_starts": 0
+}

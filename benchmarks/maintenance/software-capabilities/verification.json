@@ -1,0 +1,552 @@
+{
+  "passed": 24,
+  "checks": [
+    "一次查询返回多个相关能力",
+    "关闭力学值与气体值分别定义",
+    "未知查询不会伪造能力",
+    "未收录能力明确返回未收录",
+    "每个选择器证据来源可追溯",
+    "未核实材料不输出猜测的selector",
+    "未核实燃耗单位不补造",
+    "八个公共API签名与实际导出一致",
+    "能力表的本地引用均可解析",
+    "公开入口导出批量查询与检查",
+    "有效源输入保留可用",
+    "非法力学值和热间隙依赖同时发现",
+    "力学修正后只阻断剩余已知冲突",
+    "相等末点仅提示风险不一刀切拒绝",
+    "已完成输入不被要求重算",
+    "源载荷已经满足时提示保留",
+    "常D任务不因无位移初场而误拦",
+    "未被评价的热边界不强制开启气体",
+    "新模型未收录仅告知而不封闭能力范围",
+    "未检查的初态明确标记覆盖限制",
+    "时间和载荷数量不匹配提前发现",
+    "缺字典返回未完全检查而不伪造通过",
+    "固定界面热阻组合不误套fuelRodGap依赖",
+    "全部动态检查只调用禁用函数入口的原生字典工具"
+  ],
+  "results": {
+    "original-source": {
+      "status": "no_known_errors",
+      "errors": [],
+      "warnings": [],
+      "observed": {
+        "thermalSolver": "solidConduction",
+        "mechanicsSolver": "smallStrain",
+        "neutronicsSolver": "fromLatestTime",
+        "elementTransport": "fromLatestTime",
+        "materialProperties": "byZone",
+        "rheology": "byMaterial",
+        "heatSource": "timeDependentLhgr",
+        "burnup": "fromLatestTime",
+        "fastFlux": "fromLatestTime",
+        "corrosion": "fromLatestTime",
+        "gapGas": "FRAPCON",
+        "fgr": "none",
+        "sliceMapper": "byMaterial",
+        "temperature_boundaries": {
+          "top": "zeroGradient",
+          "fuelTop": "zeroGradient",
+          "fuelOuter": "fuelRodGap",
+          "cladInner": "fuelRodGap",
+          "cladOuter": "fixedValue",
+          "topCap": "zeroGradient",
+          "fuelBottom": "zeroGradient",
+          "bottom": "zeroGradient",
+          "front": "wedge",
+          "back": "wedge"
+        }
+      },
+      "native_entry_reads": 27,
+      "profile": "local-offbeat-openfoam-v2506",
+      "profile_basis": "当前能力配置档；安装身份由维护/启动阶段确认，检查器不重复探测二进制或源码。",
+      "scope": "仅当前配置档的已知字面输入与直接依赖，初始边界按0/T；不证明包含文件、重启状态、全部模型参数或物理精度。",
+      "solver_starts": 0,
+      "input_files_modified": false
+    },
+    "known-bad-mechanics-and-gas": {
+      "status": "known_errors",
+      "errors": [
+        {
+          "code": "unsupported_selector",
+          "message": "本机合法类型列表和实际初始化失败已确认；不要用通用关闭词猜值。",
+          "entry": "mechanicsSolver",
+          "value": "none",
+          "suggested": "constant"
+        },
+        {
+          "code": "gas_conductivity_required",
+          "message": "当前热求解会评价fuelRodGap，而none气体模型不提供所需气体导热物性；恢复适用源模型或明确改变热边界物理。",
+          "patches": [
+            "fuelOuter",
+            "cladInner"
+          ],
+          "entry": "gapGas"
+        }
+      ],
+      "warnings": [
+        {
+          "code": "load_endpoint_risk",
+          "message": "载荷末点未晚于终点；本机已观察到查下一标记越界。保留已有较晚末点，确认具体模型处理；不要为此重算已完成结果。",
+          "endTime": 10.0,
+          "last_time": 10.0
+        },
+        {
+          "code": "source_load_already_sufficient",
+          "message": "源的恒定载荷和时间覆盖已经满足该区间。核对本次重写节点的必要性；用户未要求改时间网格时优先沿用源。"
+        },
+        {
+          "code": "source_model_changed",
+          "message": "模型选择器发生变化；确认来自用户要求或必要依赖，不为纯热学/整理输入一并关闭无关模型。",
+          "entry": "gapGas",
+          "source": "FRAPCON",
+          "target": "none"
+        }
+      ],
+      "observed": {
+        "thermalSolver": "solidConduction",
+        "mechanicsSolver": "none",
+        "neutronicsSolver": "fromLatestTime",
+        "elementTransport": "fromLatestTime",
+        "materialProperties": "byZone",
+        "rheology": "byMaterial",
+        "heatSource": "timeDependentLhgr",
+        "burnup": "fromLatestTime",
+        "fastFlux": "fromLatestTime",
+        "corrosion": "fromLatestTime",
+        "gapGas": "none",
+        "fgr": "none",
+        "sliceMapper": "byMaterial",
+        "temperature_boundaries": {
+          "top": "zeroGradient",
+          "fuelTop": "zeroGradient",
+          "fuelOuter": "fuelRodGap",
+          "cladInner": "fuelRodGap",
+          "cladOuter": "zeroGradient",
+          "topCap": "zeroGradient",
+          "fuelBottom": "zeroGradient",
+          "bottom": "zeroGradient",
+          "front": "wedge",
+          "back": "wedge"
+        }
+      },
+      "native_entry_reads": 35,
+      "profile": "local-offbeat-openfoam-v2506",
+      "profile_basis": "当前能力配置档；安装身份由维护/启动阶段确认，检查器不重复探测二进制或源码。",
+      "scope": "仅当前配置档的已知字面输入与直接依赖，初始边界按0/T；不证明包含文件、重启状态、全部模型参数或物理精度。",
+      "solver_starts": 0,
+      "input_files_modified": false
+    },
+    "known-bad-gas": {
+      "status": "known_errors",
+      "errors": [
+        {
+          "code": "gas_conductivity_required",
+          "message": "当前热求解会评价fuelRodGap，而none气体模型不提供所需气体导热物性；恢复适用源模型或明确改变热边界物理。",
+          "patches": [
+            "fuelOuter",
+            "cladInner"
+          ],
+          "entry": "gapGas"
+        }
+      ],
+      "warnings": [
+        {
+          "code": "load_endpoint_risk",
+          "message": "载荷末点未晚于终点；本机已观察到查下一标记越界。保留已有较晚末点，确认具体模型处理；不要为此重算已完成结果。",
+          "endTime": 10.0,
+          "last_time": 10.0
+        },
+        {
+          "code": "source_load_already_sufficient",
+          "message": "源的恒定载荷和时间覆盖已经满足该区间。核对本次重写节点的必要性；用户未要求改时间网格时优先沿用源。"
+        },
+        {
+          "code": "source_model_changed",
+          "message": "模型选择器发生变化；确认来自用户要求或必要依赖，不为纯热学/整理输入一并关闭无关模型。",
+          "entry": "gapGas",
+          "source": "FRAPCON",
+          "target": "none"
+        }
+      ],
+      "observed": {
+        "thermalSolver": "solidConduction",
+        "mechanicsSolver": "constant",
+        "neutronicsSolver": "fromLatestTime",
+        "elementTransport": "fromLatestTime",
+        "materialProperties": "byZone",
+        "rheology": "byMaterial",
+        "heatSource": "timeDependentLhgr",
+        "burnup": "fromLatestTime",
+        "fastFlux": "fromLatestTime",
+        "corrosion": "fromLatestTime",
+        "gapGas": "none",
+        "fgr": "none",
+        "sliceMapper": "byMaterial",
+        "temperature_boundaries": {
+          "top": "zeroGradient",
+          "fuelTop": "zeroGradient",
+          "fuelOuter": "fuelRodGap",
+          "cladInner": "fuelRodGap",
+          "cladOuter": "zeroGradient",
+          "topCap": "zeroGradient",
+          "fuelBottom": "zeroGradient",
+          "bottom": "zeroGradient",
+          "front": "wedge",
+          "back": "wedge"
+        }
+      },
+      "native_entry_reads": 35,
+      "profile": "local-offbeat-openfoam-v2506",
+      "profile_basis": "当前能力配置档；安装身份由维护/启动阶段确认，检查器不重复探测二进制或源码。",
+      "scope": "仅当前配置档的已知字面输入与直接依赖，初始边界按0/T；不证明包含文件、重启状态、全部模型参数或物理精度。",
+      "solver_starts": 0,
+      "input_files_modified": false
+    },
+    "endpoint-warning": {
+      "status": "no_known_errors",
+      "errors": [],
+      "warnings": [
+        {
+          "code": "load_endpoint_risk",
+          "message": "载荷末点未晚于终点；本机已观察到查下一标记越界。保留已有较晚末点，确认具体模型处理；不要为此重算已完成结果。",
+          "endTime": 10.0,
+          "last_time": 10.0
+        },
+        {
+          "code": "source_load_already_sufficient",
+          "message": "源的恒定载荷和时间覆盖已经满足该区间。核对本次重写节点的必要性；用户未要求改时间网格时优先沿用源。"
+        }
+      ],
+      "observed": {
+        "thermalSolver": "solidConduction",
+        "mechanicsSolver": "constant",
+        "neutronicsSolver": "fromLatestTime",
+        "elementTransport": "fromLatestTime",
+        "materialProperties": "byZone",
+        "rheology": "byMaterial",
+        "heatSource": "timeDependentLhgr",
+        "burnup": "fromLatestTime",
+        "fastFlux": "fromLatestTime",
+        "corrosion": "fromLatestTime",
+        "gapGas": "FRAPCON",
+        "fgr": "none",
+        "sliceMapper": "byMaterial",
+        "temperature_boundaries": {
+          "top": "zeroGradient",
+          "fuelTop": "zeroGradient",
+          "fuelOuter": "fuelRodGap",
+          "cladInner": "fuelRodGap",
+          "cladOuter": "zeroGradient",
+          "topCap": "zeroGradient",
+          "fuelBottom": "zeroGradient",
+          "bottom": "zeroGradient",
+          "front": "wedge",
+          "back": "wedge"
+        }
+      },
+      "native_entry_reads": 35,
+      "profile": "local-offbeat-openfoam-v2506",
+      "profile_basis": "当前能力配置档；安装身份由维护/启动阶段确认，检查器不重复探测二进制或源码。",
+      "scope": "仅当前配置档的已知字面输入与直接依赖，初始边界按0/T；不证明包含文件、重启状态、全部模型参数或物理精度。",
+      "solver_starts": 0,
+      "input_files_modified": false
+    },
+    "completed-input": {
+      "status": "no_known_errors",
+      "errors": [],
+      "warnings": [
+        {
+          "code": "source_load_already_sufficient",
+          "message": "源的恒定载荷和时间覆盖已经满足该区间。核对本次重写节点的必要性；用户未要求改时间网格时优先沿用源。"
+        }
+      ],
+      "observed": {
+        "thermalSolver": "solidConduction",
+        "mechanicsSolver": "constant",
+        "neutronicsSolver": "fromLatestTime",
+        "elementTransport": "fromLatestTime",
+        "materialProperties": "byZone",
+        "rheology": "byMaterial",
+        "heatSource": "timeDependentLhgr",
+        "burnup": "fromLatestTime",
+        "fastFlux": "fromLatestTime",
+        "corrosion": "fromLatestTime",
+        "gapGas": "FRAPCON",
+        "fgr": "none",
+        "sliceMapper": "byMaterial",
+        "temperature_boundaries": {
+          "top": "zeroGradient",
+          "fuelTop": "zeroGradient",
+          "fuelOuter": "fuelRodGap",
+          "cladInner": "fuelRodGap",
+          "cladOuter": "zeroGradient",
+          "topCap": "zeroGradient",
+          "fuelBottom": "zeroGradient",
+          "bottom": "zeroGradient",
+          "front": "wedge",
+          "back": "wedge"
+        }
+      },
+      "native_entry_reads": 35,
+      "profile": "local-offbeat-openfoam-v2506",
+      "profile_basis": "当前能力配置档；安装身份由维护/启动阶段确认，检查器不重复探测二进制或源码。",
+      "scope": "仅当前配置档的已知字面输入与直接依赖，初始边界按0/T；不证明包含文件、重启状态、全部模型参数或物理精度。",
+      "solver_starts": 0,
+      "input_files_modified": false
+    },
+    "cs-constant-d-input": {
+      "status": "no_known_errors",
+      "errors": [],
+      "warnings": [],
+      "observed": {
+        "thermalSolver": "fromLatestTime",
+        "mechanicsSolver": "fromLatestTime",
+        "neutronicsSolver": "fromLatestTime",
+        "elementTransport": "byList",
+        "materialProperties": "byZone",
+        "rheology": "byMaterial",
+        "heatSource": "fromLatestTime",
+        "burnup": "fromLatestTime",
+        "fastFlux": "fromLatestTime",
+        "corrosion": "fromLatestTime",
+        "gapGas": "none",
+        "fgr": "none",
+        "sliceMapper": "autoAxialSlices",
+        "temperature_boundaries": {
+          "bottom|top|front|back": "wedge",
+          "outer": "fixedValue"
+        }
+      },
+      "native_entry_reads": 17,
+      "profile": "local-offbeat-openfoam-v2506",
+      "profile_basis": "当前能力配置档；安装身份由维护/启动阶段确认，检查器不重复探测二进制或源码。",
+      "scope": "仅当前配置档的已知字面输入与直接依赖，初始边界按0/T；不证明包含文件、重启状态、全部模型参数或物理精度。",
+      "solver_starts": 0,
+      "input_files_modified": false
+    },
+    "fixed-temperature-inactive-gap": {
+      "status": "no_known_errors",
+      "errors": [],
+      "warnings": [],
+      "observed": {
+        "thermalSolver": "constant",
+        "mechanicsSolver": "constant",
+        "neutronicsSolver": "fromLatestTime",
+        "elementTransport": "fromLatestTime",
+        "materialProperties": "byZone",
+        "rheology": "byMaterial",
+        "heatSource": "timeDependentLhgr",
+        "burnup": "fromLatestTime",
+        "fastFlux": "fromLatestTime",
+        "corrosion": "fromLatestTime",
+        "gapGas": "none",
+        "fgr": "none",
+        "sliceMapper": "byMaterial",
+        "temperature_boundaries": {
+          "top": "zeroGradient",
+          "fuelTop": "zeroGradient",
+          "fuelOuter": "fuelRodGap",
+          "cladInner": "fuelRodGap",
+          "cladOuter": "fixedValue",
+          "topCap": "zeroGradient",
+          "fuelBottom": "zeroGradient",
+          "bottom": "zeroGradient",
+          "front": "wedge",
+          "back": "wedge"
+        }
+      },
+      "native_entry_reads": 27,
+      "profile": "local-offbeat-openfoam-v2506",
+      "profile_basis": "当前能力配置档；安装身份由维护/启动阶段确认，检查器不重复探测二进制或源码。",
+      "scope": "仅当前配置档的已知字面输入与直接依赖，初始边界按0/T；不证明包含文件、重启状态、全部模型参数或物理精度。",
+      "solver_starts": 0,
+      "input_files_modified": false
+    },
+    "unrecorded-selector": {
+      "status": "no_known_errors",
+      "errors": [],
+      "warnings": [
+        {
+          "code": "unverified_selector",
+          "message": "本表未核实该值；保留用户/源的定义，按一般流程和运行反馈确认，不因未收录拒绝任务。",
+          "entry": "mechanicsSolver",
+          "value": "customExtensionModel"
+        }
+      ],
+      "observed": {
+        "thermalSolver": "constant",
+        "mechanicsSolver": "customExtensionModel",
+        "neutronicsSolver": "fromLatestTime",
+        "elementTransport": "fromLatestTime",
+        "materialProperties": "byZone",
+        "rheology": "byMaterial",
+        "heatSource": "timeDependentLhgr",
+        "burnup": "fromLatestTime",
+        "fastFlux": "fromLatestTime",
+        "corrosion": "fromLatestTime",
+        "gapGas": "none",
+        "fgr": "none",
+        "sliceMapper": "byMaterial",
+        "temperature_boundaries": {
+          "top": "zeroGradient",
+          "fuelTop": "zeroGradient",
+          "fuelOuter": "fuelRodGap",
+          "cladInner": "fuelRodGap",
+          "cladOuter": "fixedValue",
+          "topCap": "zeroGradient",
+          "fuelBottom": "zeroGradient",
+          "bottom": "zeroGradient",
+          "front": "wedge",
+          "back": "wedge"
+        }
+      },
+      "native_entry_reads": 27,
+      "profile": "local-offbeat-openfoam-v2506",
+      "profile_basis": "当前能力配置档；安装身份由维护/启动阶段确认，检查器不重复探测二进制或源码。",
+      "scope": "仅当前配置档的已知字面输入与直接依赖，初始边界按0/T；不证明包含文件、重启状态、全部模型参数或物理精度。",
+      "solver_starts": 0,
+      "input_files_modified": false
+    },
+    "initial-state-unchecked": {
+      "status": "no_known_errors",
+      "errors": [],
+      "warnings": [
+        {
+          "code": "initial_boundary_not_checked",
+          "message": "未发现0/T；当前检查不推断重启时刻或生成器产物，相关边界未检查。"
+        }
+      ],
+      "observed": {
+        "thermalSolver": "constant",
+        "mechanicsSolver": "constant",
+        "neutronicsSolver": "fromLatestTime",
+        "elementTransport": "fromLatestTime",
+        "materialProperties": "byZone",
+        "rheology": "byMaterial",
+        "heatSource": "timeDependentLhgr",
+        "burnup": "fromLatestTime",
+        "fastFlux": "fromLatestTime",
+        "corrosion": "fromLatestTime",
+        "gapGas": "none",
+        "fgr": "none",
+        "sliceMapper": "byMaterial",
+        "temperature_boundaries": {}
+      },
+      "native_entry_reads": 17,
+      "profile": "local-offbeat-openfoam-v2506",
+      "profile_basis": "当前能力配置档；安装身份由维护/启动阶段确认，检查器不重复探测二进制或源码。",
+      "scope": "仅当前配置档的已知字面输入与直接依赖，初始边界按0/T；不证明包含文件、重启状态、全部模型参数或物理精度。",
+      "solver_starts": 0,
+      "input_files_modified": false
+    },
+    "mismatched-load-table": {
+      "status": "known_errors",
+      "errors": [
+        {
+          "code": "load_table_length",
+          "message": "字面时间节点与载荷值数量不一致，应按该模型配对。"
+        }
+      ],
+      "warnings": [],
+      "observed": {
+        "thermalSolver": "solidConduction",
+        "mechanicsSolver": "smallStrain",
+        "neutronicsSolver": "fromLatestTime",
+        "elementTransport": "fromLatestTime",
+        "materialProperties": "byZone",
+        "rheology": "byMaterial",
+        "heatSource": "timeDependentLhgr",
+        "burnup": "fromLatestTime",
+        "fastFlux": "fromLatestTime",
+        "corrosion": "fromLatestTime",
+        "gapGas": "FRAPCON",
+        "fgr": "none",
+        "sliceMapper": "byMaterial",
+        "temperature_boundaries": {
+          "top": "zeroGradient",
+          "fuelTop": "zeroGradient",
+          "fuelOuter": "fuelRodGap",
+          "cladInner": "fuelRodGap",
+          "cladOuter": "fixedValue",
+          "topCap": "zeroGradient",
+          "fuelBottom": "zeroGradient",
+          "bottom": "zeroGradient",
+          "front": "wedge",
+          "back": "wedge"
+        }
+      },
+      "native_entry_reads": 27,
+      "profile": "local-offbeat-openfoam-v2506",
+      "profile_basis": "当前能力配置档；安装身份由维护/启动阶段确认，检查器不重复探测二进制或源码。",
+      "scope": "仅当前配置档的已知字面输入与直接依赖，初始边界按0/T；不证明包含文件、重启状态、全部模型参数或物理精度。",
+      "solver_starts": 0,
+      "input_files_modified": false
+    },
+    "missing-dictionary": {
+      "status": "partially_checked",
+      "errors": [],
+      "warnings": [
+        {
+          "code": "check_incomplete",
+          "message": "部分字面输入无法通过已准备的原生接口读取；不扩展宏或执行代码，不把未检查当通过。",
+          "detail": "case path is missing or escapes the case: constant/solverDict"
+        }
+      ],
+      "observed": {
+        "incomplete": true
+      },
+      "native_entry_reads": 0,
+      "profile": "local-offbeat-openfoam-v2506",
+      "profile_basis": "当前能力配置档；安装身份由维护/启动阶段确认，检查器不重复探测二进制或源码。",
+      "scope": "仅当前配置档的已知字面输入与直接依赖，初始边界按0/T；不证明包含文件、重启状态、全部模型参数或物理精度。",
+      "solver_starts": 0,
+      "input_files_modified": false
+    },
+    "resistive-gap-without-gas": {
+      "status": "no_known_errors",
+      "errors": [],
+      "warnings": [
+        {
+          "code": "load_endpoint_risk",
+          "message": "载荷末点未晚于终点；本机已观察到查下一标记越界。保留已有较晚末点，确认具体模型处理；不要为此重算已完成结果。",
+          "endTime": 1.0,
+          "last_time": 1.0
+        }
+      ],
+      "observed": {
+        "thermalSolver": "solidConduction",
+        "mechanicsSolver": "fromLatestTime",
+        "neutronicsSolver": "fromLatestTime",
+        "elementTransport": "fromLatestTime",
+        "materialProperties": "byZone",
+        "rheology": "byMaterial",
+        "heatSource": "timeDependentLhgr",
+        "burnup": "none",
+        "fastFlux": "fromLatestTime",
+        "corrosion": "fromLatestTime",
+        "gapGas": "none",
+        "fgr": "none",
+        "sliceMapper": "autoAxialSlices",
+        "temperature_boundaries": {
+          ".*Front|.*Back": "wedge",
+          "fuelOuter": "resistiveGap",
+          "cladInner": "resistiveGap",
+          "cladOuter": "fixedValue",
+          "fuelInner": "zeroGradient"
+        }
+      },
+      "native_entry_reads": 22,
+      "profile": "local-offbeat-openfoam-v2506",
+      "profile_basis": "当前能力配置档；安装身份由维护/启动阶段确认，检查器不重复探测二进制或源码。",
+      "scope": "仅当前配置档的已知字面输入与直接依赖，初始边界按0/T；不证明包含文件、重启状态、全部模型参数或物理精度。",
+      "solver_starts": 0,
+      "input_files_modified": false
+    }
+  },
+  "native_calls": 340,
+  "solver_starts": 0,
+  "network_calls": 0,
+  "retained_inputs_modified": false
+}

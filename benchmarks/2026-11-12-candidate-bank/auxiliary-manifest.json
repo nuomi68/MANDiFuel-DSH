@@ -1,0 +1,86 @@
+{
+  "description": "准备、已有结果处理及说明类辅助任务；不进入默认物理计算清单。",
+  "task_count": 10,
+  "tasks": [
+    {
+      "id": "P01",
+      "title": "全功能 TRISO 与裂变产物扩散模型的选型辨别",
+      "prompt_file": "prompts/P01.txt",
+      "prompt_sha256": "bf2a9d786b4bc488a449f2161b758cc97ee4824976576194b62f963907237564",
+      "solver_start_cap": 0,
+      "task_kind": "auxiliary"
+    },
+    {
+      "id": "P02",
+      "title": "燃料棒几何修改与冷态尺寸同步",
+      "prompt_file": "prompts/P02.txt",
+      "prompt_sha256": "986d51e2b57da6602be43d776ff1ab65732b02f3816612419ac15eb16da3b92b",
+      "solver_start_cap": 0,
+      "task_kind": "auxiliary"
+    },
+    {
+      "id": "P03",
+      "title": "轴向载荷表与平均功率归一化准备",
+      "prompt_file": "prompts/P03.txt",
+      "prompt_sha256": "3fb9329e408dc379c48edbd43b6df045001b67915867860e3b0f990c18f1e34e",
+      "solver_start_cap": 0,
+      "task_kind": "auxiliary"
+    },
+    {
+      "id": "R01",
+      "title": "时间窗口内的材料区历史峰值",
+      "prompt_file": "prompts/R01.txt",
+      "prompt_sha256": "a78cfbbfb3db3bbc8bd4d75df32d20ff5d68a573a5578ef7fee3c4cd93cd141f",
+      "solver_start_cap": 0,
+      "task_kind": "auxiliary"
+    },
+    {
+      "id": "R02",
+      "title": "张量主应力、环向应力与带符号极值",
+      "prompt_file": "prompts/R02.txt",
+      "prompt_sha256": "0cae80f191d9a605a73aa9aafd3b070a88b39a9af945a682ec9659d3f2712720",
+      "solver_start_cap": 0,
+      "task_kind": "auxiliary"
+    },
+    {
+      "id": "R03",
+      "title": "两阶段裂变产物释放的库存闭合",
+      "prompt_file": "prompts/R03.txt",
+      "prompt_sha256": "a071855bff02d3f019d45fcb35508a019ad7e7ba0b8b290e918a51c5957cb2ef",
+      "solver_start_cap": 0,
+      "task_kind": "auxiliary"
+    },
+    {
+      "id": "W02",
+      "title": "有终态场但执行失败的状态判定",
+      "prompt_file": "prompts/W02.txt",
+      "prompt_sha256": "d325f9cd1c7c2f5c87f5ddf3e3f38cfa7702d7bc9c86f341c7a690fa3fda267e",
+      "solver_start_cap": 0,
+      "task_kind": "auxiliary"
+    },
+    {
+      "id": "W03",
+      "title": "正常求解后只修复提取器",
+      "prompt_file": "prompts/W03.txt",
+      "prompt_sha256": "0dbe15a67897140490e9a5c8b7580982ef14d263ef387cc3202de26d96e22dde",
+      "solver_start_cap": 0,
+      "task_kind": "auxiliary"
+    },
+    {
+      "id": "N01",
+      "title": "线功率与热流物理量说明",
+      "prompt_file": "prompts/N01.txt",
+      "prompt_sha256": "d7e1f185766dc1743b9103dce359a5c46ff462c0f8f62cb1a6a512a1375bcf9a",
+      "solver_start_cap": 0,
+      "task_kind": "auxiliary"
+    },
+    {
+      "id": "N02",
+      "title": "有界一维数学搜索示例",
+      "prompt_file": "prompts/N02.txt",
+      "prompt_sha256": "30bc7153722dca1f76c7fb30f6be5e362e26f623af4f646af8cba81bc0589e2d",
+      "solver_start_cap": 0,
+      "task_kind": "auxiliary"
+    }
+  ]
+}

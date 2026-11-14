@@ -1,0 +1,10 @@
+球形 PyC 热膨胀，按 source-case/ 来。geometry、原 temperature 条件、PyCPARFUME material model 都沿用；asFabricatedAnisotropy=1.5。真实算到原定终点。
+
+要这些结果:
+- outer sampling points：坐标、Dx、同位置 radial displacement；
+- radial displacement distribution；
+- 每个位移量说明所用基底和单位。
+
+输入、结果场、run log 留下。OFFBEAT 最多真实启动 2 次（初始化失败、诊断启动、重试都算）；help 查询、输入准备、网格生成、纯提取不算。若失败或次数用完，已有数据照交，未完成项写清楚。
+
+source-case/、sources/、源库只读；只在本任务独立目录写新算例和产物，不动求解器及任务外文件。可用工作区已有数据、当前配置工具和公开求解器接口，保留结果根、实际运行状态、必要脚本。

@@ -1,0 +1,269 @@
+{
+  "freeze_tag": "freeze-20261114-resource-baseline",
+  "created_at_beijing": "2026-11-14T18:33:41.038812+08:00",
+  "product_version": "0.4.0-alpha.8",
+  "kind": "本地Git首次封存，后续以该标签作为资源消耗对照基线",
+  "tested_artifact_manifest_sha256": "31a3ac56d8d5f0a5ba8a2abc093eb43a44a0c6abcda8e9acd01ef005454e83a9",
+  "tested_product_files": 96,
+  "product_files_identical_to_tested_snapshot": true,
+  "tested_product_files_sha256": {
+    "CHANGELOG.md": "d4556ac7c15b7b04e28266251cd5a87cea60fa2b2f44b1d877af670845c78a55",
+    "CONTRIBUTING.md": "65442f3c65efdefb85b78128bf1af55b91dc194e5887dd24215f5a8c73b24198",
+    "LICENSE": "8b1ba204bb69a0ade2bfcf65ef294a920f6bb361b317dba43c7ef29d96332b9b",
+    "NOTICE": "ba1494a07c8390f23dcb84be529b9cbb079d3b4c3d51f3fd3c50c500f788d5f4",
+    "README.md": "6af3ea39b1f1d99441e04cebc333bf1427cc76b3835a15dbda996a175fd3b2b8",
+    "STUDY_PROTOCOL.md": "8b10041f97f8df00bc66dcb5bc5c4514f0a383d4bc006d2037584301937f0c0a",
+    "THIRD_PARTY_NOTICES.md": "9332849a6f1fdc1150d738433410c0b9c806108762c5c0554470cf7930fb35c8",
+    "configs/launcher.env.example": "7b2a7ffb8bba433ea2390f3525663bcfe8fbdaccce5a5a919213c0cda275905e",
+    "dsh/check-offline-config.mjs": "d03ea1edb7300bf87d8799e5eed7b831052f00d43e73b2cf8acc177716fda304",
+    "dsh/cordis.patch.yml": "3cc10ac18097917ee0a2312ac292389c4c76b95c912dedc1cbaf5a9f60b12be6",
+    "dsh/mandifuel-offline-subprocess.mjs": "63e26f5d56cfb0c4dede34eec32c66dae665886e679a129dc5ed7ac143423784",
+    "dsh/mandifuel-shell-env.mjs": "ce75cb0519b13eb8a86f9b7c46b6d991dd2134f2d714cae8dc0d112eb464705b",
+    "dsh/offline-exec.py": "106064fbfdd0ea6cd953da8a40afb49a5563a51bc6dbd9aa424ae9fc73ad66de",
+    "dsh/run-assistant-persona.md": "f7bdb6539d0f833e31768743adff31cdca0c48f2df91331686193d736c6604df",
+    "dsh/web-default.patch.yml": "f71eb0c23fe9c45cdf751052f003f2351a3f05bce6b3ae01c715d51754b84bdc",
+    "examples/D1/prompt.txt": "1ecb17b91ccd196c13b416eeeead3a4fe2501fbe65ff2f5e05fe257c2562f427",
+    "examples/D2/prompt.txt": "65fc704401c766cd795c3e2fa1b8dede3de5754f06cd5d42343e0523acb4a003",
+    "examples/D3/followup.txt": "8f3f0a2251b5e998b1837d4a743af79f3eea45c8a2eae02933c9d89f3cb19b4e",
+    "examples/D3/prompt.txt": "3ff083aa155cbfae225f6508cecf3c0a458e3936b07f3f1375474c396f07fec0",
+    "examples/D4/prompt.txt": "243fd06cca69998a3c95a3910a36529eb4d776f4cf6006d221a694a789d36116",
+    "examples/D5/prompt.txt": "31daa9b6842ba00a4013e381e88127bf4f18df28a37306f167b216d4bab8f75b",
+    "examples/README.md": "0b190f35f4d63680af85ccffd122eb247ea3d5920dfafb81d78f36bc19b31fab",
+    "examples/manifest.json": "bf48fb3391ffdbe51d08524b2e194640a9199bce7a860b852d3b04e387f48b8d",
+    "examples/run.py": "dc557495f5c34d1d38bb4cd974d9d471695e7cc6d77d43225fc5cf8eee6304b2",
+    "lib/mandifuel_prepare/__init__.py": "4852c94eb596ee6002b6cc901508bd38b8e91e866e39e52c62d59537ef7820ae",
+    "lib/mandifuel_prepare/capabilities.py": "d10ebd3344a24c55ea5ec0577ae074f777562f455495890f08235931091ba2d9",
+    "lib/mandifuel_prepare/foam_edit.py": "25fcee644ccaef83d50fac0309eaa2bc1eeff6096113cf331c7985f2317fc28a",
+    "lib/mandifuel_prepare/geometry_angle.py": "532d6c46fa57421c3f5f6012ce020b9c580e829bd52336b60a0f014da5d8af55",
+    "lib/mandifuel_prepare/geometry_common.py": "966d086fe10f92128c5a1cb3490f788124c4d43f7c9bf95d628f7bde4df8a897",
+    "lib/mandifuel_prepare/geometry_ops.py": "3fdaf30dc2a529067d0e00ecdfbc1b46ba1932d7dc15da5136d2cc34cb04b799",
+    "lib/mandifuel_prepare/parameter_plan.py": "f97ebd7608cd206a7136053cfd20ccbca2bf964c028c26e69734bafa63ef7ffe",
+    "lib/mandifuel_run/__init__.py": "62c3c98166d28f4a5266d1ad2e267e9ef0bffd529a1c908cda64bff55921abae",
+    "lib/mandifuel_run/case.py": "c3487961d97d2d03b7245e69ed59b45a476f940d9c4499a24ea5053d409aec3e",
+    "lib/mandifuel_run/optimization.py": "5efcd3d5a6894b458e6d3dcb49581cd1afcdb4efe23a557d9956f9deececed9f",
+    "lib/mandifuel_run/study.py": "1a69984f5c6dad19c96fa64340ed32db10dbee1e3b15b8bc0a7d8cbd5910829c",
+    "mandifuel.json": "8089d4a88f641c436036c252f11178f0c14cca9bd2b9ebce7818d3f034f2018b",
+    "rag/PROVENANCE.md": "c4313459bc239b0881d1af025d1af71006d8bd2b06c18b8eb463759316e1a66d",
+    "rag/build_index.py": "220122a96f8b81edf4861f3c3473c7f81058888923ae1330ac165f9a5d08d947",
+    "rag/data/offbeat_case_cards_compact_138.json": "92115f90198e1a1815529c02019a08ab92415cb3982fb0ce416f57307ccc78a6",
+    "rag/index/description_embeddings.json": "773087d48434c94dd7361213921fd91c586a8584f224b429f4db47f2cb4a6b1f",
+    "rag/index/manifest.json": "9c48b0ca25fa3a2de8d26a9e045546dd2544dcfe244b759afe387c57d2cc38bb",
+    "rag/index/taxonomy_index.json": "ba1ae459fb2c18619b53a9cf72e47251d8bfe59dbe21f9c4ffb54252535d8240",
+    "rag/index/vocabulary.json": "88c2910a540e669d5590c07317156c98ce48996349b7c6023309cc79151c1512",
+    "rag/providers.py": "92c202bc6506d333fa95731ab16924132e20f8a5ef2da68c9a9d4258e570a73a",
+    "rag/query.py": "d530ed1e111ef1ba197bf4c4f39943616b1a8f69b54173ac920591124e12cd19",
+    "rag/source-files.json": "97996e125837a1084e842fecc664b1d18d9673a397890b5539433096ccbb4067",
+    "requirements-examples.txt": "6fcf9aacf6717d94e286dfb8e954b86986971f5beb480b39c90f9c20e19cce9b",
+    "scripts/build-plugin.py": "4b35735f4980c7ae517269df3322551cf070e57c5ceaa14c8c0e8873ef533b4b",
+    "scripts/package-source.py": "4d370e21834117ea5b2d2ae9d8d3c392d8980f2e3372c1ceb8aec47f56f7b771",
+    "scripts/prepare-agent.sh": "c712aeee68c9f4a6f3073a910426004d34a2dfec3b6b577af17d0777eca899a2",
+    "scripts/resolve-node.sh": "42910c3ff1f233e2dd6309489b114ecc0460c5e0bc1ef97040b01cca380d53f4",
+    "scripts/start-dsh.sh": "efb49ba0c911e419a7c26378d99aba67c5a9754dd654fb82ffc30fdf2abb452e",
+    "skills/conduct-offbeat-study/SKILL.md": "65e321041a25c00d16e03abd7c0a2597ed6c800f8d80ebe16a2b30203bead0b1",
+    "skills/conduct-offbeat-study/references/fuel-rod-design-studies.md": "230583743f4810a1689d4d8b243bf127dea1561ea2f126e0fd3d17044017896f",
+    "skills/conduct-offbeat-study/references/optimization.md": "39fb24dedc4659b9e0134458735b649f7c1929f8b535594ca76007afc376fbd7",
+    "skills/conduct-offbeat-study/references/repeated-cellzone-extrema.md": "b3f19375d8cca5b99d8e58eba3b8e746ab421b9954bb99c16d7204d8043c5967",
+    "skills/conduct-offbeat-study/references/study-runner.md": "22aaa29ac29ffc9de5ca7a3e034b199480366920b49e1be56e98b0fea4a87d37",
+    "skills/conduct-offbeat-study/references/sweeps-and-candidates.md": "02b0ed7f0173e9b9a268fb7b53e362745d8e03ac0fc5dd06343d4bae565c0308",
+    "skills/conduct-offbeat-study/references/uncertainty-quantification.md": "21498f058053a1912275f21ea3440d7fd2eac431d60e181528eb6509d2191220",
+    "skills/conduct-offbeat-study/scripts/cellzone_extremum.py": "d8fcd215a72978b0f30a4b301ed5efbd82a124a54c0eeecc71f3cb877aadc16f",
+    "skills/conduct-offbeat-study/scripts/study_runner.py": "48d6fb35bebfbd15868a9da891798b2ab1e177e36776e646c0c1f8cb88848d89",
+    "skills/execute-offbeat-case/SKILL.md": "4ae75bb7be734552faec62c7dc649a0fa248f03ffe989823509a74575bacf545",
+    "skills/execute-offbeat-case/references/input-recovery.md": "37ce3dd6d35e6859e4197417ee8830a7f831a9b8ca72e7dc1d6c5a2f7391e268",
+    "skills/execute-offbeat-case/references/time-and-restart.md": "8eb9bd9afce28c1435d8b884f31a6ac2d8ff20238949b196aff13bd14af9fdb9",
+    "skills/execute-offbeat-case/scripts/case_runner.py": "b883211b49e9f7a2a8e06c5b5745dbc09a794ef63f989e569154047aad78cca3",
+    "skills/extract-offbeat-results/SKILL.md": "a97dbffb396bf544229a69fadcf02af5f9a93b40c8133adf3f92d104dccc3955",
+    "skills/extract-offbeat-results/references/offbeat-result-units.md": "d0dc2e37d95d12b41816aede0be74ce1b5675df85d8539e1b82afd1e203005c7",
+    "skills/extract-offbeat-results/references/openfoam-result-discovery.md": "b12405e018cd4d9cb53f58f3019ea28286d157458dc151417a1d09de52e64ed4",
+    "skills/extract-offbeat-results/scripts/openfoam_parser.py": "a52fe6fd8c97a7e7c9812206162807beb21f8c6493fbb8dba16a6df2887b41d3",
+    "skills/extract-offbeat-results/scripts/result_api.py": "7fa1811100759889a10cdff3b8f530031450b7fd2ce0d0252c3590f34d60cc19",
+    "skills/orchestrate-offbeat-study/SKILL.md": "e0d81b59ac6af4787dfbe2672b087c8c68e72554dcc6c6148c4b2b113e87a80c",
+    "skills/orchestrate-offbeat-study/assets/fixed_study.py": "2bd5f55a937a1ef2ecd4a3957e6b90176a02f535881ef84e0d1e31410954ec3d",
+    "skills/prepare-offbeat-case/SKILL.md": "0f0f55c443b1d69e7904e535ea1184561d9aa3c4db3b6dd8815bbba32abaa3be",
+    "skills/prepare-offbeat-case/assets/parameter-contracts.json": "5b4d79013c0e4f53ffef79061695bd576932911bc21e7510e0f897281fbe294b",
+    "skills/prepare-offbeat-case/references/box-geometry.md": "f787fb4712f4f282d1cfc71e265daf647e586f6ec56c10b10ba98ba2ea2fc6c7",
+    "skills/prepare-offbeat-case/references/geometry-construction.md": "e37749abd2b63ff85dd1c0ebf5d7472ed661fadaf246f20c00b6309715584966",
+    "skills/prepare-offbeat-case/references/input-bindings.md": "d91043c418f03b8ef1b1d0b1e9cd8761400e87f00c80bf98b23cc5a59bf4da51",
+    "skills/prepare-offbeat-case/references/parameter-plan.md": "820c2b6c2dc736aba0cc9ebec6d2b3ba5542743403aac5aeb6ac827a64728bab",
+    "skills/prepare-offbeat-case/references/radial-coordinate-map.md": "c293f3478eabceaab5a21dc2322aed5e21c7d54ac702d8e859c4da82f9e995c1",
+    "skills/prepare-offbeat-case/references/radial-geometry.md": "39348ac68349c1e78f98c1c7cb6ec507db2d07fbba1d2d9f81fe290a5cf3e8ec",
+    "skills/prepare-offbeat-case/references/sector-geometry.md": "260ea8b25188ca07e3f4b6fcf444d3cd936e918982dab236270e11bb59d6d658",
+    "skills/prepare-offbeat-case/references/software-capabilities/boundaries.md": "87d3f5ff76380492260e9fdccda3f915aa79be64c10448b40700b6d6696f553f",
+    "skills/prepare-offbeat-case/references/software-capabilities/catalog.json": "d83c42ca29209b641f72daaf8bea8244c82b349074277178f2cb9e123a4cd29b",
+    "skills/prepare-offbeat-case/references/software-capabilities/dependencies-and-operations.md": "a3c3db690b592056c1ca014012a1440aafb6f09b999faadc4cbd3a213d73fb73",
+    "skills/prepare-offbeat-case/references/software-capabilities/fields-and-units.md": "61e5893044fa60c241377fc47e72ad122463c10e30927acefe5cc4ddd78b48fb",
+    "skills/prepare-offbeat-case/references/software-capabilities/materials-and-geometry.md": "7d30181edc10714f0b5cefd6770eda8be03f1fdb9b6b479eea5b21920ebf4807",
+    "skills/prepare-offbeat-case/references/software-capabilities/models.md": "61bb5c22b49404a227d5e8378aeeba38330002e99d50c98ea571d3da50ad5b18",
+    "skills/prepare-offbeat-case/references/software-capabilities/public-tools.md": "8cb053acdf49e26524459dd735c6e7f5578ad32838fff2840ff3b4fa9e9152f6",
+    "skills/prepare-offbeat-case/references/software-capabilities/time-and-execution.md": "c9507044bfc642b1bcf8c7c2fbbb581851e5b80f411af77496958df341b9ecca",
+    "skills/prepare-offbeat-case/references/software-capabilities.md": "e6ff0ed309ae53b20bb500cc96a15073ba8f1f548b1cec4ad763ae519c80b91f",
+    "skills/prepare-offbeat-case/scripts/apply_geometry_transform.py": "a432ae9a98752b7105a94181c117df632d853b3da47c84aa528103eda869cba7",
+    "skills/prepare-offbeat-case/scripts/foam_edit.py": "24607e4f5205dd2f8377920153297bb0aff241c5c17ccf747ae483b86b007e59",
+    "skills/prepare-offbeat-case/scripts/geometry_ops.py": "73e4af2c6e46838f1fed8501d31f3d44b210b4a9c751f4582f93a7685384535a",
+    "skills/prepare-offbeat-case/scripts/geometry_tools.py": "07c15d03a7d4db6495633d9600ab31b9ca18ada31df970ed3856b2067589f942",
+    "skills/prepare-offbeat-case/scripts/parameter_plan.py": "5a0a740fe86b9150e4e0ebca64901d5a2f549f219cf4f416641c8337fe04d311",
+    "skills/prepare-offbeat-case/scripts/software_capabilities.py": "fa4991889a91eff15bab98a55cd2990235eb65bda453e29c1ce436eb2b9227ac"
+  },
+  "paired_experiment": "rag-modeling-pairs-20261114-03",
+  "aggregate": {
+    "bare": {
+      "wall_seconds": 1812.038,
+      "tool_calls": 335,
+      "steps": 281,
+      "actual_solver_starts": 28,
+      "totalTokens": 40472645
+    },
+    "skill": {
+      "wall_seconds": 1099.275,
+      "tool_calls": 239,
+      "steps": 170,
+      "actual_solver_starts": 5,
+      "totalTokens": 15248208
+    },
+    "skill_reduction_percent": {
+      "wall_seconds": 39.33488149807013,
+      "tool_calls": 28.656716417910445,
+      "steps": 39.5017793594306,
+      "totalTokens": 62.32465656741732
+    }
+  },
+  "evidence": {
+    "releases/rag-modeling-pairs-20261114-03/结果汇总.md": {
+      "original": "runs/rag-modeling-pairs-20261114-03/结果汇总.md",
+      "sha256": "c74adc1a530e3c9806cd13d954004fdc6668ee187766cbb0ea0563700d74b711"
+    },
+    "releases/rag-modeling-pairs-20261114-03/comparison.json": {
+      "original": "runs/rag-modeling-pairs-20261114-03/comparison.json",
+      "sha256": "b139cf80c3a2d1b57d333e2cd176d7e9413fe16c3b955d672669060c2373f3a2"
+    },
+    "releases/rag-modeling-pairs-20261114-03/verification.json": {
+      "original": "runs/rag-modeling-pairs-20261114-03/verification.json",
+      "sha256": "57c2679d8776a05a7368156026b9b3d1d94ef0e4a8ecfd0e7f40d812659918fa"
+    },
+    "releases/rag-modeling-pairs-20261114-03/integrity.json": {
+      "original": "runs/rag-modeling-pairs-20261114-03/integrity.json",
+      "sha256": "36c265ba551a87f239e80b1de7ebd27b48a1d5543094b2dc3f3811d2e4bc91c2"
+    },
+    "releases/rag-modeling-pairs-20261114-03/delivery-numeric-check.json": {
+      "original": "runs/rag-modeling-pairs-20261114-03/delivery-numeric-check.json",
+      "sha256": "394f0fe99dabec013ad6b34c73f8f40f0b4bb3d3789a4361553e8cc8447601a5"
+    },
+    "releases/rag-modeling-pairs-20261114-03/交付核对.json": {
+      "original": "runs/rag-modeling-pairs-20261114-03/交付核对.json",
+      "sha256": "190dc6250bc7b0198476c6d9e5c7c574af7a14bc13aeafb12e8229d39dd98574"
+    },
+    "releases/rag-modeling-pairs-20261114-03/exposure-audit.json": {
+      "original": "runs/rag-modeling-pairs-20261114-03/exposure-audit.json",
+      "sha256": "e54aa7a67caa2596e421a65f6d00aa40364aa33d464ef43c791e7eced35bf9e9"
+    },
+    "releases/rag-modeling-pairs-20261114-03/workflow-audit.json": {
+      "original": "runs/rag-modeling-pairs-20261114-03/workflow-audit.json",
+      "sha256": "a276aef43d14aa8736afe21aa1a062484b5844ff4f3a8e0b1ef1d910d4c986c2"
+    },
+    "releases/rag-modeling-pairs-20261114-03/workflow-review-corrections.json": {
+      "original": "runs/rag-modeling-pairs-20261114-03/workflow-review-corrections.json",
+      "sha256": "c9550d453933ee6f971e1c6fe3bf87e9f8e4f106af26579f3a49d14044adac1f"
+    },
+    "releases/rag-modeling-pairs-20261114-03/evaluation-compatibility-corrections.json": {
+      "original": "runs/rag-modeling-pairs-20261114-03/evaluation-compatibility-corrections.json",
+      "sha256": "0945283c5ff5b42dc143fff55454ad9f876e28c6aba6c9273534a22c7e98caa8"
+    },
+    "releases/rag-modeling-pairs-20261114-03/trace-descriptions.zh.json": {
+      "original": "runs/rag-modeling-pairs-20261114-03/trace-descriptions.zh.json",
+      "sha256": "df8a4acaa52c150f751431cd4f7daa7b73d3fdf7a631eb957c6847d1611ba749"
+    },
+    "releases/rag-modeling-pairs-20261114-03/definition/predeclared-criteria.json": {
+      "original": "runs/rag-modeling-pairs-20261114-03/definition/predeclared-criteria.json",
+      "sha256": "08734dd87a7ac547c08f893c8ae92c3fbcd0f3bc7e7a8f58077798e29ba1eb1e"
+    },
+    "releases/rag-modeling-pairs-20261114-03/中文单行轨迹/G02_裸DSH_一行轨迹.md": {
+      "original": "runs/rag-modeling-pairs-20261114-03/中文单行轨迹/G02_裸DSH_一行轨迹.md",
+      "sha256": "a1048d2b4efc6c84312d5151ac42879358531ec80caaa316744b60b9ccc3f829"
+    },
+    "releases/rag-modeling-pairs-20261114-03/中文单行轨迹/M01_裸DSH_一行轨迹.md": {
+      "original": "runs/rag-modeling-pairs-20261114-03/中文单行轨迹/M01_裸DSH_一行轨迹.md",
+      "sha256": "fd9a63076d47dba02e849a75b69b274e97c5ea80433f459b1487c11ddff0baf5"
+    },
+    "releases/rag-modeling-pairs-20261114-03/中文单行轨迹/G01_Skill_一行轨迹.md": {
+      "original": "runs/rag-modeling-pairs-20261114-03/中文单行轨迹/G01_Skill_一行轨迹.md",
+      "sha256": "6752531a532b7a04cc7b7aa5f1e4a3bb6aac066c5939d4264f4e4148cb498fd9"
+    },
+    "releases/rag-modeling-pairs-20261114-03/中文单行轨迹/翻译清单.json": {
+      "original": "runs/rag-modeling-pairs-20261114-03/中文单行轨迹/翻译清单.json",
+      "sha256": "b6c99af1c0730d402dd0c6b729582e17c0d3ce743d7b3da2af95114a5794f029"
+    },
+    "releases/rag-modeling-pairs-20261114-03/中文单行轨迹/总索引.md": {
+      "original": "runs/rag-modeling-pairs-20261114-03/中文单行轨迹/总索引.md",
+      "sha256": "efbcee1fd9682e30f08b28b895ebbbc63816af51b391f299a33da7aeb3c7ee54"
+    },
+    "releases/rag-modeling-pairs-20261114-03/中文单行轨迹/G02_Skill_一行轨迹.md": {
+      "original": "runs/rag-modeling-pairs-20261114-03/中文单行轨迹/G02_Skill_一行轨迹.md",
+      "sha256": "043467665dae6b71df5f5db29104293a365fe0c1be1a8cadd38890ef54f6412a"
+    },
+    "releases/rag-modeling-pairs-20261114-03/中文单行轨迹/M01_Skill_一行轨迹.md": {
+      "original": "runs/rag-modeling-pairs-20261114-03/中文单行轨迹/M01_Skill_一行轨迹.md",
+      "sha256": "9d594c1997d7f7dbac0e496d1875116eee7cd2f5eb12541ba5cc9eb981345110"
+    },
+    "releases/rag-modeling-pairs-20261114-03/中文单行轨迹/六次运行_一行事件汇总.md": {
+      "original": "runs/rag-modeling-pairs-20261114-03/中文单行轨迹/六次运行_一行事件汇总.md",
+      "sha256": "a74c3b14663c91de5e20239474bd6783836af2306f0324cf865ff79748e60fe6"
+    },
+    "releases/rag-modeling-pairs-20261114-03/中文单行轨迹/工具调用中文记录.jsonl": {
+      "original": "runs/rag-modeling-pairs-20261114-03/中文单行轨迹/工具调用中文记录.jsonl",
+      "sha256": "d74214b3262f92c2ac19be0676bd945bbc0058ddd3f1299a4fc1cadd7f25e613"
+    },
+    "releases/rag-modeling-pairs-20261114-03/中文单行轨迹/G01_裸DSH_一行轨迹.md": {
+      "original": "runs/rag-modeling-pairs-20261114-03/中文单行轨迹/G01_裸DSH_一行轨迹.md",
+      "sha256": "47f0d5bddbd6948c7c05256cf9b87750f216478ddcc8614a9886c1a0b33535c3"
+    },
+    "releases/quality-reference-20261114-01/完成度与数值对标.md": {
+      "original": "runs/quality-reference-20261114-01/完成度与数值对标.md",
+      "sha256": "cb80cdc2f09df6e4f6526571a5c66a060e50429894b78f0ca9e8d8831f042f24"
+    },
+    "releases/quality-reference-20261114-01/numeric-reference-check.json": {
+      "original": "runs/quality-reference-20261114-01/numeric-reference-check.json",
+      "sha256": "24addf57f2b2f72d502f012b095ed76c115afce5111a07f54fcfc101d570f530"
+    },
+    "releases/quality-reference-20261114-01/数值对标.csv": {
+      "original": "runs/quality-reference-20261114-01/数值对标.csv",
+      "sha256": "f6c9c0102f99d239eb1b86358b342b5777e5fa32ca32b93a1c55092da4396cba"
+    },
+    "releases/quality-reference-20261114-01/task-quality-classification.json": {
+      "original": "runs/quality-reference-20261114-01/task-quality-classification.json",
+      "sha256": "8c6f3fe931c1213be5db0c4853f05815df411a8fea715d71d62fc7b32ab167e4"
+    },
+    "releases/quality-reference-20261114-01/交付核对.json": {
+      "original": "runs/quality-reference-20261114-01/交付核对.json",
+      "sha256": "6420cc722e7bdd2b6dc04f4eaefce6b388836ea8b922794fa3ac3579447268c9"
+    },
+    "releases/quality-reference-20261114-01/compatibility-repair.json": {
+      "original": "runs/quality-reference-20261114-01/compatibility-repair.json",
+      "sha256": "a71b2148afc7375c62dd280f8a7b993b49bfc595bef80cd09a11382fe7a452cb"
+    },
+    "releases/quality-reference-20261114-01/mesh-refinement.json": {
+      "original": "runs/quality-reference-20261114-01/mesh-refinement.json",
+      "sha256": "40aa283344be5c17c0bb96fed869f7adc3276808f9b8bcf344308691bbfbd53a"
+    },
+    "releases/quality-reference-20261114-01/manifest.json": {
+      "original": "runs/quality-reference-20261114-01/manifest.json",
+      "sha256": "a9e303237b9a34f124363ef4bfa2a673afab74c458895c48a1c6b8def02b6543"
+    }
+  },
+  "scope_notes": [
+    "两组使用相同离线RAG、参考库和手册；Skill组使用完整Skill配置。",
+    "每题一次配对，观察到资源消耗下降；不是稳定加速比或数值精度全面提高的证明。",
+    "按题面评价任务合规，未明示精度公差作为诊断指标单列。",
+    "大型原始会话、结果场、历史示例工作区和本机配置不纳入Git；保留原路径。",
+    "本标签封存已测行为，不改运行代码，不提升产品语义版本。"
+  ],
+  "freeze_validation": {
+    "examples_check": "通过：五组工程示例完整性检查，无模型或求解器调用",
+    "rag_index_check": "通过：137张卡片，索引与清单一致",
+    "launcher_shell_syntax": "通过：prepare-agent.sh、resolve-node.sh、start-dsh.sh",
+    "skill_schema_check": "通过：五项Skill均符合quick_validate检查",
+    "staged_product_bytes": "96个产品文件与已测快照逐字节一致",
+    "staged_evidence_bytes": "所有精选证据与原始哈希逐字节一致，保留CSV原始换行",
+    "credential_scan": "未发现具体凭据模式；4处匹配均为task-quality-classification文件名误报",
+    "new_model_or_solver_runs": 0
+  }
+}

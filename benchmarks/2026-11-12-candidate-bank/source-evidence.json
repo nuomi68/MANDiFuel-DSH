@@ -1,0 +1,877 @@
+{
+  "inventory_check": {
+    "cards": 137,
+    "case_directories_found": 137,
+    "selected_reference_files_checked": 465,
+    "reference_file_hash_mismatches": 0
+  },
+  "used_case_count": 21,
+  "sources": [
+    {
+      "card_path": "Cases/Verification/NaCoolantChannelModel/vsAnalytical",
+      "absolute_case_path": "/home/lwz/offbeat/Cases/Verification/NaCoolantChannelModel/vsAnalytical",
+      "exists": true,
+      "card_name": "vs Analytical",
+      "profile": "NaCoolantChannelModel/vsAnalytical is a sodium channel analytical solution verification. Na coolant channel compared against analytical/reference solution; uses Q_FOUNDATION/Q_ESI reference data.",
+      "do_not_use_for": [
+        "TRACE comparison",
+        "water coolant",
+        "DNB",
+        "fuel rod"
+      ],
+      "reference_files": [
+        {
+          "path": "constant/solverDict",
+          "sha256": "ae60215dc250844d5374a6d7804cbab71db524e0ae24e027bdf12739defdfdfe",
+          "matches_card": true
+        },
+        {
+          "path": "Allrun",
+          "sha256": "c984eab4ed3ff8f3d6f3addfaa00580518b297e66b8275bcf9beb05a9bd29f56",
+          "matches_card": true
+        },
+        {
+          "path": "system/blockMeshDict",
+          "sha256": "2c835037602913830df93cbece679b5695f9cacb821a36c9dafbe99559e01fde",
+          "matches_card": true
+        }
+      ],
+      "allrun_solver_mentions": [
+        {
+          "line": 19,
+          "text": "runApplication -o offbeat"
+        }
+      ],
+      "note": "脚本行仅为静态证据；循环、调用脚本与条件分支可能改变真实启动数，不把出现次数当实际启动账本。"
+    },
+    {
+      "card_path": "Cases/Verification/corrosion/fixedInterfaceTemperature",
+      "absolute_case_path": "/home/lwz/offbeat/Cases/Verification/corrosion/fixedInterfaceTemperature",
+      "exists": true,
+      "card_name": "fixed Interface Temperature",
+      "profile": "corrosion/fixedInterfaceTemperature is a oxide growth with fixed outer interface temperature verification. The cladding outer interface is fixed at 550 K while cladInner is zeroGradient; the verified reference for oxideThickness is 2.73908e-5 m.",
+      "do_not_use_for": [
+        "inner heat flux corrosion"
+      ],
+      "reference_files": [
+        {
+          "path": "constant/solverDict",
+          "sha256": "0d74d870fba1f80f074d2fbe483f853354bc0b63c54fa246e0289dc5fe3bcedf",
+          "matches_card": true
+        },
+        {
+          "path": "Allrun",
+          "sha256": "468664a2ab9b50a31e53443945dcb61173d5e7c5664feb823ce55a9cd5199c3b",
+          "matches_card": true
+        },
+        {
+          "path": "system/blockMeshDict",
+          "sha256": "932362d14585eb930d210bb017ac76aa90bd20743d30a4851f6fe207eef102ab",
+          "matches_card": true
+        }
+      ],
+      "allrun_solver_mentions": [
+        {
+          "line": 8,
+          "text": "runApplication -o offbeat"
+        }
+      ],
+      "note": "脚本行仅为静态证据；循环、调用脚本与条件分支可能改变真实启动数，不把出现次数当实际启动账本。"
+    },
+    {
+      "card_path": "Cases/Verification/heatConservation",
+      "absolute_case_path": "/home/lwz/offbeat/Cases/Verification/heatConservation",
+      "exists": true,
+      "card_name": "heat Conservation",
+      "profile": "heatConservation is a fuel rod heat conservation verification. TimeDependentLhgr supplies heat to the fuel region; the fuel-cladding wedge retains an active FRAPCON gap model.",
+      "do_not_use_for": [
+        "gap-volume-only verification",
+        "structural force balance"
+      ],
+      "reference_files": [
+        {
+          "path": "constant/solverDict",
+          "sha256": "92e81136d3b7eda16181a3ee9934aebb7691984e0ff75da51d2514ff4c540ba9",
+          "matches_card": true
+        },
+        {
+          "path": "Allrun",
+          "sha256": "c5e5b5479339771aa3ff8fb6bf21bbe24f1b3e69dd89543db7b3cec52a6ce3fd",
+          "matches_card": true
+        },
+        {
+          "path": "system/blockMeshDict",
+          "sha256": "4163d6407a0221878b4ef0229001e110273a71342db1a4fab13433cc48715d4a",
+          "matches_card": true
+        }
+      ],
+      "allrun_solver_mentions": [
+        {
+          "line": 9,
+          "text": "runApplication -o offbeat"
+        },
+        {
+          "line": 12,
+          "text": "fname=\"log.offbeat\""
+        }
+      ],
+      "note": "脚本行仅为静态证据；循环、调用脚本与条件分支可能改变真实启动数，不把出现次数当实际启动账本。"
+    },
+    {
+      "card_path": "Cases/Verification/multiMaterial/biMaterialCylinder1",
+      "absolute_case_path": "/home/lwz/offbeat/Cases/Verification/multiMaterial/biMaterialCylinder1",
+      "exists": true,
+      "card_name": "bi Material Cylinder1",
+      "profile": "multiMaterial/biMaterialCylinder1 is a concentric bimaterial cylinder internal pressure verification. The displacement boundary condition applies 1e7 Pa pressure at the inner cylinder boundary; inner and outer material regions are joined by a cyclicAMI interface.",
+      "do_not_use_for": [
+        "fixed torque",
+        "frictional gap contact"
+      ],
+      "reference_files": [
+        {
+          "path": "constant/solverDict",
+          "sha256": "9fb83bc7fab5b81a05797e0daaa17a2ca98adc73a767b6c512fb21585b4732ba",
+          "matches_card": true
+        },
+        {
+          "path": "Allrun",
+          "sha256": "b97439090268d641f29cf5c246877b76d3505b3eb3b1f7fc9143f9addd82cf69",
+          "matches_card": true
+        },
+        {
+          "path": "0/D",
+          "sha256": "1b19c34a9e3ea5baa525723a5b30498b6e5835d05604fdca9b2bdaae19bee35a",
+          "matches_card": true
+        },
+        {
+          "path": "system/blockMeshDict",
+          "sha256": "6b0bdb52126dfc75373023f0ee7830a5dfdd0ee9c3f7e7f4167220c3e88b3ccb",
+          "matches_card": true
+        }
+      ],
+      "allrun_solver_mentions": [
+        {
+          "line": 11,
+          "text": "runApplication -o offbeat"
+        }
+      ],
+      "note": "脚本行仅为静态证据；循环、调用脚本与条件分支可能改变真实启动数，不把出现次数当实际启动账本。"
+    },
+    {
+      "card_path": "Cases/Verification/testBetaFraction",
+      "absolute_case_path": "/home/lwz/offbeat/Cases/Verification/testBetaFraction",
+      "exists": true,
+      "card_name": "test Beta Fraction",
+      "profile": "testBetaFraction is a zircaloy beta phase transition thermal cycle verification. The benchmark compares the Zircaloy phase-transition model with Massih equilibrium and plus-minus reference curves; a 900-1400-900 K cycle and a slow equilibrium ramp check beta phase fraction 0.401681 at 1150 K.",
+      "do_not_use_for": [
+        "neutronics",
+        "delayed neutron fraction"
+      ],
+      "reference_files": [
+        {
+          "path": "constant/solverDict",
+          "sha256": "cb687a3be6d43ee88ae6818417f76cb5735622c76d6d753375434b3d6674a675",
+          "matches_card": true
+        },
+        {
+          "path": "Allrun",
+          "sha256": "085b121a4893b3da5ab48bd82b58359a5e767efd70821d81d6eff085debab5da",
+          "matches_card": true
+        },
+        {
+          "path": "0/T",
+          "sha256": "185f8d8ee92d53f2216f07e83268c4b117dfbd87febae33ab015303a08770a7e",
+          "matches_card": true
+        },
+        {
+          "path": "system/probes",
+          "sha256": "566bff10788f0868600e02d5c8199d05a50e1e6f43021c24c6d04b4fb48d31aa",
+          "matches_card": true
+        },
+        {
+          "path": "system/blockMeshDict",
+          "sha256": "0f8b302dbac1b00c4928838aac9c21efdd9dff61861ee33c89dc07d830ddc5db",
+          "matches_card": true
+        }
+      ],
+      "allrun_solver_mentions": [
+        {
+          "line": 17,
+          "text": "runApplication -o offbeat"
+        },
+        {
+          "line": 30,
+          "text": "runApplication -o offbeat"
+        },
+        {
+          "line": 69,
+          "text": "plt.plot(Te[:,1], Be[:,1], label='OFFBEAT, eq', lw = 2, ls='-')"
+        },
+        {
+          "line": 70,
+          "text": "plt.plot(T[:,1], B[:,1], label='OFFBEAT, +-10 K/s', lw = 2, ls='--')"
+        }
+      ],
+      "note": "脚本行仅为静态证据；循环、调用脚本与条件分支可能改变真实启动数，不把出现次数当实际启动账本。"
+    },
+    {
+      "card_path": "Cases/Verification/trisoBenchmarks/case_1",
+      "absolute_case_path": "/home/lwz/offbeat/Cases/Verification/trisoBenchmarks/case_1",
+      "exists": true,
+      "card_name": "TRISO Benchmarks case 1",
+      "profile": "trisoBenchmarks/case_1 is a sic only triso layer benchmark. The spherical coating stack contains only the SiC layer, without IPyC or OPyC; gap-gas and fission-gas-release models are disabled; rKernel 250 um with tSiC 35 um.",
+      "do_not_use_for": [
+        "IPyC only",
+        "IPyC SiC",
+        "OPyC",
+        "gapGas TRISO",
+        "SCIANTIX"
+      ],
+      "reference_files": [
+        {
+          "path": "constant/solverDict",
+          "sha256": "617696a3eca3277e1cf3d409654a08155bea4e667889f1b860a162d8489f3fc1",
+          "matches_card": true
+        },
+        {
+          "path": "Allrun",
+          "sha256": "7f0057cb63a71eeae814d3f716bcc008804bf3215cb89c77b742fe31371eaafc",
+          "matches_card": true
+        },
+        {
+          "path": "sphereDict",
+          "sha256": "f8ae53237d4d5e875291ea25238bff3a62752ffba1fcb7b69ee825faaa7af65c",
+          "matches_card": true
+        }
+      ],
+      "allrun_solver_mentions": [
+        {
+          "line": 10,
+          "text": "runApplication -o offbeat"
+        }
+      ],
+      "note": "脚本行仅为静态证据；循环、调用脚本与条件分支可能改变真实启动数，不把出现次数当实际启动账本。"
+    },
+    {
+      "card_path": "Cases/Verification/trisoFpDiffusion/case_1a",
+      "absolute_case_path": "/home/lwz/offbeat/Cases/Verification/trisoFpDiffusion/case_1a",
+      "exists": true,
+      "card_name": "TRISO Fp Diffusion case 1a",
+      "profile": "trisoFpDiffusion/case_1a is a kernel only 1473K cs release fraction benchmark. The Kernel-only FpDiffusion case prescribes 1473.15 K; the verified reference for the Cs release fraction is 0.4673.",
+      "do_not_use_for": [
+        "multilayer coating diffusion",
+        "mechanics"
+      ],
+      "reference_files": [
+        {
+          "path": "constant/solverDict",
+          "sha256": "b1b58a028245a0a8d43a8b17ee891299eb12ca3a300013271f16602251d0665f",
+          "matches_card": true
+        },
+        {
+          "path": "Allrun",
+          "sha256": "d8e162cf40de49d6ca235413d1faf5c069f8cb1e5c4efa69640c461955a0d765",
+          "matches_card": true
+        },
+        {
+          "path": "0/T",
+          "sha256": "53e503231c924842786aede39524906dfb8051ed562d216b3533ef79ba0d878a",
+          "matches_card": true
+        },
+        {
+          "path": "system/blockMeshDict",
+          "sha256": "f7b16896a1ec0b39ef4aceafb5e01b24554f9095b98800d9ab6dcdf5ca6b0ea2",
+          "matches_card": true
+        }
+      ],
+      "allrun_solver_mentions": [
+        {
+          "line": 10,
+          "text": "runApplication -o offbeat"
+        },
+        {
+          "line": 14,
+          "text": "CsSimulation=$(grep -i \"Fraction of Cs release\" log.offbeat | tail -n 1| cut -d\" \" -f5)"
+        }
+      ],
+      "note": "脚本行仅为静态证据；循环、调用脚本与条件分支可能改变真实启动数，不把出现次数当实际启动账本。"
+    },
+    {
+      "card_path": "Cases/Verification/trisoFpDiffusion/case_1b",
+      "absolute_case_path": "/home/lwz/offbeat/Cases/Verification/trisoFpDiffusion/case_1b",
+      "exists": true,
+      "card_name": "TRISO Fp Diffusion case 1b",
+      "profile": "trisoFpDiffusion/case_1b is a kernel only 1873K cs release fraction benchmark. The Kernel-only FpDiffusion case prescribes 1873.15 K with initialCsConcentration 1; the verified reference for the Cs release fraction is 0.99999959.",
+      "do_not_use_for": [
+        "multilayer coating diffusion",
+        "mechanics"
+      ],
+      "reference_files": [
+        {
+          "path": "constant/solverDict",
+          "sha256": "8e5a89f01c932fd811b91c20abff3c537351155097d0a812321500402033d9b4",
+          "matches_card": true
+        },
+        {
+          "path": "Allrun",
+          "sha256": "67c8f6bea7964a86c363f3522cb38256f09d966e4885813a24eae790eb97594e",
+          "matches_card": true
+        },
+        {
+          "path": "0/T",
+          "sha256": "64ab15c98df04cf17dc22f4c64677649ea7094001fb79c876293e3321a814ea4",
+          "matches_card": true
+        },
+        {
+          "path": "system/blockMeshDict",
+          "sha256": "f7b16896a1ec0b39ef4aceafb5e01b24554f9095b98800d9ab6dcdf5ca6b0ea2",
+          "matches_card": true
+        }
+      ],
+      "allrun_solver_mentions": [
+        {
+          "line": 10,
+          "text": "runApplication -o offbeat"
+        },
+        {
+          "line": 14,
+          "text": "CsSimulation=$(grep -i \"Fraction of Cs release\" log.offbeat | tail -n 1| cut -d\" \" -f5)"
+        }
+      ],
+      "note": "脚本行仅为静态证据；循环、调用脚本与条件分支可能改变真实启动数，不把出现次数当实际启动账本。"
+    },
+    {
+      "card_path": "Cases/Verification/trisoFpDiffusion/case_2b",
+      "absolute_case_path": "/home/lwz/offbeat/Cases/Verification/trisoFpDiffusion/case_2b",
+      "exists": true,
+      "card_name": "TRISO Fp Diffusion case 2b",
+      "profile": "trisoFpDiffusion/case_2b is a kernel buffer ipyc 1873K cs release fraction benchmark. The Kernel-Buffer-IPyC FpDiffusion stack prescribes 1873.15 K and includes Cs and Kr transport entries; the verified reference for the Cs release fraction is 0.994653.",
+      "do_not_use_for": [
+        "Kernel-only diffusion",
+        "mechanics"
+      ],
+      "reference_files": [
+        {
+          "path": "constant/solverDict",
+          "sha256": "6e72c790cbe53135306c41d618130617e9240a4458eed7327632f7bd46779b20",
+          "matches_card": true
+        },
+        {
+          "path": "Allrun",
+          "sha256": "16033043ba8ffe79a7d447f4bf93462378292e461b39b522c068ef2f7ed83a70",
+          "matches_card": true
+        },
+        {
+          "path": "0/T",
+          "sha256": "64ab15c98df04cf17dc22f4c64677649ea7094001fb79c876293e3321a814ea4",
+          "matches_card": true
+        },
+        {
+          "path": "system/blockMeshDict",
+          "sha256": "bff495a386aa4d2f5fa95b52a46197c51b211a1df2bbe93d288e7fb40eb0ccea",
+          "matches_card": true
+        }
+      ],
+      "allrun_solver_mentions": [
+        {
+          "line": 10,
+          "text": "runApplication -o offbeat"
+        },
+        {
+          "line": 14,
+          "text": "CsSimulation=$(grep -i \"Fraction of Cs release\" log.offbeat | tail -n 1| cut -d\" \" -f5)"
+        }
+      ],
+      "note": "脚本行仅为静态证据；循环、调用脚本与条件分支可能改变真实启动数，不把出现次数当实际启动账本。"
+    },
+    {
+      "card_path": "Cases/Verification/trisoFpDiffusion/case_3a",
+      "absolute_case_path": "/home/lwz/offbeat/Cases/Verification/trisoFpDiffusion/case_3a",
+      "exists": true,
+      "card_name": "TRISO Fp Diffusion case 3a",
+      "profile": "trisoFpDiffusion/case_3a is a full coating 1873K cs release fraction benchmark. The spherical Kernel-Buffer-IPyC-SiC-OPyC transport stack is held at 1873.15 K; the verified reference for the Cs release fraction is 1.54447e-4.",
+      "do_not_use_for": [
+        "mechanics",
+        "temperature solution"
+      ],
+      "reference_files": [
+        {
+          "path": "constant/solverDict",
+          "sha256": "b7e48de768e92f2f7f7066b6114582b901ea372841a193641586ef988b87b401",
+          "matches_card": true
+        },
+        {
+          "path": "Allrun",
+          "sha256": "d12186fe7e266656fc2f6aab639db5c84b6d9b70766f31379f031e18d14fe455",
+          "matches_card": true
+        },
+        {
+          "path": "0/T",
+          "sha256": "64ab15c98df04cf17dc22f4c64677649ea7094001fb79c876293e3321a814ea4",
+          "matches_card": true
+        },
+        {
+          "path": "sphereDict",
+          "sha256": "5f56f5c94d5f2e7c2b6604a4ff956147bca2412cf33a7c90a5c707d1a3dff32e",
+          "matches_card": true
+        }
+      ],
+      "allrun_solver_mentions": [
+        {
+          "line": 10,
+          "text": "runApplication -o offbeat"
+        },
+        {
+          "line": 14,
+          "text": "CsSimulation=$(grep -i \"Fraction of Cs release\" log.offbeat | tail -n 1| cut -d\" \" -f5)"
+        }
+      ],
+      "note": "脚本行仅为静态证据；循环、调用脚本与条件分支可能改变真实启动数，不把出现次数当实际启动账本。"
+    },
+    {
+      "card_path": "Cases/Verification/trisoFpDiffusion/case_3d",
+      "absolute_case_path": "/home/lwz/offbeat/Cases/Verification/trisoFpDiffusion/case_3d",
+      "exists": true,
+      "card_name": "TRISO Fp Diffusion case 3d",
+      "profile": "trisoFpDiffusion/case_3d is a two run sic crack cs cumulative release benchmark. The second calculation enables SiC crackFpRelease for the second solve and accumulates Cs released over both runs; the cumulative Cs release fraction is checked against 0.999992.",
+      "do_not_use_for": [
+        "single-run release",
+        "mechanics"
+      ],
+      "reference_files": [
+        {
+          "path": "constant/solverDict",
+          "sha256": "25dc4408bc117033ff17cd3a1da4bf1616fa8b07e32b1826ca818389819de442",
+          "matches_card": true
+        },
+        {
+          "path": "Allrun",
+          "sha256": "56fe2daefba327577ad45352151938e614fa332e0b330bcc754ce25d5874dfe4",
+          "matches_card": true
+        },
+        {
+          "path": "0/T",
+          "sha256": "c5570348d30feefe4d6012cbb0b25e479ad422f7ce210915bb8d18bf5f1d870f",
+          "matches_card": true
+        },
+        {
+          "path": "sphereDict",
+          "sha256": "5f56f5c94d5f2e7c2b6604a4ff956147bca2412cf33a7c90a5c707d1a3dff32e",
+          "matches_card": true
+        }
+      ],
+      "allrun_solver_mentions": [
+        {
+          "line": 10,
+          "text": "runApplication -o offbeat"
+        },
+        {
+          "line": 12,
+          "text": "initial=$(grep -i \"Initial Cs amount\" log.offbeat | tail -n 1| cut -d\" \" -f4)"
+        },
+        {
+          "line": 13,
+          "text": "Cs1=$(grep -i \"Released Cs amount\" log.offbeat | tail -n 1| cut -d\" \" -f4)"
+        },
+        {
+          "line": 19,
+          "text": "runApplication -o offbeat"
+        },
+        {
+          "line": 21,
+          "text": "Cs2=$(grep -i \"Released Cs amount\" log.offbeat | tail -n 1| cut -d\" \" -f4)"
+        }
+      ],
+      "note": "脚本行仅为静态证据；循环、调用脚本与条件分支可能改变真实启动数，不把出现次数当实际启动账本。"
+    },
+    {
+      "card_path": "Cases/Verification/trisoModulesTest/hollowsphere_1D",
+      "absolute_case_path": "/home/lwz/offbeat/Cases/Verification/trisoModulesTest/hollowsphere_1D",
+      "exists": true,
+      "card_name": "hollowsphere 1 D",
+      "profile": "trisoModulesTest/hollowsphere_1D is a hollow sphere 1d mechanics module test. Single buffer material hollow sphere; thermalExpansion off with constant E and nu; an analytical solution provides the reference.",
+      "do_not_use_for": [
+        "full triso particle",
+        "gapGas TRISO",
+        "SCIANTIX",
+        "production benchmark"
+      ],
+      "reference_files": [
+        {
+          "path": "constant/solverDict",
+          "sha256": "92abe1b57db91ea60fe205f3c7b6ba4ba91ac7a5038828593fe8bb7ceeaab77d",
+          "matches_card": true
+        },
+        {
+          "path": "Allrun",
+          "sha256": "b04bf33b14b032ac83a22ba599c88aa14a63807a83e498d99df783c1f920639d",
+          "matches_card": true
+        },
+        {
+          "path": "system/blockMeshDict",
+          "sha256": "a8e2931cfae7609f4e709f1794370778522b9cc18c828830c76a6d81735c5f6e",
+          "matches_card": true
+        }
+      ],
+      "allrun_solver_mentions": [
+        {
+          "line": 10,
+          "text": "runApplication -o offbeat"
+        }
+      ],
+      "note": "脚本行仅为静态证据；循环、调用脚本与条件分支可能改变真实启动数，不把出现次数当实际启动账本。"
+    },
+    {
+      "card_path": "Cases/Verification/trisoModulesTest/testPyC_alpha_spherical",
+      "absolute_case_path": "/home/lwz/offbeat/Cases/Verification/trisoModulesTest/testPyC_alpha_spherical",
+      "exists": true,
+      "card_name": "test Py C alpha spherical",
+      "profile": "trisoModulesTest/testPyC_alpha_spherical is a pyrocarbon spherical thermal expansion module test. The case provides a one-dimensional spherical analytical displacement comparison; a deliberately anisotropic BAF separates radial and tangential expansion.",
+      "do_not_use_for": [
+        "Cartesian thermal expansion",
+        "irradiation swelling"
+      ],
+      "reference_files": [
+        {
+          "path": "constant/solverDict",
+          "sha256": "d962d7232e67612a0605efd90c834a2a176f1215c236c72485c9c77ab936593d",
+          "matches_card": true
+        },
+        {
+          "path": "Allrun",
+          "sha256": "baf04b01ba5990d7244d11e0eb351a2e41fa188f06011500e76217040b0702d2",
+          "matches_card": true
+        },
+        {
+          "path": "README",
+          "sha256": "89d47bfba634e1bdbada683b3fb0e5b1d12fdf82627b084f869283aa2f53f6c3",
+          "matches_card": true
+        },
+        {
+          "path": "system/blockMeshDict",
+          "sha256": "6a956e33c14685cea80bdcafcf46bf0bfed3acfff0fef4a2032e692c9596a99f",
+          "matches_card": true
+        }
+      ],
+      "allrun_solver_mentions": [
+        {
+          "line": 10,
+          "text": "runApplication -o offbeat"
+        }
+      ],
+      "note": "脚本行仅为静态证据；循环、调用脚本与条件分支可能改变真实启动数，不把出现次数当实际启动账本。"
+    },
+    {
+      "card_path": "Cases/Verification/trisoModulesTest/testSiC_creep",
+      "absolute_case_path": "/home/lwz/offbeat/Cases/Verification/trisoModulesTest/testSiC_creep",
+      "exists": true,
+      "card_name": "test Si C creep",
+      "profile": "trisoModulesTest/testSiC_creep is a silicon carbide irradiation creep module test. MonolithicSiCCreepModel is checked against the analytical creep-strain reference; the fixture uses 600 K, 50 MPa and a prescribed fast-neutron flux.",
+      "do_not_use_for": [
+        "PyC creep",
+        "SiC elastic-property suite"
+      ],
+      "reference_files": [
+        {
+          "path": "constant/solverDict",
+          "sha256": "26c49934ee06a06adce528eb13d718475fc66a17a04e44d40700ca5a6c636103",
+          "matches_card": true
+        },
+        {
+          "path": "Allrun",
+          "sha256": "3c504ab79b8df01620c05968779416e4481b6ec31185bfe0c0ef843243a4de0a",
+          "matches_card": true
+        },
+        {
+          "path": "README",
+          "sha256": "592dd1a914c8a9c9947e1835916a22353047496144aaa4efa5e7363da5fa5e8c",
+          "matches_card": true
+        },
+        {
+          "path": "system/blockMeshDict",
+          "sha256": "bd567157c8e7c2eb8fda4c0bace67d94936179a9eaaf135c79b0bb7fc3393eb7",
+          "matches_card": true
+        }
+      ],
+      "allrun_solver_mentions": [
+        {
+          "line": 10,
+          "text": "runApplication -o offbeat"
+        }
+      ],
+      "note": "脚本行仅为静态证据；循环、调用脚本与条件分支可能改变真实启动数，不把出现次数当实际启动账本。"
+    },
+    {
+      "card_path": "Cases/restart/baseCase",
+      "absolute_case_path": "/home/lwz/offbeat/Cases/restart/baseCase",
+      "exists": true,
+      "card_name": "restart base Case",
+      "profile": "baseCase is a restart workflow base case. The path is the base calculation for the Cases/restart workflow; the geometry contains fuel and cladding regions with restart fields.",
+      "do_not_use_for": [
+        "standalone reference benchmark",
+        "completed restart continuation"
+      ],
+      "reference_files": [
+        {
+          "path": "constant/solverDict",
+          "sha256": "88d324f423c09137acc4d8c4036685595486d4485941c27c475b3bc6b88c0445",
+          "matches_card": true
+        },
+        {
+          "path": "Allrun",
+          "sha256": "8873bd0eac5d2ac29a0129a0689ecfcd5063ff50e463294744fd7449a1f9f7f9",
+          "matches_card": true
+        },
+        {
+          "path": "rodDict",
+          "sha256": "d752fe91ca60dbb765ee4462a0857575bf5bdd32233160fe3659cd21885a40b1",
+          "matches_card": true
+        }
+      ],
+      "allrun_solver_mentions": [
+        {
+          "line": 10,
+          "text": "echo \"Running OFFBEAT\""
+        },
+        {
+          "line": 11,
+          "text": "offbeat > log.offbeat"
+        }
+      ],
+      "note": "脚本行仅为静态证据；循环、调用脚本与条件分支可能改变真实启动数，不把出现次数当实际启动账本。"
+    },
+    {
+      "card_path": "Cases/testCases/exerciseOFFBEAT/case1_solved",
+      "absolute_case_path": "/home/lwz/offbeat/Cases/testCases/exerciseOFFBEAT/case1_solved",
+      "exists": true,
+      "card_name": "case1 solved",
+      "profile": "exerciseOFFBEAT/case1_solved is a offbeat training thermal baseline reference. Case1_solved is the completed reference for this curriculum stage; constant fuel conductivity and a fixed gap conductance isolate radial heat transfer.",
+      "do_not_use_for": [
+        "verification benchmark",
+        "production reference case"
+      ],
+      "reference_files": [
+        {
+          "path": "constant/solverDict",
+          "sha256": "9b3dfc15bd83d220edcc049990e916a082c2a9ad79331995a870e04b07241972",
+          "matches_card": true
+        },
+        {
+          "path": "Allrun",
+          "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c",
+          "matches_card": true
+        },
+        {
+          "path": "README.md",
+          "sha256": "49c6cb5a28d7ee49ce2a7048760dcb751b08c3ec9232e0150448f6570a00af4e",
+          "matches_card": true
+        },
+        {
+          "path": "rodDict",
+          "sha256": "c77e8b0689df79b627cc5dd5690b8d43036d8bd1b36409e5f9de881034bb9e3c",
+          "matches_card": true
+        }
+      ],
+      "allrun_solver_mentions": [
+        {
+          "line": 6,
+          "text": "offbeat | tee log.offbeat"
+        }
+      ],
+      "note": "脚本行仅为静态证据；循环、调用脚本与条件分支可能改变真实启动数，不把出现次数当实际启动账本。"
+    },
+    {
+      "card_path": "Cases/testCases/exerciseOFFBEAT/case1c_solved",
+      "absolute_case_path": "/home/lwz/offbeat/Cases/testCases/exerciseOFFBEAT/case1c_solved",
+      "exists": true,
+      "card_name": "case1c solved",
+      "profile": "exerciseOFFBEAT/case1c_solved is a offbeat training annular fuel variant reference. Case1c_solved is the completed reference for this curriculum stage; the Case 1 variant adds a 0.75 mm central fuel hole.",
+      "do_not_use_for": [
+        "verification benchmark",
+        "production reference case"
+      ],
+      "reference_files": [
+        {
+          "path": "constant/solverDict",
+          "sha256": "9b3dfc15bd83d220edcc049990e916a082c2a9ad79331995a870e04b07241972",
+          "matches_card": true
+        },
+        {
+          "path": "Allrun",
+          "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c",
+          "matches_card": true
+        },
+        {
+          "path": "README.md",
+          "sha256": "7905a03e2dd82ea0743e83cfa05ce8a7fde2325997aab92969103ce1897d269f",
+          "matches_card": true
+        },
+        {
+          "path": "rodDict",
+          "sha256": "b3fab246ef818a655cdfbb529ef5c24b9bd3c414e133ba054abfe7f116206f37",
+          "matches_card": true
+        }
+      ],
+      "allrun_solver_mentions": [
+        {
+          "line": 6,
+          "text": "offbeat | tee log.offbeat"
+        }
+      ],
+      "note": "脚本行仅为静态证据；循环、调用脚本与条件分支可能改变真实启动数，不把出现次数当实际启动账本。"
+    },
+    {
+      "card_path": "Cases/testCases/exerciseOFFBEAT/case8_solved",
+      "absolute_case_path": "/home/lwz/offbeat/Cases/testCases/exerciseOFFBEAT/case8_solved",
+      "exists": true,
+      "card_name": "case8 solved",
+      "profile": "exerciseOFFBEAT/case8_solved is a offbeat training two dimensional axial power profile reference. Case8_solved is the completed reference for this curriculum stage; the smeared r-z model resolves the prescribed axial power and fast-flux profiles.",
+      "do_not_use_for": [
+        "verification benchmark",
+        "production reference case"
+      ],
+      "reference_files": [
+        {
+          "path": "constant/solverDict",
+          "sha256": "a0db7a6f95ca8aba61211933b1a1af0d694f28b58498235ed4350f348d4c1dbe",
+          "matches_card": true
+        },
+        {
+          "path": "Allrun",
+          "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c",
+          "matches_card": true
+        },
+        {
+          "path": "rodDict",
+          "sha256": "be0dd96d6196b465d32b725a054a65821088cba6a431b1bc33e7b3538f5df0c2",
+          "matches_card": true
+        }
+      ],
+      "allrun_solver_mentions": [
+        {
+          "line": 6,
+          "text": "offbeat | tee log.offbeat"
+        }
+      ],
+      "note": "脚本行仅为静态证据；循环、调用脚本与条件分支可能改变真实启动数，不把出现次数当实际启动账本。"
+    },
+    {
+      "card_path": "Cases/testCases/generic_TRISO_1D",
+      "absolute_case_path": "/home/lwz/offbeat/Cases/testCases/generic_TRISO_1D",
+      "exists": true,
+      "card_name": "generic TRISO 1 D",
+      "profile": "generic_TRISO_1D is a generic full triso one dimensional template. The spherical mesh contains Kernel, Buffer, IPyC, SiC and OPyC regions; TRISO gap gas, SCIANTIX FGR and incremental updated mechanics are active.",
+      "do_not_use_for": [
+        "fission-product coating diffusion",
+        "single-property module test"
+      ],
+      "reference_files": [
+        {
+          "path": "constant/solverDict",
+          "sha256": "fa8e8a696589d919207067fd633d40e8121d031cd922578c9695b24517b132d9",
+          "matches_card": true
+        },
+        {
+          "path": "Allrun",
+          "sha256": "182b19022b52ac022d8f9a49a8b5c8e7aebde6505001b546657f543f1450fffa",
+          "matches_card": true
+        },
+        {
+          "path": "README.md",
+          "sha256": "f29f1ab491db48a28d7847399cba1b987744c9da47bb853270de479d9f4eaaa9",
+          "matches_card": true
+        },
+        {
+          "path": "sphereDict",
+          "sha256": "e461f9f79d693980a4f7490d840d5f9fab9f187743a8db5fa93f551c8ed86e8c",
+          "matches_card": true
+        }
+      ],
+      "allrun_solver_mentions": [
+        {
+          "line": 10,
+          "text": "runApplication -o offbeat"
+        }
+      ],
+      "note": "脚本行仅为静态证据；循环、调用脚本与条件分支可能改变真实启动数，不把出现次数当实际启动账本。"
+    },
+    {
+      "card_path": "Cases/testCases/generic_pwr_1D",
+      "absolute_case_path": "/home/lwz/offbeat/Cases/testCases/generic_pwr_1D",
+      "exists": true,
+      "card_name": "generic PWR 1 D",
+      "profile": "generic_pwr_1D is a generic pwr 1d baseline fuel rod. 1D radial PWR template with UO2 fuel and zircaloy cladding; fgr SCIANTIX with gapGas FRAPCON and burnup Lassmann.",
+      "do_not_use_for": [
+        "new SCIANTIX input specific",
+        "2D effects",
+        "coolant channel"
+      ],
+      "reference_files": [
+        {
+          "path": "constant/solverDict",
+          "sha256": "c8c9bcaf20b2ec6afdeaad38c32cdf1e0856418c6da8f8e231458c396a23edf5",
+          "matches_card": true
+        },
+        {
+          "path": "Allrun",
+          "sha256": "78746ea324495fd247b4c92f592a968ac83e4f15834ec570bc8112c24d0c018c",
+          "matches_card": true
+        },
+        {
+          "path": "rodDict",
+          "sha256": "a859bcd0a9718ab74fde422aba855e6a9b58126546027e37fb9bd36b535e75ec",
+          "matches_card": true
+        }
+      ],
+      "allrun_solver_mentions": [
+        {
+          "line": 6,
+          "text": "offbeat | tee log.offbeat"
+        }
+      ],
+      "note": "脚本行仅为静态证据；循环、调用脚本与条件分支可能改变真实启动数，不把出现次数当实际启动账本。"
+    },
+    {
+      "card_path": "Cases/testCases/hotBiMaterialCylinder",
+      "absolute_case_path": "/home/lwz/offbeat/Cases/testCases/hotBiMaterialCylinder",
+      "exists": true,
+      "card_name": "hot Bi Material Cylinder",
+      "profile": "hotBiMaterialCylinder is a hot bimaterial cylinder radial stress. The case models biMaterial hot cylinder with inner 800 K 1e7 Pa and outer 300 K 1e5 Pa; geometry regions are inner and outer with cylindricalStress on.",
+      "do_not_use_for": [
+        "bimaterial plate bending",
+        "generic multi material block",
+        "fuel rod"
+      ],
+      "reference_files": [
+        {
+          "path": "constant/solverDict",
+          "sha256": "357892fcb5266852581d6da285af12fca1f8e9d7c3b6f70bb1db30e73152161e",
+          "matches_card": true
+        },
+        {
+          "path": "Allrun",
+          "sha256": "edddefaf1920c956e125f91b47d1d1d8098b6f9b9924426e12b66ba624303253",
+          "matches_card": true
+        },
+        {
+          "path": "README.md",
+          "sha256": "2c03bfa6e1325e67fd0315bded3b179871e9d0777e083e86363b2a91df9ef603",
+          "matches_card": true
+        },
+        {
+          "path": "system/blockMeshDict",
+          "sha256": "6b0bdb52126dfc75373023f0ee7830a5dfdd0ee9c3f7e7f4167220c3e88b3ccb",
+          "matches_card": true
+        }
+      ],
+      "allrun_solver_mentions": [
+        {
+          "line": 9,
+          "text": "runApplication -o offbeat"
+        }
+      ],
+      "note": "脚本行仅为静态证据；循环、调用脚本与条件分支可能改变真实启动数，不把出现次数当实际启动账本。"
+    }
+  ],
+  "execution_performed": false
+}

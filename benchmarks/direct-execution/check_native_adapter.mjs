@@ -1,0 +1,24 @@
+// Validate registration with the installed DSH registry, not only a stub.
+import assert from 'node:assert/strict';
+import { pathToFileURL } from 'node:url';
+import { join } from 'node:path';
+import { apply } from '../../dsh/mandifuel-shell-env.mjs';
+const root=process.env.MANDIFUEL_DSH_PACKAGE_ROOT || '/home/lwz/.nvm/versions/node/v22.23.2/lib/node_modules/@deepseek-ai/dsh';
+const { Context }=await import(pathToFileURL(join(root,'node_modules/@deepseek-ai/cordis/lib/index.js')));
+const { ShellEnvRegistry }=await import(pathToFileURL(join(root,'node_modules/@deepseek-ai/dsh-shell-env/lib/index.js')));
+const ctx=new Context();
+const sections=[];
+ctx.systemPrompt={section(s){sections.push(s);}};
+const registry=new ShellEnvRegistry(ctx,{dshHome:'/tmp/mandifuel-registry-check'});
+process.env.MANDIFUEL_ENVIRONMENT_READY='1';
+process.env.MANDIFUEL_TASK_PYTHON='/configured/python3';
+process.env.MANDIFUEL_OFFBEAT_EXECUTABLE='/configured/budget-wrapper/offbeat';
+apply(ctx);
+const values=registry.collect({});
+assert.equal(values.DSH_MANDIFUEL_ENVIRONMENT_READY,'1');
+assert.equal(values.DSH_MANDIFUEL_TASK_PYTHON,'/configured/python3');
+assert.equal(values.DSH_MANDIFUEL_OFFBEAT_EXECUTABLE,'/configured/budget-wrapper/offbeat');
+assert.ok(registry.list().every(v=>v.key.startsWith('DSH_')));
+assert.equal(sections.length,2);
+assert.throws(()=>registry.register({name:'invalid-name-negative-control',variables:{MANDIFUEL_INVALID:{description:'negative control'}},resolve(){return {};}}),/invalid key/);
+console.log('PASS: native DSH registry accepts readiness keys and rejects invalid-prefix negative control');

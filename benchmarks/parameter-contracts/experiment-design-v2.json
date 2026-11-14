@@ -1,0 +1,43 @@
+{
+  "created_at_beijing": "2026-11-14T10:50:42.579062+08:00",
+  "purpose": "把已验证的输入绑定和重复操作固化，减少模型探索且检查实际物理参数生效",
+  "task_ids": [
+    "C06"
+  ],
+  "arms": [
+    "skill"
+  ],
+  "unchanged": [
+    "原题面",
+    "源输入",
+    "deepseek-official/deepseek-v4-flash",
+    "最多两次真实OFFBEAT启动",
+    "任务工具离线和源只读隔离"
+  ],
+  "intervention": [
+    "公开的单UO2/FpDiffusion/Cs常D契约",
+    "参数计划批量改卡并原生回读",
+    "公共执行器与正时间实际场检查",
+    "可选公共API库存及径向表",
+    "按计划及输入哈希复用准备记录"
+  ],
+  "not_injected": [
+    "历史轨迹",
+    "基准数值答案",
+    "C06专属时间或温度默认值"
+  ],
+  "comparison_runs": {
+    "previous_skill": "runs/run-assistant-newcases-20261113-01",
+    "previous_bare": "runs/c06-bare-retest-20261114-01"
+  },
+  "limit": "单题单次跨轮比较；先看正确完成，再描述耗时、工具、模型用量，不能据此推断所有任务稳定胜出",
+  "tests": {
+    "checks": 23,
+    "passed": true,
+    "organizer_solver_starts": 0,
+    "command": "bash prepared environment; python3 -B benchmarks/direct-execution/check_parameter_plan.py"
+  },
+  "revision": 2,
+  "correction": "首轮公共入口在 Cs 提取阶段未归一化相对 case 路径；统一为绝对路径并添加相对路径全入口回归测试；首轮完整保留。未修改题面、物理绑定或评分规则。",
+  "first_trial": "runs/parameter-plan-c06-20261114-01"
+}

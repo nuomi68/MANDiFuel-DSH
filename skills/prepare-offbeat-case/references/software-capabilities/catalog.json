@@ -1,0 +1,2908 @@
+{
+  "schema_version": 1,
+  "catalog_id": "offbeat-local-capabilities-20261114",
+  "generated_at_beijing": "2026-11-14T14:57:54.756401+08:00",
+  "profile": {
+    "name": "local-offbeat-openfoam-v2506",
+    "binary_sha256": "fd01aeacea13b98dc0fd346cf5ff55baa93df208a776d57531f1e9004c70b0f7",
+    "shared_library_sha256": "64ae0c75541fc575511aebdace3caedd7bb428668c05742190f2aba476d3ea41",
+    "scope": "当前本地安装；历史执行记录确认二进制身份，维护当日另记录共享库身份。文档/源卡观察不等于当前构造器注册或物理验证。"
+  },
+  "levels": {
+    "runtime_verified": "本机执行通过",
+    "registered": "本机注册确认",
+    "documented": "本地说明",
+    "input_observed": "源卡出现",
+    "unverified": "待核实"
+  },
+  "scope": "仅为声明安装的已知能力索引。执行通过不证明所有组合/精度；未列出不等于不支持。运行助手查询本表，不读取维护源码。",
+  "sources": {
+    "doc:tools/index.md": {
+      "kind": "local_document",
+      "path": "tools/index.md",
+      "sha256": "4746f8fe570d38f9f24ff95ada94d0e6e9fbcd124a8a2bb87537a94680ef967e"
+    },
+    "doc:user_guide/boundary_conditions/displacement/index.md": {
+      "kind": "local_document",
+      "path": "user_guide/boundary_conditions/displacement/index.md",
+      "sha256": "82c1eb0b25dc87267a040dbf908834c11e4458dc358251dec9e9bb9dca245f64"
+    },
+    "doc:user_guide/boundary_conditions/index.md": {
+      "kind": "local_document",
+      "path": "user_guide/boundary_conditions/index.md",
+      "sha256": "01724195e895f9e2d6517d3426f24343eec2d3fbdca77b398302cbf9fa3d19b2"
+    },
+    "doc:user_guide/boundary_conditions/temperature/index.md": {
+      "kind": "local_document",
+      "path": "user_guide/boundary_conditions/temperature/index.md",
+      "sha256": "fa6be1c4b6a4e8736724a791b92a2edb9ff8ad6b16b59cf8d823afc29940bcba"
+    },
+    "doc:user_guide/data_processing/index.md": {
+      "kind": "local_document",
+      "path": "user_guide/data_processing/index.md",
+      "sha256": "fbfe63592eeae9cfe6dd30818e972f11107046c9efc509f63c5e4ec124a254e7"
+    },
+    "doc:user_guide/discretization_schemes/index.md": {
+      "kind": "local_document",
+      "path": "user_guide/discretization_schemes/index.md",
+      "sha256": "57da20520d27a5f7777ad181c04b101b05b8f6658dcf18c2290e1e9f701aa8e9"
+    },
+    "doc:user_guide/general/computational_domain.md": {
+      "kind": "local_document",
+      "path": "user_guide/general/computational_domain.md",
+      "sha256": "f28353c691af8461f4371f4093936b6ce9a1a3057a611c08ea0fe6b08e505836"
+    },
+    "doc:user_guide/general/folder_structure.md": {
+      "kind": "local_document",
+      "path": "user_guide/general/folder_structure.md",
+      "sha256": "a83351c2875fcb5ad5e5e22ab0cd2ba37ea68e1199ebee0e22e9b901f69db4c1"
+    },
+    "doc:user_guide/general/workflow.md": {
+      "kind": "local_document",
+      "path": "user_guide/general/workflow.md",
+      "sha256": "32d28af437a2df1907b163db5a19467a214ff014efa47b0e833b6b99b75091ac"
+    },
+    "doc:user_guide/index.md": {
+      "kind": "local_document",
+      "path": "user_guide/index.md",
+      "sha256": "9f577921b8415ddd112be46f851136a138f4026415789a545d4cb7d7f1f36efe"
+    },
+    "doc:user_guide/materials/constantMaterial.md": {
+      "kind": "local_document",
+      "path": "user_guide/materials/constantMaterial.md",
+      "sha256": "b3e11d62704904a7cb58e739c689b96913924840965d18ddb39124f7d967541c"
+    },
+    "doc:user_guide/materials/inconel600.md": {
+      "kind": "local_document",
+      "path": "user_guide/materials/inconel600.md",
+      "sha256": "c1a0232ae057e4c96af84a82518dab464ac5ca59f617a27a8848f63c449e6146"
+    },
+    "doc:user_guide/materials/index.md": {
+      "kind": "local_document",
+      "path": "user_guide/materials/index.md",
+      "sha256": "3c6f895cf0250f4f1a9d93dd216047a7a1e81c2dc142e23a41099d6e7b0a8efd"
+    },
+    "doc:user_guide/materials/materials.md": {
+      "kind": "local_document",
+      "path": "user_guide/materials/materials.md",
+      "sha256": "3ad966638fc5e8bb9148df6df15da855f0cd44a1c4e0fc23b427a00e0e33b9f8"
+    },
+    "doc:user_guide/materials/molybdenum.md": {
+      "kind": "local_document",
+      "path": "user_guide/materials/molybdenum.md",
+      "sha256": "ad91c920de9b01a5f280600d3f549b67021440a5a5d24b7a55ec6937e2cd6499"
+    },
+    "doc:user_guide/materials/steel1515Ti.md": {
+      "kind": "local_document",
+      "path": "user_guide/materials/steel1515Ti.md",
+      "sha256": "cddc5753dee2f2f3ed9d7857409c9fdc2d4346ee3ca9bf5c7ae00365d137aee5"
+    },
+    "doc:user_guide/materials/uPuO2.md": {
+      "kind": "local_document",
+      "path": "user_guide/materials/uPuO2.md",
+      "sha256": "0338a6183573ff780770a410a9bb203e05ee4158659f2a5baf9fa67c6af37d8e"
+    },
+    "doc:user_guide/materials/uo2.md": {
+      "kind": "local_document",
+      "path": "user_guide/materials/uo2.md",
+      "sha256": "4c63f3b1bf804f7a37e11ad31dcf9b962d45285a63531bf3ed3dfd2f35631e91"
+    },
+    "doc:user_guide/materials/zircaloy.md": {
+      "kind": "local_document",
+      "path": "user_guide/materials/zircaloy.md",
+      "sha256": "17205ce79b62006c79b78e71b4423723e4d017aefcf4942ad5effd8e113f21cb"
+    },
+    "doc:user_guide/sensitivity_analysis/index.md": {
+      "kind": "local_document",
+      "path": "user_guide/sensitivity_analysis/index.md",
+      "sha256": "bd98d28f4d20637a7a84fd4386e5c70992a3fd948e2234902c0fe6fcc73ad7fe"
+    },
+    "doc:user_guide/solution_control/index.md": {
+      "kind": "local_document",
+      "path": "user_guide/solution_control/index.md",
+      "sha256": "4d92f6a4782fbbd10ad9c93890b5deab30b9c80a264b0590d5a0a3e04630fc3d"
+    },
+    "doc:user_guide/solverDict/burnup.md": {
+      "kind": "local_document",
+      "path": "user_guide/solverDict/burnup.md",
+      "sha256": "88fe491d95b0f76c30ebb696c6c2618c28b7994b1a48a10d6d76134351d4d397"
+    },
+    "doc:user_guide/solverDict/element_transport_solver.md": {
+      "kind": "local_document",
+      "path": "user_guide/solverDict/element_transport_solver.md",
+      "sha256": "3d705ec9174dd3835202f11171e38e164812d9816a66ec5aa1540c99283983ec"
+    },
+    "doc:user_guide/solverDict/fast_flux.md": {
+      "kind": "local_document",
+      "path": "user_guide/solverDict/fast_flux.md",
+      "sha256": "39571c264fa483a88ad8d951add326b544b5cd19cee5a4a91441797c4c3972d4"
+    },
+    "doc:user_guide/solverDict/fgr.md": {
+      "kind": "local_document",
+      "path": "user_guide/solverDict/fgr.md",
+      "sha256": "f9480e1fed9da294470178422fd2a10cc4487e8dd1a36194f6335374ac33bca3"
+    },
+    "doc:user_guide/solverDict/gap_gas.md": {
+      "kind": "local_document",
+      "path": "user_guide/solverDict/gap_gas.md",
+      "sha256": "8eb2fdab886f17ec31c7db134f0300d35ff4d6058260dafb2e2c89c8080ae6bd"
+    },
+    "doc:user_guide/solverDict/heat_source.md": {
+      "kind": "local_document",
+      "path": "user_guide/solverDict/heat_source.md",
+      "sha256": "5eb259c4767435b17afd674c707971fb09486dc26b13ba17a1fe9011125ca912"
+    },
+    "doc:user_guide/solverDict/index.md": {
+      "kind": "local_document",
+      "path": "user_guide/solverDict/index.md",
+      "sha256": "0ff078b0749bfc7d4f619ddb7455afcacffc2c72cb6f517b981f2873ce7a7ee5"
+    },
+    "doc:user_guide/solverDict/materialProperties.md": {
+      "kind": "local_document",
+      "path": "user_guide/solverDict/materialProperties.md",
+      "sha256": "1078259791469556913330c65ddfc14e1d20c60c7cf6a62c18bcbda8f2d123fc"
+    },
+    "doc:user_guide/solverDict/mechanics_solver.md": {
+      "kind": "local_document",
+      "path": "user_guide/solverDict/mechanics_solver.md",
+      "sha256": "fea3451722c2d04ce4f212fd7072ae3a2c963043e0579e0c43ecbb909279f678"
+    },
+    "doc:user_guide/solverDict/multi_material_correction.md": {
+      "kind": "local_document",
+      "path": "user_guide/solverDict/multi_material_correction.md",
+      "sha256": "40384e708ab78540bae8caed8f4a3c180786797dfef707a721b1a842ed367b2a"
+    },
+    "doc:user_guide/solverDict/neutronics_solver.md": {
+      "kind": "local_document",
+      "path": "user_guide/solverDict/neutronics_solver.md",
+      "sha256": "efb1be59a1047ff2f90de582579e734323cbd15efeab0a43aa0d7bd58c16ce70"
+    },
+    "doc:user_guide/solverDict/rheology.md": {
+      "kind": "local_document",
+      "path": "user_guide/solverDict/rheology.md",
+      "sha256": "14c2fc8db06bd56c004eede95376dea41fcbbdcdf40fb0cd715a4049037e9823"
+    },
+    "doc:user_guide/solverDict/slice_mapper.md": {
+      "kind": "local_document",
+      "path": "user_guide/solverDict/slice_mapper.md",
+      "sha256": "f9d3dc085fbdda8013bf62fbfacd92c0436a689298dcab423226f81e014551da"
+    },
+    "doc:user_guide/solverDict/thermal_solver.md": {
+      "kind": "local_document",
+      "path": "user_guide/solverDict/thermal_solver.md",
+      "sha256": "3602041182333c4ff4a9d0ed315a348b2982da305b14048ec4135bbeee792582"
+    },
+    "doc:user_guide/time_control/index.md": {
+      "kind": "local_document",
+      "path": "user_guide/time_control/index.md",
+      "sha256": "130575e0b87928294b1fdf91f9a751cfc862196cc283c39cc5f22d186abc1d78"
+    },
+    "input_inventory": {
+      "kind": "local_input_inventory",
+      "case_count": 136,
+      "scope": "仅证明字面输入出现，不证明本机运行有效。"
+    },
+    "runtime_initialization": {
+      "kind": "retained_normal_runs",
+      "record_count": 18,
+      "scope": "本机正常记录中的初始化和输入；同一组合可能重复，不含数值答案。"
+    },
+    "mechanics_registry": {
+      "kind": "retained_native_diagnostic",
+      "values": [
+        "constant",
+        "smallStrain",
+        "smallStrainIncrementalUpdated",
+        "largeStrainTotLag",
+        "largeStrainUpdLag"
+      ],
+      "scope": "本机mechanicsSolver非法类型诊断的合法类型列表。"
+    }
+  },
+  "selectors": {
+    "thermalSolver": {
+      "purpose": "温度方程",
+      "owner": "constant/solverDict",
+      "entry": "thermalSolver",
+      "preferred_inactive": "constant",
+      "aliases": {
+        "fromLatestTime": "constant"
+      },
+      "bindings": [
+        "0/T",
+        "thermalSolverOptions",
+        "heatSource 与 Q、T 边界"
+      ],
+      "choices": [
+        {
+          "value": "constant",
+          "level": "runtime_verified",
+          "meaning": "不解温度方程，读取并沿用起始 T；固定均匀温度时同时确认内部场和所需边界。",
+          "source_case_count": 1,
+          "runtime_observations": 1,
+          "example_case": "Cases/Verification/corrosion/fixedInterfaceTemperature",
+          "sources": [
+            "runtime_initialization",
+            "doc:user_guide/solverDict/thermal_solver.md",
+            "input_inventory"
+          ]
+        },
+        {
+          "value": "fromLatestTime",
+          "level": "runtime_verified",
+          "meaning": "旧名，兼容映射到 constant。",
+          "source_case_count": 30,
+          "runtime_observations": 6,
+          "example_case": "Cases/Verification/actinidesRedistribution",
+          "sources": [
+            "runtime_initialization",
+            "doc:user_guide/solverDict/thermal_solver.md",
+            "input_inventory"
+          ]
+        },
+        {
+          "value": "readTemperature",
+          "level": "documented",
+          "meaning": "逐时读取 constant 子目录中的给定温度场；按源配方确定目录结构。",
+          "source_case_count": 0,
+          "runtime_observations": 0,
+          "example_case": null,
+          "sources": [
+            "doc:user_guide/solverDict/thermal_solver.md"
+          ]
+        },
+        {
+          "value": "solidConduction",
+          "level": "runtime_verified",
+          "meaning": "求固体导热方程，可使用体积热源 Q。",
+          "source_case_count": 105,
+          "runtime_observations": 11,
+          "example_case": "Cases/Verification/NaCoolantChannelModel/vsAnalytical",
+          "sources": [
+            "runtime_initialization",
+            "doc:user_guide/solverDict/thermal_solver.md",
+            "input_inventory"
+          ]
+        }
+      ],
+      "sources": [
+        "doc:user_guide/solverDict/thermal_solver.md",
+        "input_inventory",
+        "runtime_initialization"
+      ]
+    },
+    "mechanicsSolver": {
+      "purpose": "动量平衡/位移",
+      "owner": "constant/solverDict",
+      "entry": "mechanicsSolver",
+      "preferred_inactive": "constant",
+      "aliases": {
+        "fromLatestTime": "constant"
+      },
+      "bindings": [
+        "0/D 或 0/DD",
+        "mechanicsSolverOptions",
+        "rheologyOptions",
+        "system/fvSolution 对应字段求解设置"
+      ],
+      "choices": [
+        {
+          "value": "constant",
+          "level": "runtime_verified",
+          "meaning": "不解位移方程，沿用已有位移状态；不等于把已有 D 清零。",
+          "source_case_count": 1,
+          "runtime_observations": 4,
+          "example_case": "Cases/Verification/corrosion/fixedInterfaceTemperature",
+          "sources": [
+            "runtime_initialization",
+            "mechanics_registry",
+            "doc:user_guide/solverDict/mechanics_solver.md",
+            "input_inventory"
+          ]
+        },
+        {
+          "value": "fromLatestTime",
+          "level": "runtime_verified",
+          "meaning": "旧输入兼容映射到 constant。",
+          "source_case_count": 40,
+          "runtime_observations": 10,
+          "example_case": "Cases/Verification/NaCoolantChannelModel/vsAnalytical",
+          "sources": [
+            "runtime_initialization",
+            "doc:user_guide/solverDict/mechanics_solver.md",
+            "input_inventory"
+          ]
+        },
+        {
+          "value": "largeStrainTotLag",
+          "level": "registered",
+          "meaning": "总位移 D，总拉格朗日大应变；不更新计算网格。",
+          "source_case_count": 0,
+          "runtime_observations": 0,
+          "example_case": null,
+          "sources": [
+            "mechanics_registry",
+            "doc:user_guide/solverDict/mechanics_solver.md"
+          ]
+        },
+        {
+          "value": "largeStrainUpdLag",
+          "level": "registered",
+          "meaning": "增量位移 DD，更新拉格朗日大应变，更新网格。",
+          "source_case_count": 3,
+          "runtime_observations": 0,
+          "example_case": "Cases/Verification/plateHole",
+          "sources": [
+            "mechanics_registry",
+            "doc:user_guide/solverDict/mechanics_solver.md",
+            "input_inventory"
+          ]
+        },
+        {
+          "value": "smallStrain",
+          "level": "runtime_verified",
+          "meaning": "总位移 D，小应变，计算网格不更新。",
+          "source_case_count": 84,
+          "runtime_observations": 4,
+          "example_case": "Cases/Verification/beamBending",
+          "sources": [
+            "runtime_initialization",
+            "mechanics_registry",
+            "doc:user_guide/solverDict/mechanics_solver.md",
+            "input_inventory"
+          ]
+        },
+        {
+          "value": "smallStrainIncrementalUpdated",
+          "level": "registered",
+          "meaning": "增量位移 DD，小应变并更新网格。",
+          "source_case_count": 7,
+          "runtime_observations": 0,
+          "example_case": "Cases/Verification/trisoBenchmarks/case_10",
+          "sources": [
+            "mechanics_registry",
+            "doc:user_guide/solverDict/mechanics_solver.md",
+            "input_inventory"
+          ]
+        }
+      ],
+      "sources": [
+        "doc:user_guide/solverDict/mechanics_solver.md",
+        "input_inventory",
+        "runtime_initialization"
+      ],
+      "known_invalid": {
+        "none": "本机合法类型列表和实际初始化失败已确认；不要用通用关闭词猜值。"
+      }
+    },
+    "neutronicsSolver": {
+      "purpose": "中子学",
+      "owner": "constant/solverDict",
+      "entry": "neutronicsSolver",
+      "preferred_inactive": "none",
+      "aliases": {
+        "fromLatestTime": "none"
+      },
+      "bindings": [
+        "对应源中的中子通量初场",
+        "neutronicsSolverOptions；与 fastFlux 分开"
+      ],
+      "choices": [
+        {
+          "value": "diffusion",
+          "level": "documented",
+          "meaning": "单群中子扩散；所需场和系数沿对应源卡。",
+          "source_case_count": 22,
+          "runtime_observations": 0,
+          "example_case": "Cases/Verification/burnupFBR",
+          "sources": [
+            "doc:user_guide/solverDict/neutronics_solver.md",
+            "input_inventory"
+          ]
+        },
+        {
+          "value": "fromLatestTime",
+          "level": "runtime_verified",
+          "meaning": "本机已接受的旧输入，初始化日志选择 none。",
+          "source_case_count": 104,
+          "runtime_observations": 17,
+          "example_case": "Cases/Verification/NaCoolantChannelModel/vsAnalytical",
+          "sources": [
+            "runtime_initialization",
+            "doc:user_guide/solverDict/neutronics_solver.md",
+            "input_inventory"
+          ]
+        },
+        {
+          "value": "none",
+          "level": "runtime_verified",
+          "meaning": "不求中子方程；不据此推断其他给定通量也被清零。",
+          "source_case_count": 10,
+          "runtime_observations": 1,
+          "example_case": "Cases/Verification/corrosion/fixedInnerHeatFlux",
+          "sources": [
+            "runtime_initialization",
+            "doc:user_guide/solverDict/neutronics_solver.md",
+            "input_inventory"
+          ]
+        }
+      ],
+      "sources": [
+        "doc:user_guide/solverDict/neutronics_solver.md",
+        "input_inventory",
+        "runtime_initialization"
+      ]
+    },
+    "elementTransport": {
+      "purpose": "元素/裂变产物迁移",
+      "owner": "constant/solverDict",
+      "entry": "elementTransport",
+      "preferred_inactive": "none",
+      "aliases": {
+        "fromLatestTime": "none"
+      },
+      "bindings": [
+        "elementTransportOptions/solvers",
+        "对应模型 Options、初态和材料参数"
+      ],
+      "choices": [
+        {
+          "value": "byList",
+          "level": "runtime_verified",
+          "meaning": "由 elementTransportOptions/solvers 列表启用具体输运方程。",
+          "source_case_count": 28,
+          "runtime_observations": 4,
+          "example_case": "Cases/Verification/actinidesRedistribution",
+          "sources": [
+            "runtime_initialization",
+            "doc:user_guide/solverDict/element_transport_solver.md",
+            "input_inventory"
+          ]
+        },
+        {
+          "value": "fromLatestTime",
+          "level": "runtime_verified",
+          "meaning": "旧输入兼容；本机初始化选择 none。",
+          "source_case_count": 102,
+          "runtime_observations": 13,
+          "example_case": "Cases/Verification/NaCoolantChannelModel/vsAnalytical",
+          "sources": [
+            "runtime_initialization",
+            "doc:user_guide/solverDict/element_transport_solver.md",
+            "input_inventory"
+          ]
+        },
+        {
+          "value": "none",
+          "level": "runtime_verified",
+          "meaning": "本机已接受的停用输运选择。",
+          "source_case_count": 6,
+          "runtime_observations": 1,
+          "example_case": "Cases/Verification/corrosion/fixedInnerHeatFlux",
+          "sources": [
+            "runtime_initialization",
+            "doc:user_guide/solverDict/element_transport_solver.md",
+            "input_inventory"
+          ]
+        }
+      ],
+      "sources": [
+        "doc:user_guide/solverDict/element_transport_solver.md",
+        "input_inventory",
+        "runtime_initialization"
+      ]
+    },
+    "materialProperties": {
+      "purpose": "材料分区",
+      "owner": "constant/solverDict",
+      "entry": "materialProperties",
+      "preferred_inactive": null,
+      "aliases": {},
+      "bindings": [
+        "materials/<zone>/material",
+        "constant/polyMesh/cellZones"
+      ],
+      "choices": [
+        {
+          "value": "byZone",
+          "level": "runtime_verified",
+          "meaning": "按 cellZone 绑定材料；分区名称和 materials 中的材料项必须对应。",
+          "source_case_count": 136,
+          "runtime_observations": 18,
+          "example_case": "Cases/Verification/NaCoolantChannelModel/vsAnalytical",
+          "sources": [
+            "runtime_initialization",
+            "doc:user_guide/solverDict/materialProperties.md",
+            "input_inventory"
+          ]
+        }
+      ],
+      "sources": [
+        "doc:user_guide/solverDict/materialProperties.md",
+        "input_inventory",
+        "runtime_initialization"
+      ]
+    },
+    "rheology": {
+      "purpose": "本构组织方式",
+      "owner": "constant/solverDict",
+      "entry": "rheology",
+      "preferred_inactive": null,
+      "aliases": {},
+      "bindings": [
+        "materials/<zone>/rheologyModel",
+        "materials/<zone>/rheologyModelOptions",
+        "rheologyOptions"
+      ],
+      "choices": [
+        {
+          "value": "byMaterial",
+          "level": "runtime_verified",
+          "meaning": "本构在每个 materials/<zone>/rheologyModel 中选择。",
+          "source_case_count": 136,
+          "runtime_observations": 18,
+          "example_case": "Cases/Verification/NaCoolantChannelModel/vsAnalytical",
+          "sources": [
+            "runtime_initialization",
+            "doc:user_guide/solverDict/rheology.md",
+            "input_inventory"
+          ]
+        }
+      ],
+      "sources": [
+        "doc:user_guide/solverDict/rheology.md",
+        "input_inventory",
+        "runtime_initialization"
+      ]
+    },
+    "heatSource": {
+      "purpose": "体积热源",
+      "owner": "constant/solverDict",
+      "entry": "heatSource",
+      "preferred_inactive": "none",
+      "aliases": {
+        "fromLatestTime": "constant"
+      },
+      "bindings": [
+        "起始 Q 或 heatSourceOptions",
+        "lhgr / vhgr 与 timePoints",
+        "axialProfile / radialProfile / materials"
+      ],
+      "choices": [
+        {
+          "value": "constant",
+          "level": "documented",
+          "meaning": "沿用起始 Q 场，不等于零功率。",
+          "source_case_count": 0,
+          "runtime_observations": 0,
+          "example_case": null,
+          "sources": [
+            "doc:user_guide/solverDict/heat_source.md"
+          ]
+        },
+        {
+          "value": "constantLhgr",
+          "level": "runtime_verified",
+          "meaning": "恒定线功率，heatSourceOptions/lhgr 为标量；实际本机输入已确认。",
+          "source_case_count": 1,
+          "runtime_observations": 3,
+          "example_case": "Cases/Verification/burnupFBR",
+          "sources": [
+            "runtime_initialization",
+            "doc:user_guide/solverDict/heat_source.md",
+            "input_inventory"
+          ]
+        },
+        {
+          "value": "fromLatestTime",
+          "level": "runtime_verified",
+          "meaning": "旧名，兼容 constant。",
+          "source_case_count": 62,
+          "runtime_observations": 7,
+          "example_case": "Cases/Verification/NaCoolantChannelModel/vsAnalytical",
+          "sources": [
+            "runtime_initialization",
+            "doc:user_guide/solverDict/heat_source.md",
+            "input_inventory"
+          ]
+        },
+        {
+          "value": "laserHeatSource",
+          "level": "input_observed",
+          "meaning": "源卡中出现的激光热源；未独立验证构造参数和适用范围。",
+          "source_case_count": 1,
+          "runtime_observations": 0,
+          "example_case": "Cases/Verification/laserHeating",
+          "sources": [
+            "input_inventory"
+          ]
+        },
+        {
+          "value": "none",
+          "level": "documented",
+          "meaning": "本地说明中的无热源选择；不创建 Q，尚未用本机正常记录独立验证该组合。",
+          "source_case_count": 0,
+          "runtime_observations": 0,
+          "example_case": null,
+          "sources": [
+            "doc:user_guide/solverDict/heat_source.md"
+          ]
+        },
+        {
+          "value": "timeDependentLhgr",
+          "level": "runtime_verified",
+          "meaning": "线功率时间表：timePoints 与 lhgr 为配对列表，可叠加空间分布。",
+          "source_case_count": 58,
+          "runtime_observations": 8,
+          "example_case": "Cases/Verification/NaCoolantChannelModel/vsTRACE",
+          "sources": [
+            "runtime_initialization",
+            "doc:user_guide/solverDict/heat_source.md",
+            "input_inventory"
+          ]
+        },
+        {
+          "value": "timeDependentVhgr",
+          "level": "documented",
+          "meaning": "体积热源时间表，输入 vhgr 单位 W/m³；具体表格结构按源。",
+          "source_case_count": 14,
+          "runtime_observations": 0,
+          "example_case": "Cases/Verification/trisoBenchmarks/case_10",
+          "sources": [
+            "doc:user_guide/solverDict/heat_source.md",
+            "input_inventory"
+          ]
+        }
+      ],
+      "sources": [
+        "doc:user_guide/solverDict/heat_source.md",
+        "input_inventory",
+        "runtime_initialization"
+      ]
+    },
+    "burnup": {
+      "purpose": "燃耗",
+      "owner": "constant/solverDict",
+      "entry": "burnup",
+      "preferred_inactive": "none",
+      "aliases": {
+        "fromLatestTime": "constant"
+      },
+      "bindings": [
+        "burnupOptions",
+        "热源、密度及核素输入",
+        "实际 Bu 字段单位"
+      ],
+      "choices": [
+        {
+          "value": "Lassmann",
+          "level": "documented",
+          "meaning": "简化核素耗损与径向形状因子模型。",
+          "source_case_count": 21,
+          "runtime_observations": 0,
+          "example_case": "Cases/Verification/neutronics/cylindricalPellet/testDifferentEnrichments/baseCase",
+          "sources": [
+            "doc:user_guide/solverDict/burnup.md",
+            "input_inventory"
+          ]
+        },
+        {
+          "value": "LassmannFBR",
+          "level": "input_observed",
+          "meaning": "快堆相关燃耗模型，源卡存在；完整参数及当前注册待核实。",
+          "source_case_count": 1,
+          "runtime_observations": 0,
+          "example_case": "Cases/Verification/burnupFBR",
+          "sources": [
+            "input_inventory"
+          ]
+        },
+        {
+          "value": "constant",
+          "level": "runtime_verified",
+          "meaning": "从起始 Bu 沿用燃耗；不等于清零。",
+          "source_case_count": 6,
+          "runtime_observations": 1,
+          "example_case": "Cases/Verification/corrosion/fixedInnerHeatFlux",
+          "sources": [
+            "runtime_initialization",
+            "doc:user_guide/solverDict/burnup.md",
+            "input_inventory"
+          ]
+        },
+        {
+          "value": "fromLatestTime",
+          "level": "runtime_verified",
+          "meaning": "旧名，本机选择 constant。",
+          "source_case_count": 68,
+          "runtime_observations": 11,
+          "example_case": "Cases/Verification/NaCoolantChannelModel/vsAnalytical",
+          "sources": [
+            "runtime_initialization",
+            "doc:user_guide/solverDict/burnup.md",
+            "input_inventory"
+          ]
+        },
+        {
+          "value": "fromPower",
+          "level": "documented",
+          "meaning": "由热源推进燃耗。",
+          "source_case_count": 33,
+          "runtime_observations": 0,
+          "example_case": "Cases/Verification/trisoBenchmarks/case_10",
+          "sources": [
+            "doc:user_guide/solverDict/burnup.md",
+            "input_inventory"
+          ]
+        },
+        {
+          "value": "none",
+          "level": "runtime_verified",
+          "meaning": "不推进/不创建燃耗场（本地说明）。",
+          "source_case_count": 6,
+          "runtime_observations": 6,
+          "example_case": "Cases/testCases/exerciseOFFBEAT/case1",
+          "sources": [
+            "runtime_initialization",
+            "doc:user_guide/solverDict/burnup.md",
+            "input_inventory"
+          ]
+        }
+      ],
+      "sources": [
+        "doc:user_guide/solverDict/burnup.md",
+        "input_inventory",
+        "runtime_initialization"
+      ]
+    },
+    "fastFlux": {
+      "purpose": "快通量与快注量",
+      "owner": "constant/solverDict",
+      "entry": "fastFlux",
+      "preferred_inactive": "none",
+      "aliases": {
+        "fromLatestTime": "constant"
+      },
+      "bindings": [
+        "fastFluxOptions/timePoints、fastFlux",
+        "fastFluxOptions/axialProfile",
+        "起始 fastFlux / fastFluence 与本构单位约定"
+      ],
+      "choices": [
+        {
+          "value": "constant",
+          "level": "runtime_verified",
+          "meaning": "沿用给定 fastFlux；fastFluence 仍可随时间累积，不能当作注量冻结。",
+          "source_case_count": 10,
+          "runtime_observations": 1,
+          "example_case": "Cases/Verification/corrosion/fixedInnerHeatFlux",
+          "sources": [
+            "runtime_initialization",
+            "doc:user_guide/solverDict/fast_flux.md",
+            "input_inventory"
+          ]
+        },
+        {
+          "value": "fromLatestTime",
+          "level": "runtime_verified",
+          "meaning": "旧名，本机选择 constant。",
+          "source_case_count": 63,
+          "runtime_observations": 17,
+          "example_case": "Cases/Verification/NaCoolantChannelModel/vsAnalytical",
+          "sources": [
+            "runtime_initialization",
+            "doc:user_guide/solverDict/fast_flux.md",
+            "input_inventory"
+          ]
+        },
+        {
+          "value": "none",
+          "level": "documented",
+          "meaning": "本地说明中的停用选择。",
+          "source_case_count": 1,
+          "runtime_observations": 0,
+          "example_case": "Cases/Verification/trisoModulesTest/testSwellingMATPRO",
+          "sources": [
+            "doc:user_guide/solverDict/fast_flux.md",
+            "input_inventory"
+          ]
+        },
+        {
+          "value": "timeDependentAxialProfile",
+          "level": "documented",
+          "meaning": "给定平均快通量历史及轴向分布。",
+          "source_case_count": 61,
+          "runtime_observations": 0,
+          "example_case": "Cases/Verification/testUserParameters",
+          "sources": [
+            "doc:user_guide/solverDict/fast_flux.md",
+            "input_inventory"
+          ]
+        }
+      ],
+      "sources": [
+        "doc:user_guide/solverDict/fast_flux.md",
+        "input_inventory",
+        "runtime_initialization"
+      ]
+    },
+    "corrosion": {
+      "purpose": "边界腐蚀/氧化生长",
+      "owner": "constant/solverDict",
+      "entry": "corrosion",
+      "preferred_inactive": null,
+      "aliases": {
+        "fromLatestTime": "constant"
+      },
+      "bindings": [
+        "corrosionOptions/patches/<patch>/corrosionModel",
+        "oxidationKineticsModel",
+        "温度边界与 oxideThickness 作用域"
+      ],
+      "choices": [
+        {
+          "value": "byPatch",
+          "level": "runtime_verified",
+          "meaning": "按 corrosionOptions/patches/<patch> 配置腐蚀模型和动力学。",
+          "source_case_count": 4,
+          "runtime_observations": 1,
+          "example_case": "Cases/Verification/corrosion/fixedInnerHeatFlux",
+          "sources": [
+            "runtime_initialization",
+            "input_inventory"
+          ]
+        },
+        {
+          "value": "constant",
+          "level": "input_observed",
+          "meaning": "源卡存在的固定腐蚀状态模式；本机 fromLatestTime 初始化也选择 constant。",
+          "source_case_count": 2,
+          "runtime_observations": 0,
+          "example_case": "Cases/Verification/hydrogenTransport/laCroixBenchmark",
+          "sources": [
+            "input_inventory"
+          ]
+        },
+        {
+          "value": "fromLatestTime",
+          "level": "runtime_verified",
+          "meaning": "已执行的旧固定状态选择；不要自行更换为未核实的 none。",
+          "source_case_count": 130,
+          "runtime_observations": 17,
+          "example_case": "Cases/Verification/NaCoolantChannelModel/vsAnalytical",
+          "sources": [
+            "runtime_initialization",
+            "input_inventory"
+          ]
+        }
+      ],
+      "sources": [
+        "input_inventory",
+        "runtime_initialization"
+      ]
+    },
+    "gapGas": {
+      "purpose": "间隙气体状态与物性",
+      "owner": "constant/solverDict",
+      "entry": "gapGas",
+      "preferred_inactive": "none",
+      "aliases": {},
+      "bindings": [
+        "0/gapGas",
+        "gapGasOptions",
+        "调用气体物性的热边界、几何和 FGR"
+      ],
+      "choices": [
+        {
+          "value": "FRAPCON",
+          "level": "runtime_verified",
+          "meaning": "棒状燃料间隙/气室的体积、压力、温度、组成及气体物性。",
+          "source_case_count": 45,
+          "runtime_observations": 3,
+          "example_case": "Cases/Verification/burnupFBR",
+          "sources": [
+            "runtime_initialization",
+            "doc:user_guide/solverDict/gap_gas.md",
+            "input_inventory"
+          ]
+        },
+        {
+          "value": "TRISO",
+          "level": "documented",
+          "meaning": "TRISO Buffer—IPyC 间隙气体模型（本地说明和源卡）。",
+          "source_case_count": 6,
+          "runtime_observations": 0,
+          "example_case": "Cases/Verification/trisoBenchmarks/case_10",
+          "sources": [
+            "doc:user_guide/solverDict/gap_gas.md",
+            "input_inventory"
+          ]
+        },
+        {
+          "value": "none",
+          "level": "runtime_verified",
+          "meaning": "不提供有效气体导热物性；气体模型使用者被评价时可能失败。",
+          "source_case_count": 84,
+          "runtime_observations": 15,
+          "example_case": "Cases/Verification/NaCoolantChannelModel/vsAnalytical",
+          "sources": [
+            "runtime_initialization",
+            "doc:user_guide/solverDict/gap_gas.md",
+            "input_inventory"
+          ]
+        }
+      ],
+      "sources": [
+        "doc:user_guide/solverDict/gap_gas.md",
+        "input_inventory",
+        "runtime_initialization"
+      ]
+    },
+    "fgr": {
+      "purpose": "裂变气体释放",
+      "owner": "constant/solverDict",
+      "entry": "fgr",
+      "preferred_inactive": "none",
+      "aliases": {},
+      "bindings": [
+        "算例根 input_settings.txt（存在时）",
+        "源中的气体/晶粒等耦合初态",
+        "fgrOptions 与气体模型"
+      ],
+      "choices": [
+        {
+          "value": "SCIANTIX",
+          "level": "documented",
+          "meaning": "调用 SCIANTIX 局部气体演化模型；保留源中的根输入和耦合初态。",
+          "source_case_count": 31,
+          "runtime_observations": 0,
+          "example_case": "Cases/Verification/testUserParameters",
+          "sources": [
+            "doc:user_guide/solverDict/fgr.md",
+            "input_inventory"
+          ]
+        },
+        {
+          "value": "SCIANTIXRIA",
+          "level": "documented",
+          "meaning": "RIA 相关阈值释放，读取 SCIANTIX 初态；本地说明，尚未独立运行验证。",
+          "source_case_count": 0,
+          "runtime_observations": 0,
+          "example_case": null,
+          "sources": [
+            "doc:user_guide/solverDict/fgr.md"
+          ]
+        },
+        {
+          "value": "none",
+          "level": "runtime_verified",
+          "meaning": "不计算裂变气体释放；不是关闭 gas 导热模型的同义操作。",
+          "source_case_count": 104,
+          "runtime_observations": 18,
+          "example_case": "Cases/Verification/NaCoolantChannelModel/vsAnalytical",
+          "sources": [
+            "runtime_initialization",
+            "doc:user_guide/solverDict/fgr.md",
+            "input_inventory"
+          ]
+        }
+      ],
+      "sources": [
+        "doc:user_guide/solverDict/fgr.md",
+        "input_inventory",
+        "runtime_initialization"
+      ]
+    },
+    "sliceMapper": {
+      "purpose": "三维网格到轴向切片的映射",
+      "owner": "constant/solverDict",
+      "entry": "sliceMapper",
+      "preferred_inactive": "none",
+      "aliases": {},
+      "bindings": [
+        "globalOptions/pinDirection",
+        "materials/<zone>/nSlices 等",
+        "依赖切片的热源、本构或燃耗模型"
+      ],
+      "choices": [
+        {
+          "value": "autoAxialSlices",
+          "level": "runtime_verified",
+          "meaning": "按材料和单元轴向位置自动分组。",
+          "source_case_count": 100,
+          "runtime_observations": 12,
+          "example_case": "Cases/Verification/NaCoolantChannelModel/vsAnalytical",
+          "sources": [
+            "runtime_initialization",
+            "doc:user_guide/solverDict/slice_mapper.md",
+            "input_inventory"
+          ]
+        },
+        {
+          "value": "byMaterial",
+          "level": "runtime_verified",
+          "meaning": "在材料项定义 nSlices 等切片参数。",
+          "source_case_count": 17,
+          "runtime_observations": 4,
+          "example_case": "Cases/Verification/corrosion/fixedInnerHeatFlux",
+          "sources": [
+            "runtime_initialization",
+            "doc:user_guide/solverDict/slice_mapper.md",
+            "input_inventory"
+          ]
+        },
+        {
+          "value": "byPellets",
+          "level": "documented",
+          "meaning": "按芯块高度划分切片，参数按源。",
+          "source_case_count": 1,
+          "runtime_observations": 0,
+          "example_case": "Cases/testCases/exerciseOFFBEAT/case9_solved",
+          "sources": [
+            "doc:user_guide/solverDict/slice_mapper.md",
+            "input_inventory"
+          ]
+        },
+        {
+          "value": "none",
+          "level": "runtime_verified",
+          "meaning": "不建立映射；需要切片平均或轴向力平衡的模型不能据此认为不依赖映射。",
+          "source_case_count": 18,
+          "runtime_observations": 2,
+          "example_case": "Cases/Verification/beamBending",
+          "sources": [
+            "runtime_initialization",
+            "doc:user_guide/solverDict/slice_mapper.md",
+            "input_inventory"
+          ]
+        }
+      ],
+      "sources": [
+        "doc:user_guide/solverDict/slice_mapper.md",
+        "input_inventory",
+        "runtime_initialization"
+      ]
+    }
+  },
+  "materials": [
+    {
+      "name": "PyC",
+      "value": "PyC",
+      "level": "input_observed",
+      "meaning": "热解碳材料，各向异性及辐照参数按源。",
+      "source_case_count": 32,
+      "runtime_observations": 0,
+      "spelling_verified": true,
+      "example_case": "Cases/Verification/trisoBenchmarks/case_10"
+    },
+    {
+      "name": "SiC",
+      "value": "SiC",
+      "level": "input_observed",
+      "meaning": "碳化硅涂层/试样材料；蠕变等不是仅选材料就自动确定。",
+      "source_case_count": 13,
+      "runtime_observations": 0,
+      "spelling_verified": true,
+      "example_case": "Cases/Verification/trisoFpDiffusion/case_3a"
+    },
+    {
+      "name": "UO2",
+      "value": "UO2",
+      "level": "runtime_verified",
+      "meaning": "二氧化铀燃料，默认物性和行为相关式按所选配置。",
+      "source_case_count": 75,
+      "runtime_observations": 10,
+      "spelling_verified": true,
+      "example_case": "Cases/Verification/NaCoolantChannelModel/vsAnalytical"
+    },
+    {
+      "name": "UPuO2",
+      "value": "UPuO2",
+      "level": "input_observed",
+      "meaning": "混合氧化物燃料，相关式和燃料组成按源。",
+      "source_case_count": 7,
+      "runtime_observations": 0,
+      "spelling_verified": true,
+      "example_case": "Cases/Verification/actinidesRedistribution"
+    },
+    {
+      "name": "buffer",
+      "value": "buffer",
+      "level": "input_observed",
+      "meaning": "TRISO缓冲层材料，名称大小写保留。",
+      "source_case_count": 18,
+      "runtime_observations": 0,
+      "spelling_verified": true,
+      "example_case": "Cases/Verification/trisoFpDiffusion/case_2a"
+    },
+    {
+      "name": "constant",
+      "value": "constant",
+      "level": "runtime_verified",
+      "meaning": "显式常数材料，常见rho、Cp、k、E、nu、alpha、Tref等沿完整源输入。",
+      "source_case_count": 40,
+      "runtime_observations": 12,
+      "spelling_verified": true,
+      "example_case": "Cases/Verification/NaCoolantChannelModel/vsTRACE"
+    },
+    {
+      "name": "Inconel 600",
+      "value": null,
+      "level": "documented",
+      "meaning": "本地手册列出的Inconel 600；当前源卡扫描未观察。",
+      "source_case_count": 0,
+      "runtime_observations": 0,
+      "spelling_verified": false,
+      "example_case": null
+    },
+    {
+      "name": "钼（Molybdenum）",
+      "value": null,
+      "level": "documented",
+      "meaning": "本地手册列出的钼材料；实际selector大小写需对应源确认。",
+      "source_case_count": 0,
+      "runtime_observations": 0,
+      "spelling_verified": false,
+      "example_case": null
+    },
+    {
+      "name": "steel1515Ti",
+      "value": "steel1515Ti",
+      "level": "input_observed",
+      "meaning": "15-15Ti不锈钢材料，物性与本构按源。",
+      "source_case_count": 3,
+      "runtime_observations": 0,
+      "spelling_verified": true,
+      "example_case": "Cases/Verification/burnupFBR"
+    },
+    {
+      "name": "zircaloy",
+      "value": "zircaloy",
+      "level": "runtime_verified",
+      "meaning": "锆合金包壳，可包含相变、蠕变、生长等行为。",
+      "source_case_count": 55,
+      "runtime_observations": 7,
+      "spelling_verified": true,
+      "example_case": "Cases/Verification/actinidesRedistribution"
+    }
+  ],
+  "property_models": {
+    "PoissonRatioModel": [
+      {
+        "value": "ZyConstant",
+        "level": "input_observed",
+        "source_case_count": 23,
+        "example_case": "Cases/Verification/burnupFBR"
+      },
+      {
+        "value": "constant",
+        "level": "input_observed",
+        "source_case_count": 38,
+        "example_case": "Cases/Verification/trisoBenchmarks/case_10"
+      }
+    ],
+    "YoungModulusModel": [
+      {
+        "value": "PyCPARFUME",
+        "level": "input_observed",
+        "source_case_count": 4,
+        "example_case": "Cases/Verification/trisoModulesTest/testPyC_E_nu"
+      },
+      {
+        "value": "SiCPARFUME",
+        "level": "input_observed",
+        "source_case_count": 1,
+        "example_case": "Cases/Verification/trisoModulesTest/testSiC_k_Cp_E_alpha"
+      },
+      {
+        "value": "UPuO2SckCen",
+        "level": "input_observed",
+        "source_case_count": 1,
+        "example_case": "Cases/testCases/generic_mox_1D"
+      },
+      {
+        "value": "constant",
+        "level": "input_observed",
+        "source_case_count": 34,
+        "example_case": "Cases/Verification/porosityDynamicMesh"
+      }
+    ],
+    "conductivityModel": [
+      {
+        "value": "BufferPARFUME",
+        "level": "input_observed",
+        "source_case_count": 3,
+        "example_case": "Cases/Verification/trisoModulesTest/testBuffer_E_nu"
+      },
+      {
+        "value": "SiCPARFUME",
+        "level": "input_observed",
+        "source_case_count": 1,
+        "example_case": "Cases/Verification/trisoModulesTest/testSiC_k_Cp_E_alpha"
+      },
+      {
+        "value": "UO2MATPRO",
+        "level": "input_observed",
+        "source_case_count": 6,
+        "example_case": "Cases/Verification/trisoBenchmarks/case_10"
+      },
+      {
+        "value": "UPuO2Kato",
+        "level": "input_observed",
+        "source_case_count": 3,
+        "example_case": "Cases/Verification/porosityDynamicMesh"
+      },
+      {
+        "value": "UPuO2MagniMAMOX",
+        "level": "input_observed",
+        "source_case_count": 1,
+        "example_case": "Cases/testCases/generic_mox_1D"
+      },
+      {
+        "value": "constant",
+        "level": "input_observed",
+        "source_case_count": 40,
+        "example_case": "Cases/Verification/corrosion/fixedInnerHeatFlux"
+      }
+    ],
+    "damageModel": [
+      {
+        "value": "isotropicCracking",
+        "level": "input_observed",
+        "source_case_count": 2,
+        "example_case": "Cases/testCases/damageModel/isotropicCracking_1D"
+      },
+      {
+        "value": "mazars",
+        "level": "input_observed",
+        "source_case_count": 2,
+        "example_case": "Cases/testCases/damageModel/mazars_1D"
+      }
+    ],
+    "densificationModel": [
+      {
+        "value": "UO2FRAPCON",
+        "level": "input_observed",
+        "source_case_count": 27,
+        "example_case": "Cases/Verification/actinidesRedistribution"
+      },
+      {
+        "value": "empirical",
+        "level": "input_observed",
+        "source_case_count": 11,
+        "example_case": "Cases/testCases/exerciseOFFBEAT/case4_solved"
+      },
+      {
+        "value": "none",
+        "level": "input_observed",
+        "source_case_count": 43,
+        "example_case": "Cases/Verification/NaCoolantChannelModel/vsAnalytical"
+      }
+    ],
+    "densityModel": [
+      {
+        "value": "UO2Constant",
+        "level": "input_observed",
+        "source_case_count": 5,
+        "example_case": "Cases/Verification/trisoBenchmarks/case_10"
+      },
+      {
+        "value": "constant",
+        "level": "input_observed",
+        "source_case_count": 42,
+        "example_case": "Cases/Verification/trisoBenchmarks/case_10"
+      }
+    ],
+    "emissivityModel": [
+      {
+        "value": "ZyConstant",
+        "level": "input_observed",
+        "source_case_count": 1,
+        "example_case": "Cases/testCases/generic_mox_1D"
+      },
+      {
+        "value": "constant",
+        "level": "input_observed",
+        "source_case_count": 42,
+        "example_case": "Cases/Verification/trisoBenchmarks/case_10"
+      }
+    ],
+    "failureModel": [
+      {
+        "value": "ZyOverstrainBISON",
+        "level": "input_observed",
+        "source_case_count": 1,
+        "example_case": "Cases/testCases/generic_PUZRY"
+      },
+      {
+        "value": "none",
+        "level": "input_observed",
+        "source_case_count": 2,
+        "example_case": "Cases/Verification/testBetaFraction"
+      }
+    ],
+    "heatCapacityModel": [
+      {
+        "value": "SiCSnead",
+        "level": "input_observed",
+        "source_case_count": 1,
+        "example_case": "Cases/Verification/trisoModulesTest/testSiC_k_Cp_E_alpha"
+      },
+      {
+        "value": "UO2MATPRO",
+        "level": "input_observed",
+        "source_case_count": 6,
+        "example_case": "Cases/Verification/trisoBenchmarks/case_10"
+      },
+      {
+        "value": "constant",
+        "level": "input_observed",
+        "source_case_count": 39,
+        "example_case": "Cases/Verification/trisoBenchmarks/case_10"
+      }
+    ],
+    "phaseTransitionModel": [
+      {
+        "value": "ZyDynamic",
+        "level": "input_observed",
+        "source_case_count": 2,
+        "example_case": "Cases/Verification/testBetaFraction"
+      },
+      {
+        "value": "none",
+        "level": "input_observed",
+        "source_case_count": 26,
+        "example_case": "Cases/testCases/damageModel/isotropicCracking_1D"
+      }
+    ],
+    "poissonRatioModel": [
+      {
+        "value": "constant",
+        "level": "input_observed",
+        "source_case_count": 1,
+        "example_case": "Cases/Verification/porosityDynamicMesh"
+      }
+    ],
+    "poreVelocityModel": [
+      {
+        "value": "UO2Sens",
+        "level": "input_observed",
+        "source_case_count": 1,
+        "example_case": "Cases/testCases/porosity/powerRamp_1D"
+      },
+      {
+        "value": "constant",
+        "level": "input_observed",
+        "source_case_count": 1,
+        "example_case": "Cases/Verification/porosity"
+      },
+      {
+        "value": "none",
+        "level": "input_observed",
+        "source_case_count": 1,
+        "example_case": "Cases/Verification/trisoFpDiffusion/case_1b"
+      },
+      {
+        "value": "vaporPressureMOX",
+        "level": "input_observed",
+        "source_case_count": 4,
+        "example_case": "Cases/Verification/porosityDynamicMesh"
+      }
+    ],
+    "relocationModel": [
+      {
+        "value": "UO2FRAPCON",
+        "level": "input_observed",
+        "source_case_count": 34,
+        "example_case": "Cases/Verification/actinidesRedistribution"
+      },
+      {
+        "value": "none",
+        "level": "input_observed",
+        "source_case_count": 47,
+        "example_case": "Cases/Verification/NaCoolantChannelModel/vsAnalytical"
+      }
+    ],
+    "rheologyModel": [
+      {
+        "value": "elasticity",
+        "level": "input_observed",
+        "source_case_count": 127,
+        "example_case": "Cases/Verification/NaCoolantChannelModel/vsAnalytical"
+      },
+      {
+        "value": "misesPlasticCreep",
+        "level": "input_observed",
+        "source_case_count": 42,
+        "example_case": "Cases/Verification/burnupFBR"
+      },
+      {
+        "value": "misesPlasticity",
+        "level": "input_observed",
+        "source_case_count": 1,
+        "example_case": "Cases/Verification/thickCylinderExpansion"
+      },
+      {
+        "value": "neoHookeanMisesPlasticity",
+        "level": "input_observed",
+        "source_case_count": 1,
+        "example_case": "Cases/Verification/volumeConservationLargeStrain"
+      }
+    ],
+    "rheologyModelOptions/creepModel": [
+      {
+        "value": "LimbackCreepModel",
+        "level": "input_observed",
+        "source_case_count": 23,
+        "example_case": "Cases/Verification/corrosion/fixedInnerHeatFlux"
+      },
+      {
+        "value": "LimbackCreepModelLOCA",
+        "level": "input_observed",
+        "source_case_count": 2,
+        "example_case": "Cases/testCases/generic_PUZRY"
+      },
+      {
+        "value": "MatproCreepModel",
+        "level": "input_observed",
+        "source_case_count": 3,
+        "example_case": "Cases/Verification/testUserParameters"
+      },
+      {
+        "value": "MonolithicSiCCreepModel",
+        "level": "input_observed",
+        "source_case_count": 1,
+        "example_case": "Cases/Verification/trisoModulesTest/testSiC_creep"
+      },
+      {
+        "value": "PARFUMUEBufferCreepModel",
+        "level": "input_observed",
+        "source_case_count": 1,
+        "example_case": "Cases/Verification/trisoModulesTest/testBuffer_creep"
+      },
+      {
+        "value": "PARFUMUEPyCCreepModel",
+        "level": "input_observed",
+        "source_case_count": 1,
+        "example_case": "Cases/Verification/trisoModulesTest/testPyC_creep"
+      },
+      {
+        "value": "RoutbortFastMOXCreepModel",
+        "level": "input_observed",
+        "source_case_count": 1,
+        "example_case": "Cases/testCases/generic_mox_1D"
+      },
+      {
+        "value": "TobbeAIM1CreepModel",
+        "level": "input_observed",
+        "source_case_count": 2,
+        "example_case": "Cases/Verification/burnupFBR"
+      },
+      {
+        "value": "constantCreepPrincipalStress",
+        "level": "input_observed",
+        "source_case_count": 11,
+        "example_case": "Cases/Verification/trisoBenchmarks/case_10"
+      },
+      {
+        "value": "correlationCreepPrincipalStress",
+        "level": "input_observed",
+        "source_case_count": 1,
+        "example_case": "Cases/Verification/trisoBenchmarks/case_8"
+      },
+      {
+        "value": "fromLatestTime",
+        "level": "input_observed",
+        "source_case_count": 1,
+        "example_case": "Cases/testCases/smearedCrackingExample"
+      }
+    ],
+    "rheologyModelOptions/damageModel": [
+      {
+        "value": "smearedCracking",
+        "level": "input_observed",
+        "source_case_count": 1,
+        "example_case": "Cases/testCases/smearedCrackingExample"
+      }
+    ],
+    "rheologyModelOptions/softeningModel": [
+      {
+        "value": "exponentialSoftening",
+        "level": "input_observed",
+        "source_case_count": 1,
+        "example_case": "Cases/testCases/smearedCrackingExample"
+      }
+    ],
+    "rheologyModelOptions/yieldStressModel": [
+      {
+        "value": "FRAPTRAN",
+        "level": "input_observed",
+        "source_case_count": 1,
+        "example_case": "Cases/testCases/generic_pwr_2D_rz_3pellets"
+      },
+      {
+        "value": "constant",
+        "level": "input_observed",
+        "source_case_count": 1,
+        "example_case": "Cases/testCases/generic_pwr_2D_rz_3pellets"
+      }
+    ],
+    "swellingModel": [
+      {
+        "value": "BufferPARFUME",
+        "level": "input_observed",
+        "source_case_count": 1,
+        "example_case": "Cases/Verification/trisoModulesTest/testBuffer_swelling"
+      },
+      {
+        "value": "FBRMOX",
+        "level": "input_observed",
+        "source_case_count": 1,
+        "example_case": "Cases/testCases/generic_mox_1D"
+      },
+      {
+        "value": "PyCCorrelation",
+        "level": "input_observed",
+        "source_case_count": 10,
+        "example_case": "Cases/Verification/trisoBenchmarks/case_10"
+      },
+      {
+        "value": "PyCPARFUME",
+        "level": "input_observed",
+        "source_case_count": 1,
+        "example_case": "Cases/Verification/trisoModulesTest/testPyC_swelling"
+      },
+      {
+        "value": "UO2FRAPCON",
+        "level": "input_observed",
+        "source_case_count": 33,
+        "example_case": "Cases/Verification/actinidesRedistribution"
+      },
+      {
+        "value": "UO2MATPRO",
+        "level": "input_observed",
+        "source_case_count": 1,
+        "example_case": "Cases/Verification/trisoModulesTest/testSwellingMATPRO"
+      },
+      {
+        "value": "constant",
+        "level": "input_observed",
+        "source_case_count": 2,
+        "example_case": "Cases/Verification/trisoBenchmarks/case_4a"
+      },
+      {
+        "value": "growthBISONZy",
+        "level": "input_observed",
+        "source_case_count": 7,
+        "example_case": "Cases/testCases/exerciseOFFBEAT/case6_solved"
+      },
+      {
+        "value": "growthGeneralized1515Ti",
+        "level": "input_observed",
+        "source_case_count": 1,
+        "example_case": "Cases/testCases/generic_mox_1D"
+      },
+      {
+        "value": "none",
+        "level": "input_observed",
+        "source_case_count": 51,
+        "example_case": "Cases/Verification/NaCoolantChannelModel/vsAnalytical"
+      }
+    ],
+    "thermalExpansionModel": [
+      {
+        "value": "BufferPARFUME",
+        "level": "input_observed",
+        "source_case_count": 3,
+        "example_case": "Cases/Verification/trisoModulesTest/testBuffer_E_nu"
+      },
+      {
+        "value": "PyCPARFUME",
+        "level": "input_observed",
+        "source_case_count": 3,
+        "example_case": "Cases/Verification/trisoModulesTest/testPyC_alpha"
+      },
+      {
+        "value": "SiCSnead",
+        "level": "input_observed",
+        "source_case_count": 1,
+        "example_case": "Cases/Verification/trisoModulesTest/testSiC_k_Cp_E_alpha"
+      },
+      {
+        "value": "UO2RELAP",
+        "level": "input_observed",
+        "source_case_count": 1,
+        "example_case": "Cases/Verification/trisoModulesTest/testSwellingMATPRO"
+      },
+      {
+        "value": "UPuO2Lemehov",
+        "level": "input_observed",
+        "source_case_count": 1,
+        "example_case": "Cases/testCases/generic_mox_1D"
+      },
+      {
+        "value": "constant",
+        "level": "input_observed",
+        "source_case_count": 10,
+        "example_case": "Cases/Verification/trisoBenchmarks/case_10"
+      }
+    ]
+  },
+  "boundaries": {
+    "T": [
+      {
+        "type": "NaCoolantChannel",
+        "level": "documented",
+        "meaning": "钠冷通道换热",
+        "inputs": "以源卡的确切类型名为准；本地手册标题带 fvPatchScalarField 后缀，不能照抄标题当 selector。",
+        "source_case_count": 2,
+        "runtime_observations": 0
+      },
+      {
+        "type": "axialProfileT",
+        "level": "documented",
+        "meaning": "轴向温度分布",
+        "inputs": "按源确认轴线、归一化位置与温度项。",
+        "source_case_count": 0,
+        "runtime_observations": 0
+      },
+      {
+        "type": "convectiveHTC",
+        "level": "documented",
+        "meaning": "给定对流换热",
+        "inputs": "T0（K）、h（W/(m²·K)）；value 通常仅初始化。",
+        "source_case_count": 2,
+        "runtime_observations": 0
+      },
+      {
+        "type": "coolantChannel",
+        "level": "documented",
+        "meaning": "冷却剂通道换热",
+        "inputs": "保持完整通道输入及质量流量、入口温度、物性约定。",
+        "source_case_count": 4,
+        "runtime_observations": 0
+      },
+      {
+        "type": "cyclic",
+        "level": "input_observed",
+        "meaning": "周期连接",
+        "inputs": "保持配对和变换。",
+        "source_case_count": 4,
+        "runtime_observations": 0
+      },
+      {
+        "type": "cyclicAMI",
+        "level": "runtime_verified",
+        "meaning": "非共形周期连接",
+        "inputs": "保持 AMI 配对与实际覆盖。",
+        "source_case_count": 4,
+        "runtime_observations": 2
+      },
+      {
+        "type": "empty",
+        "level": "runtime_verified",
+        "meaning": "降维边界",
+        "inputs": "由网格维数决定，不当作普通物理表面改载荷。",
+        "source_case_count": 21,
+        "runtime_observations": 2
+      },
+      {
+        "type": "fixedGradient",
+        "level": "documented",
+        "meaning": "给定法向梯度",
+        "inputs": "gradient；温度梯度 K/m，按所选字段核实。",
+        "source_case_count": 0,
+        "runtime_observations": 0
+      },
+      {
+        "type": "fixedTemperature",
+        "level": "documented",
+        "meaning": "考虑附加热阻的定温边界",
+        "inputs": "按源定义外界/界面温度，不能等同普通 fixedValue 的全部语法。",
+        "source_case_count": 0,
+        "runtime_observations": 0
+      },
+      {
+        "type": "fixedValue",
+        "level": "runtime_verified",
+        "meaning": "给定场值",
+        "inputs": "value；T 为 K，D/DD 为 m；实际作用取决于字段。",
+        "source_case_count": 91,
+        "runtime_observations": 18
+      },
+      {
+        "type": "fuelRodGap",
+        "level": "runtime_verified",
+        "meaning": "由气体/间隙状态参与的燃料棒界面换热",
+        "inputs": "被热求解评价时需要可用的气体导热物性；gapGas none 已验证会失败。",
+        "source_case_count": 33,
+        "runtime_observations": 6
+      },
+      {
+        "type": "radiativeConvectiveSink",
+        "level": "documented",
+        "meaning": "辐射与对流散热",
+        "inputs": "T0、alpha、emissivity；不把 value 当环境载荷。",
+        "source_case_count": 1,
+        "runtime_observations": 0
+      },
+      {
+        "type": "resistiveGap",
+        "level": "runtime_verified",
+        "meaning": "给定界面热阻/导热系数",
+        "inputs": "alpha（W/(m²·K)）、coupled、kappa；源卡中固定 alpha 的纯热学场景可不使用气体模型。",
+        "source_case_count": 7,
+        "runtime_observations": 12
+      },
+      {
+        "type": "symmetry",
+        "level": "input_observed",
+        "meaning": "对称边界",
+        "inputs": "保持源约束。",
+        "source_case_count": 5,
+        "runtime_observations": 0
+      },
+      {
+        "type": "symmetryPlane",
+        "level": "input_observed",
+        "meaning": "平面对称边界",
+        "inputs": "保持源约束。",
+        "source_case_count": 1,
+        "runtime_observations": 0
+      },
+      {
+        "type": "temperatureCoupled",
+        "level": "documented",
+        "meaning": "两侧直接耦合导热",
+        "inputs": "配对 regionCoupledOFFBEAT 元数据和 kappa。",
+        "source_case_count": 1,
+        "runtime_observations": 0
+      },
+      {
+        "type": "timeDependentAxialProfileHTC",
+        "level": "documented",
+        "meaning": "时变轴向对流换热",
+        "inputs": "环境温度、系数和时间/空间表按源。",
+        "source_case_count": 0,
+        "runtime_observations": 0
+      },
+      {
+        "type": "timeDependentAxialProfileT",
+        "level": "documented",
+        "meaning": "随时间变化的轴向温度分布",
+        "inputs": "同时核对空间与时间索引。",
+        "source_case_count": 1,
+        "runtime_observations": 0
+      },
+      {
+        "type": "timeDependentTemperature",
+        "level": "documented",
+        "meaning": "随时间给定温度",
+        "inputs": "时间表和载荷项沿源；列表语法不在本表完整覆盖。",
+        "source_case_count": 4,
+        "runtime_observations": 0
+      },
+      {
+        "type": "trisoGap",
+        "level": "documented",
+        "meaning": "TRISO 间隙换热",
+        "inputs": "保持源中的气体和几何组合；jumpDistance 是热跳跃贡献，不是直接几何间隙宽度。",
+        "source_case_count": 6,
+        "runtime_observations": 0
+      },
+      {
+        "type": "uniformFixedValue",
+        "level": "documented",
+        "meaning": "均匀给定值/时间函数",
+        "inputs": "uniformValue；不能用 value 初始化项替代实际载荷。",
+        "source_case_count": 22,
+        "runtime_observations": 0
+      },
+      {
+        "type": "wedge",
+        "level": "runtime_verified",
+        "meaning": "轴对称/球对称楔形约束",
+        "inputs": "保留几何与场类型一致；球楔形体积分数不能直接用圆柱角度比例替代。",
+        "source_case_count": 94,
+        "runtime_observations": 18
+      },
+      {
+        "type": "xzTemperatureProfile",
+        "level": "documented",
+        "meaning": "x-z 温度分布",
+        "inputs": "按源坐标与数据约定。",
+        "source_case_count": 0,
+        "runtime_observations": 0
+      },
+      {
+        "type": "zeroGradient",
+        "level": "runtime_verified",
+        "meaning": "零法向梯度",
+        "inputs": "用于绝热温度边界时不额外给定温度；面值与邻近存储单元取值口径应注明。",
+        "source_case_count": 34,
+        "runtime_observations": 22
+      }
+    ],
+    "D": [
+      {
+        "type": "coolantPressure",
+        "level": "documented",
+        "meaning": "冷却剂压力载荷",
+        "inputs": "沿源所引用的 coolantPressureList 或实际压力数据定义。",
+        "source_case_count": 30,
+        "runtime_observations": 0
+      },
+      {
+        "type": "cyclic",
+        "level": "input_observed",
+        "meaning": "周期连接",
+        "inputs": "保持配对和变换。",
+        "source_case_count": 4,
+        "runtime_observations": 0
+      },
+      {
+        "type": "cyclicAMI",
+        "level": "runtime_verified",
+        "meaning": "非共形周期连接",
+        "inputs": "保持 AMI 配对与实际覆盖。",
+        "source_case_count": 4,
+        "runtime_observations": 2
+      },
+      {
+        "type": "empty",
+        "level": "runtime_verified",
+        "meaning": "降维边界",
+        "inputs": "由网格维数决定，不当作普通物理表面改载荷。",
+        "source_case_count": 15,
+        "runtime_observations": 2
+      },
+      {
+        "type": "fixedDisplacement",
+        "level": "documented",
+        "meaning": "给定位移",
+        "inputs": "位移方向、基底、value 及时间条件按源。",
+        "source_case_count": 0,
+        "runtime_observations": 0
+      },
+      {
+        "type": "fixedDisplacementZeroShear",
+        "level": "runtime_verified",
+        "meaning": "指定方向位移并允许滑移",
+        "inputs": "保留源中的轴向约束与剪切处理。",
+        "source_case_count": 16,
+        "runtime_observations": 6
+      },
+      {
+        "type": "fixedPointLoad",
+        "level": "documented",
+        "meaning": "集中载荷",
+        "inputs": "施加载荷位置与力的单位按源。",
+        "source_case_count": 0,
+        "runtime_observations": 0
+      },
+      {
+        "type": "fixedTorque",
+        "level": "documented",
+        "meaning": "给定扭矩",
+        "inputs": "轴线与扭矩输入按源。",
+        "source_case_count": 1,
+        "runtime_observations": 0
+      },
+      {
+        "type": "fixedValue",
+        "level": "documented",
+        "meaning": "给定场值",
+        "inputs": "value；T 为 K，D/DD 为 m；实际作用取决于字段。",
+        "source_case_count": 19,
+        "runtime_observations": 0
+      },
+      {
+        "type": "frictionalGapContact",
+        "level": "input_observed",
+        "meaning": "含摩擦接触",
+        "inputs": "源卡存在；摩擦输入/适用构型未独立验证。",
+        "source_case_count": 1,
+        "runtime_observations": 0
+      },
+      {
+        "type": "gapContact",
+        "level": "runtime_verified",
+        "meaning": "显式接触界面",
+        "inputs": "成对的耦合 patch、压力/牵引、penaltyFactor 等；仅在实际机械求解评价时处理相关依赖。",
+        "source_case_count": 30,
+        "runtime_observations": 6
+      },
+      {
+        "type": "gapPressure",
+        "level": "documented",
+        "meaning": "间隙气体压力载荷",
+        "inputs": "保持气体模型依赖与源作用面。",
+        "source_case_count": 7,
+        "runtime_observations": 0
+      },
+      {
+        "type": "implicitGapContact",
+        "level": "documented",
+        "meaning": "隐式接触",
+        "inputs": "按对应源保留配对与求解设置，不能仅替换类型名。",
+        "source_case_count": 4,
+        "runtime_observations": 0
+      },
+      {
+        "type": "plenumSpringPressure",
+        "level": "documented",
+        "meaning": "气室/弹簧压力载荷",
+        "inputs": "保留气室几何、气体与弹簧输入。",
+        "source_case_count": 11,
+        "runtime_observations": 0
+      },
+      {
+        "type": "symmetry",
+        "level": "input_observed",
+        "meaning": "对称边界",
+        "inputs": "保持源约束。",
+        "source_case_count": 3,
+        "runtime_observations": 0
+      },
+      {
+        "type": "symmetryPlane",
+        "level": "input_observed",
+        "meaning": "平面对称边界",
+        "inputs": "保持源约束。",
+        "source_case_count": 1,
+        "runtime_observations": 0
+      },
+      {
+        "type": "topCladRingPressure",
+        "level": "documented",
+        "meaning": "包壳端环载荷",
+        "inputs": "作用区域和方向按源。",
+        "source_case_count": 7,
+        "runtime_observations": 0
+      },
+      {
+        "type": "tractionDisplacement",
+        "level": "runtime_verified",
+        "meaning": "牵引/压力边界",
+        "inputs": "traction 与 pressure；压力 Pa，正压力与应力分量的符号须分开解释。",
+        "source_case_count": 50,
+        "runtime_observations": 17
+      },
+      {
+        "type": "unilateralContact",
+        "level": "documented",
+        "meaning": "单侧接触/滑动约束",
+        "inputs": "法向和支承位置按源；不等于双向固定。",
+        "source_case_count": 1,
+        "runtime_observations": 0
+      },
+      {
+        "type": "wedge",
+        "level": "runtime_verified",
+        "meaning": "轴对称/球对称楔形约束",
+        "inputs": "保留几何与场类型一致；球楔形体积分数不能直接用圆柱角度比例替代。",
+        "source_case_count": 55,
+        "runtime_observations": 9
+      },
+      {
+        "type": "zeroGradient",
+        "level": "runtime_verified",
+        "meaning": "零法向梯度",
+        "inputs": "用于绝热温度边界时不额外给定温度；面值与邻近存储单元取值口径应注明。",
+        "source_case_count": 1,
+        "runtime_observations": 1
+      }
+    ],
+    "DD": [
+      {
+        "type": "empty",
+        "level": "input_observed",
+        "meaning": "降维边界",
+        "inputs": "由网格维数决定，不当作普通物理表面改载荷。",
+        "source_case_count": 3,
+        "runtime_observations": 0
+      },
+      {
+        "type": "fixedValue",
+        "level": "input_observed",
+        "meaning": "给定场值",
+        "inputs": "value；T 为 K，D/DD 为 m；实际作用取决于字段。",
+        "source_case_count": 2,
+        "runtime_observations": 0
+      },
+      {
+        "type": "gapContact",
+        "level": "input_observed",
+        "meaning": "显式接触界面",
+        "inputs": "成对的耦合 patch、压力/牵引、penaltyFactor 等；仅在实际机械求解评价时处理相关依赖。",
+        "source_case_count": 5,
+        "runtime_observations": 0
+      },
+      {
+        "type": "symmetry",
+        "level": "input_observed",
+        "meaning": "对称边界",
+        "inputs": "保持源约束。",
+        "source_case_count": 1,
+        "runtime_observations": 0
+      },
+      {
+        "type": "symmetryPlane",
+        "level": "input_observed",
+        "meaning": "平面对称边界",
+        "inputs": "保持源约束。",
+        "source_case_count": 2,
+        "runtime_observations": 0
+      },
+      {
+        "type": "tractionDisplacement",
+        "level": "input_observed",
+        "meaning": "牵引/压力边界",
+        "inputs": "traction 与 pressure；压力 Pa，正压力与应力分量的符号须分开解释。",
+        "source_case_count": 11,
+        "runtime_observations": 0
+      },
+      {
+        "type": "uniformFixedValue",
+        "level": "input_observed",
+        "meaning": "均匀给定值/时间函数",
+        "inputs": "uniformValue；不能用 value 初始化项替代实际载荷。",
+        "source_case_count": 2,
+        "runtime_observations": 0
+      },
+      {
+        "type": "wedge",
+        "level": "input_observed",
+        "meaning": "轴对称/球对称楔形约束",
+        "inputs": "保留几何与场类型一致；球楔形体积分数不能直接用圆柱角度比例替代。",
+        "source_case_count": 9,
+        "runtime_observations": 0
+      }
+    ]
+  },
+  "fields": [
+    {
+      "name": "T",
+      "unit": "K",
+      "dimensions": [
+        0,
+        0,
+        0,
+        1,
+        0,
+        0,
+        0
+      ],
+      "meaning": "温度",
+      "level": "runtime_verified"
+    },
+    {
+      "name": "D",
+      "unit": "m",
+      "dimensions": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "meaning": "总位移向量；不能用作扩散系数",
+      "level": "runtime_verified"
+    },
+    {
+      "name": "DD",
+      "unit": "m",
+      "dimensions": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "meaning": "增量位移向量；与相应机械模型配套",
+      "level": "documented"
+    },
+    {
+      "name": "Q",
+      "unit": "W/m³",
+      "dimensions": [
+        1,
+        -1,
+        -3,
+        0,
+        0,
+        0,
+        0
+      ],
+      "meaning": "实际体积热源",
+      "level": "runtime_verified"
+    },
+    {
+      "name": "lhgr",
+      "unit": "W/m",
+      "dimensions": null,
+      "meaning": "线功率，局部或平均作用域随模型定义",
+      "level": "runtime_verified"
+    },
+    {
+      "name": "k",
+      "unit": "W/(m·K)",
+      "dimensions": [
+        1,
+        1,
+        -3,
+        -1,
+        0,
+        0,
+        0
+      ],
+      "meaning": "热导率",
+      "level": "runtime_verified"
+    },
+    {
+      "name": "rho",
+      "unit": "kg/m³",
+      "dimensions": [
+        1,
+        -3,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "meaning": "密度，可在材料卡中而不单独写场",
+      "level": "documented"
+    },
+    {
+      "name": "Cp",
+      "unit": "J/(kg·K)",
+      "dimensions": [
+        0,
+        2,
+        -2,
+        -1,
+        0,
+        0,
+        0
+      ],
+      "meaning": "定压比热；温变 Cp 不可简单套用常数能量公式",
+      "level": "documented"
+    },
+    {
+      "name": "sigma",
+      "unit": "Pa",
+      "dimensions": [
+        1,
+        -1,
+        -2,
+        0,
+        0,
+        0,
+        0
+      ],
+      "meaning": "笛卡尔对称应力张量，分量顺序 xx xy xz yy yz zz",
+      "level": "runtime_verified"
+    },
+    {
+      "name": "sigmaCyl",
+      "unit": "Pa",
+      "dimensions": null,
+      "meaning": "变换后的柱坐标应力；确认轴线，标准棒通常为 z 轴",
+      "level": "runtime_verified"
+    },
+    {
+      "name": "sigmaEq",
+      "unit": "Pa",
+      "dimensions": null,
+      "meaning": "等效应力",
+      "level": "runtime_verified"
+    },
+    {
+      "name": "sigmaHyd",
+      "unit": "Pa",
+      "dimensions": null,
+      "meaning": "静水应力，保留符号",
+      "level": "runtime_verified"
+    },
+    {
+      "name": "sigmaY",
+      "unit": "Pa",
+      "dimensions": null,
+      "meaning": "屈服应力，仅在相应模型写出时可用",
+      "level": "documented"
+    },
+    {
+      "name": "epsilon",
+      "unit": "1",
+      "dimensions": null,
+      "meaning": "总应变，场名按实际输出确认",
+      "level": "runtime_verified"
+    },
+    {
+      "name": "epsEl",
+      "unit": "1",
+      "dimensions": null,
+      "meaning": "弹性应变",
+      "level": "runtime_verified"
+    },
+    {
+      "name": "epsTh",
+      "unit": "1",
+      "dimensions": null,
+      "meaning": "热应变；不把它当总应变",
+      "level": "runtime_verified"
+    },
+    {
+      "name": "epsilonCreep",
+      "unit": "1",
+      "dimensions": null,
+      "meaning": "旧说明中的蠕变应变名；当前具体模型字段名仍需核实",
+      "level": "documented"
+    },
+    {
+      "name": "gapWidth",
+      "unit": "m",
+      "dimensions": null,
+      "meaning": "仅按已确认间隙作用域解释；内部占位值不代表边界",
+      "level": "runtime_verified"
+    },
+    {
+      "name": "interfaceP",
+      "unit": "Pa",
+      "dimensions": null,
+      "meaning": "界面接触压力，作用范围需确认",
+      "level": "runtime_verified"
+    },
+    {
+      "name": "oxideThickness",
+      "unit": "m",
+      "dimensions": [
+        0,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "meaning": "氧化层厚度可能是面场；按真实边界条目取值",
+      "level": "runtime_verified"
+    },
+    {
+      "name": "gasPressure",
+      "unit": "Pa",
+      "dimensions": null,
+      "meaning": "仅限明确的间隙气体状态压力，不扩展到任意同名对象",
+      "level": "runtime_verified"
+    },
+    {
+      "name": "Bu",
+      "unit": "MWd/MT_oxide",
+      "dimensions": null,
+      "meaning": "本机已维护的确切字段约定；不与 BU/BUkgU/Bu_kgU 混用",
+      "level": "runtime_verified"
+    },
+    {
+      "name": "Bu_kgU",
+      "unit": null,
+      "dimensions": null,
+      "meaning": "本地历史来源存在单位冲突；unit_unverified",
+      "level": "unverified"
+    },
+    {
+      "name": "fastFlux",
+      "unit": "n/(cm²·s)",
+      "dimensions": null,
+      "meaning": "本地手册和源注释一致；不要擅自按 SI m²改数字，具体输入/输出作用域仍需确认",
+      "level": "documented"
+    },
+    {
+      "name": "fastFluence",
+      "unit": "n/cm²",
+      "dimensions": null,
+      "meaning": "本地手册约定；constant fastFlux 不等于注量停止累积",
+      "level": "documented"
+    },
+    {
+      "name": "Cs",
+      "unit": "mol/m³",
+      "dimensions": [
+        0,
+        -3,
+        0,
+        0,
+        1,
+        0,
+        0
+      ],
+      "meaning": "已验证 Cs 浓度场；均匀初始值在 intialFpConcentration（实际拼写）",
+      "level": "runtime_verified"
+    },
+    {
+      "name": "diffCs",
+      "unit": "m²/s",
+      "dimensions": [
+        0,
+        2,
+        -1,
+        0,
+        0,
+        0,
+        0
+      ],
+      "meaning": "运行后有效 Cs 扩散系数，不用 0/diffCs 种子证明生效",
+      "level": "runtime_verified"
+    },
+    {
+      "name": "sourceCs",
+      "unit": "mol/(m³·s)",
+      "dimensions": [
+        0,
+        -3,
+        -1,
+        0,
+        1,
+        0,
+        0
+      ],
+      "meaning": "Cs 生成源，零源需实际场核实",
+      "level": "runtime_verified"
+    },
+    {
+      "name": "V",
+      "unit": "m³",
+      "dimensions": [
+        0,
+        3,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "meaning": "单元体积，可由原生后处理获得",
+      "level": "runtime_verified"
+    }
+  ],
+  "controls": [
+    {
+      "file": "system/controlDict",
+      "entry": "startFrom",
+      "value_or_unit": "startTime / latestTime",
+      "meaning": "选择新鲜起点或保留状态，不能混入更晚目录。"
+    },
+    {
+      "file": "system/controlDict",
+      "entry": "startTime",
+      "value_or_unit": "模型时间",
+      "meaning": "新鲜计算通常为0；续算按可信检查点。"
+    },
+    {
+      "file": "system/controlDict",
+      "entry": "endTime",
+      "value_or_unit": "模型时间",
+      "meaning": "不等于裁剪载荷表，也不能只凭该值证明完成。"
+    },
+    {
+      "file": "system/controlDict",
+      "entry": "deltaT",
+      "value_or_unit": "模型时间",
+      "meaning": "物理秒转换由 userTime 决定。"
+    },
+    {
+      "file": "system/controlDict",
+      "entry": "userTime/type",
+      "value_or_unit": "seconds / hours / days",
+      "meaning": "缺省沿源秒制；days 已有本机运行验证，hours 仅接口约定；其他类型不猜。"
+    },
+    {
+      "file": "system/controlDict",
+      "entry": "adjustableTimeStep",
+      "value_or_unit": "off / false 或 on / true",
+      "meaning": "请求固定步长时关闭；不凭空新增不存在的其他开关。"
+    },
+    {
+      "file": "system/controlDict",
+      "entry": "adjustableWriteTimeStep",
+      "value_or_unit": "若源存在则 false",
+      "meaning": "附加写出时间控制，不是 writeControl 的枚举值。"
+    },
+    {
+      "file": "system/controlDict",
+      "entry": "writeControl",
+      "value_or_unit": "timeStep / runTime / adjustableRunTime 等",
+      "meaning": "每步输出可用 timeStep；精确模型间隔按现有说明选择。"
+    },
+    {
+      "file": "system/controlDict",
+      "entry": "writeInterval",
+      "value_or_unit": "与 writeControl 对应",
+      "meaning": "不是所有模式都按秒解释。"
+    },
+    {
+      "file": "system/controlDict",
+      "entry": "purgeWrite",
+      "value_or_unit": "非负整数",
+      "meaning": "需全部保存帧时用0；保留结果不能靠反复重算补齐。"
+    },
+    {
+      "file": "system/controlDict",
+      "entry": "writeFormat / writeCompression",
+      "value_or_unit": "ascii；off",
+      "meaning": "只在用户需要相应交付格式时设置。"
+    },
+    {
+      "file": "system/controlDict",
+      "entry": "timePrecision / writePrecision",
+      "value_or_unit": "显示与序列化精度",
+      "meaning": "不能为日志或目录显示尾数重算已完成物理过程。"
+    },
+    {
+      "file": "system/fvSchemes",
+      "entry": "ddtSchemes/default",
+      "value_or_unit": "Euler / steadyState 等",
+      "meaning": "Euler 是瞬态时间离散；steadyState 是稳态离散，不把伪时间序列当真实瞬态。"
+    },
+    {
+      "file": "system/fvSolution",
+      "entry": "solvers/<field>",
+      "value_or_unit": "字段对应的线性求解与阈值",
+      "meaning": "D/DD/T 与所选模型一致，阈值沿源与请求。"
+    },
+    {
+      "file": "system/fvSolution",
+      "entry": "stressAnalysis",
+      "value_or_unit": "maxOuterIter、T、D、relT 等源项",
+      "meaning": "名称随本机输入，未请求时保留；不靠随意放宽精度换成功。"
+    },
+    {
+      "file": "constant/solverDict",
+      "entry": "heatSourceOptions/timePoints",
+      "value_or_unit": "模型时间列表",
+      "meaning": "与时间载荷配对；已有更晚有效末点应保留。"
+    },
+    {
+      "file": "constant/solverDict",
+      "entry": "heatSourceOptions/lhgr",
+      "value_or_unit": "标量或列表，依 heatSource",
+      "meaning": "constantLhgr 标量，timeDependentLhgr 列表；kW/m 转 W/m 乘1000。"
+    },
+    {
+      "file": "constant/solverDict",
+      "entry": "heatSourceOptions/vhgr",
+      "value_or_unit": "W/m³",
+      "meaning": "用于相应体积热源模型，不能与线功率直接互换。"
+    },
+    {
+      "file": "constant/solverDict",
+      "entry": "rheologyOptions/thermalExpansion",
+      "value_or_unit": "off / on",
+      "meaning": "控制热应变，与 mechanicsSolver 是否求位移分开。"
+    }
+  ],
+  "parameters": [
+    {
+      "entry": "materials/<zone>/material",
+      "unit_or_type": "材料类型",
+      "meaning": "精确大小写；继承对应源中的完整属性和行为模型。"
+    },
+    {
+      "entry": "materials/<zone>/rho",
+      "unit_or_type": "kg/m³",
+      "meaning": "constant 材料常用密度项。"
+    },
+    {
+      "entry": "materials/<zone>/Cp",
+      "unit_or_type": "J/(kg·K)",
+      "meaning": "constant 材料常用比热项。"
+    },
+    {
+      "entry": "materials/<zone>/k",
+      "unit_or_type": "W/(m·K)",
+      "meaning": "热导率；UO2 等材料改常数时还需正确 conductivityModel。"
+    },
+    {
+      "entry": "materials/<zone>/E",
+      "unit_or_type": "Pa",
+      "meaning": "杨氏模量；GPa乘1e9。"
+    },
+    {
+      "entry": "materials/<zone>/nu",
+      "unit_or_type": "1",
+      "meaning": "泊松比；不按其他材料默认值替换。"
+    },
+    {
+      "entry": "materials/<zone>/alpha",
+      "unit_or_type": "1/K",
+      "meaning": "热膨胀系数，与热应变开关分开。"
+    },
+    {
+      "entry": "materials/<zone>/Tref",
+      "unit_or_type": "K",
+      "meaning": "参考温度，沿用物理定义。"
+    },
+    {
+      "entry": "materials/<zone>/DiamCold",
+      "unit_or_type": "m",
+      "meaning": "已有项随燃料外半径变化同步为2r。"
+    },
+    {
+      "entry": "materials/<zone>/GapCold",
+      "unit_or_type": "m",
+      "meaning": "已有项为直径间隙2*(rCladInner-rFuelOuter)，不是径向间隙。"
+    },
+    {
+      "entry": "materials/<zone>/rheologyModel",
+      "unit_or_type": "本构名称",
+      "meaning": "不是顶层 mechanicsSolver；弹性/塑性/蠕变配套。"
+    },
+    {
+      "entry": "materials/<zone>/rheologyModelOptions/creepModel",
+      "unit_or_type": "蠕变模型",
+      "meaning": "保留对应通量、应力、温度、单位及 fluxConversionFactor。"
+    },
+    {
+      "entry": "materials/<zone>/phaseTransitionModel",
+      "unit_or_type": "相变模型",
+      "meaning": "ZyDynamic 在源卡出现；未做本机独立相变验证。"
+    },
+    {
+      "entry": "materials/<zone>/fissionProductsTransport/Cs/{d1,q1,d2,q2}",
+      "unit_or_type": "模型系数",
+      "meaning": "单UO2/Cs已验证常D：d1=D，q1=d2=q2=0；别推广到所有材料/元素。"
+    },
+    {
+      "entry": "elementTransportOptions/FpDiffusionOptions/intialFpConcentration/Cs",
+      "unit_or_type": "mol/m³",
+      "meaning": "实际拼写 intial；不能自动改成 initial。"
+    },
+    {
+      "entry": "elementTransportOptions/FpDiffusionOptions/outerPatches",
+      "unit_or_type": "patch 名称",
+      "meaning": "沿源的扩散外表面配置；核对实际 Cs 边界。"
+    },
+    {
+      "entry": "0/gapGas/gasPressure",
+      "unit_or_type": "Pa",
+      "meaning": "明确的初始间隙气体压力。"
+    },
+    {
+      "entry": "0/gapGas/gasPressureType",
+      "unit_or_type": "源定义",
+      "meaning": "按源的状态初始化方式。"
+    },
+    {
+      "entry": "0/gapGas/massFractions",
+      "unit_or_type": "质量分数",
+      "meaning": "组分与气体模型兼容。"
+    },
+    {
+      "entry": "gapGasOptions",
+      "unit_or_type": "模型专属",
+      "meaning": "几何/储气空间体积按实际计算域，不能直接塞整棒/整球值。"
+    },
+    {
+      "entry": "heatSourceOptions/axialProfile",
+      "unit_or_type": "空间分布",
+      "meaning": "type、axialLocations、timePoints、data、插值配套。"
+    },
+    {
+      "entry": "heatSourceOptions/radialProfile",
+      "unit_or_type": "径向形状",
+      "meaning": "沿源归一化约定；不以节点算术平均替代积分平均。"
+    },
+    {
+      "entry": "fastFluxOptions/{timePoints,fastFlux,axialProfile}",
+      "unit_or_type": "模型时间和通量",
+      "meaning": "与热源的时间网格分开，单位见字段说明。"
+    },
+    {
+      "entry": "corrosionOptions/patches/<patch>/corrosionModel",
+      "unit_or_type": "腐蚀模型",
+      "meaning": "已验证源中有 zircaloyOuterCorrosion；对象是明确边界。"
+    },
+    {
+      "entry": "corrosionOptions/patches/<patch>/oxidationKineticsModel",
+      "unit_or_type": "动力学模型",
+      "meaning": "源中存在 EPRI-KWU-CE|Cathcart-Pawel 组合写法，保持确切字符串。"
+    }
+  ],
+  "operations": [
+    {
+      "id": "disable_mechanics",
+      "goal": "关闭力学方程",
+      "actions": [
+        "mechanicsSolver constant；兼容旧 fromLatestTime"
+      ],
+      "constraint": "保留已有位移状态；不自动关闭气体模型、热边界或其他物理模块。"
+    },
+    {
+      "id": "thermal_only",
+      "goal": "纯热学准备",
+      "actions": [
+        "保留/选择适用热模型",
+        "固定力学状态；按请求关闭热应变",
+        "沿用内部热耦合和所需物性"
+      ],
+      "constraint": "没有气隙实体热容不等于不需要气体导热物性。"
+    },
+    {
+      "id": "prescribed_temperature",
+      "goal": "给定温度",
+      "actions": [
+        "thermalSolver constant",
+        "按请求设置起始 T 与对应边界"
+      ],
+      "constraint": "不自动把所有功率、燃耗、通量清零。"
+    },
+    {
+      "id": "constant_power",
+      "goal": "恒定线功率",
+      "actions": [
+        "已用 constantLhgr 时使用标量",
+        "已用 timeDependentLhgr 时让配对值恒定",
+        "源值已满足就复用"
+      ],
+      "constraint": "不为整理格式重写模型和时间节点，保留已有稍后末点。"
+    },
+    {
+      "id": "fixed_step",
+      "goal": "固定步长瞬态",
+      "actions": [
+        "deltaT 为请求模型时间步长",
+        "关闭已有自适应开关",
+        "采用请求的瞬态格式和写出方式"
+      ],
+      "constraint": "模型时间与物理秒分开；正常终态以执行器证据为准。"
+    },
+    {
+      "id": "steady_thermal",
+      "goal": "稳态热学",
+      "actions": [
+        "ddtSchemes/default steadyState",
+        "沿用相同几何、界面和物性",
+        "按请求设置功率和边界"
+      ],
+      "constraint": "不是必须额外试算的特殊任务，也不是把所有模型改为 none。"
+    },
+    {
+      "id": "restart",
+      "goal": "物理续算",
+      "actions": [
+        "保留完整检查点状态与输入",
+        "独立目标、不继承旧执行凭据",
+        "不执行会清理状态的生成/清理步骤"
+      ],
+      "constraint": "不能仅复制T/D；未验证的活跃耦合模型续算不被一般成功记录覆盖。"
+    },
+    {
+      "id": "cs_constant_diffusion",
+      "goal": "单UO2/Cs常扩散",
+      "actions": [
+        "使用 fpdiffusion-cs-constant-v1 公共入口",
+        "运行后核实 diffCs、T、sourceCs"
+      ],
+      "constraint": "只在声明适用范围内，未知材料组合走一般输入/运行反馈。"
+    },
+    {
+      "id": "change_rod_geometry",
+      "goal": "棒尺寸修改",
+      "actions": [
+        "修改 rodDict 等生成器输入",
+        "已有冷态直径/间隙同步",
+        "必要几何锚定采样点同步"
+      ],
+      "constraint": "保留轴向结构和无关材料/载荷，生成器负责派生网格。"
+    },
+    {
+      "id": "energy_increment",
+      "goal": "常密度比热热能增量",
+      "actions": [
+        "确认rho、Cp在本次范围为常数",
+        "按实际cellZone求rho*Cp*sum((T-T0)*V)"
+      ],
+      "constraint": "单位J；只积分真实实体域，不自动加入气隙热容或放大到整棒。"
+    }
+  ],
+  "rules": [
+    {
+      "id": "selector_not_universal",
+      "severity": "错误",
+      "condition": "关闭方式按具体选择器",
+      "meaning": "mechanicsSolver none 本机已证实非法；gapGas/fgr/neutronics 等的 none 另有各自含义。"
+    },
+    {
+      "id": "fuelRodGap_gas",
+      "severity": "错误",
+      "condition": "solidConduction 实际评价 fuelRodGap 且 gapGas none",
+      "meaning": "缺少气体导热物性会失败。温度方程固定、未评价该边界时不凭边界名字强制开启气体模型。"
+    },
+    {
+      "id": "minimal_changes",
+      "severity": "原则",
+      "condition": "源输入已经满足请求",
+      "meaning": "保持原值和时间网格；每项改动对应用户要求或已证实依赖。"
+    },
+    {
+      "id": "heat_time_coverage",
+      "severity": "风险",
+      "condition": "时变线功率表末点等于或早于终点",
+      "meaning": "本机已出现查下一标记越界；保留现有更晚末点。相等不一概认定每个配方必失败，需结合具体时步/模型。"
+    },
+    {
+      "id": "rhoCp_constant",
+      "severity": "范围",
+      "condition": "热能增量用rho*Cp*DeltaT",
+      "meaning": "只适用于已确认常数物性；温变Cp需要模型一致的焓/积分定义。"
+    },
+    {
+      "id": "displacement_field",
+      "severity": "依赖",
+      "condition": "增量/更新拉格朗日力学",
+      "meaning": "使用DD初边界和相应求解项，不能把D机械复制为标量场。"
+    },
+    {
+      "id": "materials_zones",
+      "severity": "依赖",
+      "condition": "materialProperties byZone",
+      "meaning": "实际分区与材料项对应；固定材料合法不代表任意温度/辐照条件均适用。"
+    },
+    {
+      "id": "coupled_patches",
+      "severity": "依赖",
+      "condition": "区域耦合界面",
+      "meaning": "几何配对、neighbourPatch/neighbourRegion及owner信息按源保持；必要配方changeDictionary不能遗漏。"
+    },
+    {
+      "id": "sampling_compatibility",
+      "severity": "已知兼容风险",
+      "condition": "本机OpenFOAM v2506旧采样输入",
+      "meaning": "已遇到lineUniform不被注册、patchProbes缺patch而仅给patchName；用支持语法或适用的已有场提取，不为此改物理。"
+    },
+    {
+      "id": "empty_patch_metadata",
+      "severity": "工具限制",
+      "condition": "list_scopes遇到0面defaultFaces",
+      "meaning": "函数存在，但当前范围查询可抛解析异常。该网格已由原生工具正常运行；不把它当物理坏网格，不为查询重算。"
+    },
+    {
+      "id": "field_scope",
+      "severity": "语义",
+      "condition": "边界/材料区/全域响应",
+      "meaning": "不能用内部占位值替代边界，不能用探针替代全区最大单元值。"
+    },
+    {
+      "id": "execution_evidence",
+      "severity": "完成",
+      "condition": "退出码、正常结束、实际终点三项结合",
+      "meaning": "失败运行即使已写终态目录仍为失败；输入回读不代表物理生效。"
+    },
+    {
+      "id": "uncovered",
+      "severity": "恢复",
+      "condition": "本表没有条目或仅有源卡观察",
+      "meaning": "这不构成拒绝任务的理由；保留源、定点查资料、按允许范围运行并修复，默认不限启动次数。"
+    }
+  ],
+  "public_apis": [
+    {
+      "name": "list_times",
+      "signature": "list_times(result_root: str | Path, variable: str | None=None, *, source: str='fields')",
+      "description": "列出求解或后处理的数值时刻，可限定必须含有某个场。",
+      "source": "extract-offbeat-results/scripts/result_api.py",
+      "availability": "public_export_checked"
+    },
+    {
+      "name": "list_variables",
+      "signature": "list_variables(result_root: str | Path, *, time: TimeSelector='latest')",
+      "description": "描述一个时刻或全部求解时刻中可读的体场。",
+      "source": "extract-offbeat-results/scripts/result_api.py",
+      "availability": "public_export_checked"
+    },
+    {
+      "name": "list_scopes",
+      "signature": "list_scopes(result_root: str | Path, *, time: TimeSelector='latest')",
+      "description": "返回解析时刻网格中的具名单元区与边界。",
+      "source": "extract-offbeat-results/scripts/result_api.py",
+      "availability": "public_export_checked"
+    },
+    {
+      "name": "describe_field",
+      "signature": "describe_field(result_root: str | Path, variable: str, *, time: TimeSelector='latest')",
+      "description": "返回字段绑定；dimensions使用精确、可序列化的十进制字符串。",
+      "source": "extract-offbeat-results/scripts/result_api.py",
+      "availability": "public_export_checked"
+    },
+    {
+      "name": "describe_mesh",
+      "signature": "describe_mesh(result_root: str | Path, *, time: TimeSelector='latest')",
+      "description": "返回相对于结果根目录的、与所选时刻绑定的网格文件路径。",
+      "source": "extract-offbeat-results/scripts/result_api.py",
+      "availability": "public_export_checked"
+    },
+    {
+      "name": "iter_fields",
+      "signature": "iter_fields(result_root: str | Path, variable: str, *, time: TimeSelector='latest', scope: Scope='internal', component: str='value', location: Location | None=None, owner_zone: str | None=None, entry_name: str='value', include_volumes: bool=False)",
+      "description": "逐时刻迭代选定帧，支持相应的动网格几何。",
+      "source": "extract-offbeat-results/scripts/result_api.py",
+      "availability": "public_export_checked"
+    },
+    {
+      "name": "read_field",
+      "signature": "read_field(result_root: str | Path, variable: str, *, time: TimeSelector='latest', scope: Scope='internal', component: str='value', location: Location | None=None, owner_zone: str | None=None, entry_name: str='value', include_volumes: bool=False)",
+      "description": "读取标量分量或principal_max；time=all将全部帧载入内存。",
+      "source": "extract-offbeat-results/scripts/result_api.py",
+      "availability": "public_export_checked"
+    },
+    {
+      "name": "extreme",
+      "signature": "extreme(result_root: str | Path, variable: str, *, operation: Literal['max', 'min', 'max_abs']='max', details: bool=False, **selection: object)",
+      "description": "对一个或全部时刻的选定场求极值；默认返回float。",
+      "source": "extract-offbeat-results/scripts/result_api.py",
+      "availability": "public_export_checked"
+    }
+  ],
+  "tooling": {
+    "foam_edit": "get_foam_entry / set_foam_entry，已有项的原生编辑与回读；不会检查全部物理语义。",
+    "case_runner": "run_case / inspect_case，保存执行状态、实际终点和diagnostic；同目录幂等，修复后新尝试。",
+    "parameter_plan": "已验证Cs常D范围内的批量准备/执行/实际场核对，不作为全部任务入口。",
+    "Study": "多评价历史与调度，prepare/execute/evaluate/collect，按实际公开说明使用；默认不限制求解次数。",
+    "generators": "rodDict/rod3Ddict.json/sphereDict是输入；调用配方中的现成生成器，不读实现。",
+    "postProcess": "纯后处理，可生成C/V；不因提取错误重算物理过程。"
+  },
+  "limitations": [
+    "时间控制和离散格式的本地官方页面尚为空页；相关条目依据已维护协议、输入与运行证据。",
+    "elementTransport本地说明未列FpDiffusion；该能力由实际输入/运行与已验证契约补充。",
+    "本地后处理说明有BU/BUkgU等命名和单位差异，确切Bu以现有核实约定为准，Bu_kgU待核实。",
+    "list_scopes存在，空defaultFaces异常属于当前解析器范围查询限制，不是方法缺失。",
+    "模型名和property key区分大小写，例如源中PoissonRatioModel和poissonRatioModel不能擅自归并。",
+    "手册constant材料列出的所有required项与可运行源并不完全一致；不凭旧列表补造未需要的参数。",
+    "没有对文档/源卡列出的全部模型逐个求解，不宣称穷举注册表或完整参数验证。"
+  ],
+  "coverage": {
+    "rag_cards": 137,
+    "input_cases_parsed": 136,
+    "excluded_utility_directories": [
+      "Cases/testCases/test_createTuFields"
+    ],
+    "normal_execution_records": 18,
+    "selector_families": 13,
+    "selector_values": 48,
+    "material_models": 10,
+    "confirmed_material_selectors": 8,
+    "property_families": 20,
+    "property_values": 70,
+    "boundary_entries": 53,
+    "field_entries": 29,
+    "controls": 19,
+    "parameter_bindings": 25,
+    "operations": 10,
+    "rules": 13,
+    "public_apis": 8
+  }
+}

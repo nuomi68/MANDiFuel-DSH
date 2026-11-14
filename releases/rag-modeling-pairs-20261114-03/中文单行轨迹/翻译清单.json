@@ -1,0 +1,66 @@
+{
+  "生成时间_北京时间": "2026-11-14T17:29:09.722644+08:00",
+  "事件总数": 574,
+  "文档": [
+    {
+      "任务": "G01",
+      "组别": "裸DSH",
+      "文件": "G01_裸DSH_一行轨迹.md",
+      "事件数": 91,
+      "模型轮次": 76,
+      "SHA256": "47f0d5bddbd6948c7c05256cf9b87750f216478ddcc8614a9886c1a0b33535c3"
+    },
+    {
+      "任务": "G01",
+      "组别": "Skill",
+      "文件": "G01_Skill_一行轨迹.md",
+      "事件数": 82,
+      "模型轮次": 51,
+      "SHA256": "6752531a532b7a04cc7b7aa5f1e4a3bb6aac066c5939d4264f4e4148cb498fd9"
+    },
+    {
+      "任务": "G02",
+      "组别": "裸DSH",
+      "文件": "G02_裸DSH_一行轨迹.md",
+      "事件数": 93,
+      "模型轮次": 81,
+      "SHA256": "a1048d2b4efc6c84312d5151ac42879358531ec80caaa316744b60b9ccc3f829"
+    },
+    {
+      "任务": "G02",
+      "组别": "Skill",
+      "文件": "G02_Skill_一行轨迹.md",
+      "事件数": 82,
+      "模型轮次": 60,
+      "SHA256": "043467665dae6b71df5f5db29104293a365fe0c1be1a8cadd38890ef54f6412a"
+    },
+    {
+      "任务": "M01",
+      "组别": "裸DSH",
+      "文件": "M01_裸DSH_一行轨迹.md",
+      "事件数": 151,
+      "模型轮次": 124,
+      "SHA256": "fd9a63076d47dba02e849a75b69b274e97c5ea80433f459b1487c11ddff0baf5"
+    },
+    {
+      "任务": "M01",
+      "组别": "Skill",
+      "文件": "M01_Skill_一行轨迹.md",
+      "事件数": 75,
+      "模型轮次": 59,
+      "SHA256": "9d594c1997d7f7dbac0e496d1875116eee7cd2f5eb12541ba5cc9eb981345110"
+    }
+  ],
+  "源文件SHA256": {
+    "G01/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-G01-bare-workspace--/session-d6ab03de-8d0b-48e0-8dce-66bcd03277fc/session.jsonl": "aea273c46c4bdb4012df6bded7c801a0e84955114f8db8ffcf7981d9bfd89f4b",
+    "G01/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-G01-skill-workspace--/session-09e5d326-306c-4bfb-98ce-338f390e0581/session.jsonl": "93e6084e510df3a67d025e024ce67bbb130edcac9600be596952c1870b0d3227",
+    "G02/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-G02-bare-workspace--/session-1abf8481-d474-4137-9eff-e796d97ea082/session.jsonl": "32cf4f15d88181f9d46fb12ae75688622663c734f5b3b1b122bcb044b8fdff34",
+    "G02/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-G02-skill-workspace--/session-398490e6-b7ba-402b-8ea5-32b8dbf3f883/session.jsonl": "4eb27b1f337df2e18ef2274e34cb9d14d4bee02b88fd27a239eef1cec436249c",
+    "M01/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-M01-bare-workspace--/session-fe301b10-3c3a-4b91-9e0e-6390237ae841/session.jsonl": "603dfbae0dfa6d04648511f57fbf4578ce9313b005ef446eceda8e115b60822b",
+    "M01/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-M01-skill-workspace--/session-3b597a44-6d26-4a97-b686-138d175a4cad/session.jsonl": "8553fdc75d10537fd1646cca1cbdd203a6801d2d3cc685a50519f00a090f7e5a"
+  },
+  "原始轨迹保持不变": true,
+  "翻译字典SHA256": "df8a4acaa52c150f751431cd4f7daa7b73d3fdf7a631eb957c6847d1611ba749",
+  "动作处理": "关键动作逐项翻译，其他动作按可观察操作、对象、文件/API名压缩为中文；完整原描述与命令保留在工具参数和原始轨迹中，不导出内部推理。",
+  "本轮新增动作词条": 391
+}
