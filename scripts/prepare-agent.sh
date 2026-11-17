@@ -33,6 +33,7 @@ mandifuel_prepare_agent_environment() {
     local -a override_names=(
         MANDIFUEL_OPENFOAM_BASHRC MANDIFUEL_OFFBEAT_BIN MANDIFUEL_BASE_PYTHON
         MANDIFUEL_DSH MANDIFUEL_NODE MANDIFUEL_CASE_LIBRARY_ROOT
+        MANDIFUEL_PROJECT_ROOT MANDIFUEL_DEFAULT_WORKDIR
         MANDIFUEL_RAG_MAPPING_BASE_URL MANDIFUEL_RAG_MAPPING_MODEL
         MANDIFUEL_RAG_MAPPING_API_KEY_ENV MANDIFUEL_RAG_EMBEDDING_BASE_URL
         MANDIFUEL_RAG_EMBEDDING_MODEL MANDIFUEL_RAG_EMBEDDING_DIMENSION
@@ -48,6 +49,22 @@ mandifuel_prepare_agent_environment() {
         printf -v "$name" '%s' "${overrides[$name]}"
         export "$name"
     done
+    MANDIFUEL_PROJECT_ROOT="${MANDIFUEL_PROJECT_ROOT:-$plugin_root}"
+    MANDIFUEL_DEFAULT_WORKDIR="${MANDIFUEL_DEFAULT_WORKDIR:-$MANDIFUEL_PROJECT_ROOT}"
+    if [[ "$MANDIFUEL_PROJECT_ROOT" != /* || ! -d "$MANDIFUEL_PROJECT_ROOT" ||
+          "$MANDIFUEL_DEFAULT_WORKDIR" != /* || ! -d "$MANDIFUEL_DEFAULT_WORKDIR" ]]; then
+        printf '%s\n' 'MANDiFuel startup: project root and default workdir must be existing absolute directories.' >&2
+        return 78
+    fi
+    MANDIFUEL_PROJECT_ROOT="$(cd -- "$MANDIFUEL_PROJECT_ROOT" && pwd -P)"
+    MANDIFUEL_DEFAULT_WORKDIR="$(cd -- "$MANDIFUEL_DEFAULT_WORKDIR" && pwd -P)"
+    if [[ "$MANDIFUEL_PROJECT_ROOT" == / ||
+          ( "$MANDIFUEL_DEFAULT_WORKDIR" != "$MANDIFUEL_PROJECT_ROOT" &&
+            "$MANDIFUEL_DEFAULT_WORKDIR" != "$MANDIFUEL_PROJECT_ROOT/"* ) ]]; then
+        printf '%s\n' 'MANDiFuel startup: default workdir must be inside a project root other than /.' >&2
+        return 78
+    fi
+    export MANDIFUEL_PROJECT_ROOT MANDIFUEL_DEFAULT_WORKDIR
     openfoam_bashrc="${MANDIFUEL_OPENFOAM_BASHRC:-}"
     base_python="${MANDIFUEL_BASE_PYTHON:-}"
     MANDIFUEL_RAG_MAPPING_BASE_URL="${MANDIFUEL_RAG_MAPPING_BASE_URL:-https://api.deepseek.com}"
@@ -149,6 +166,7 @@ mandifuel_prepare_agent_environment() {
         "MANDiFuel plugin root: $plugin_root" \
         "RAG index: 137 case cards, dual index verified" \
         "Task network: offline (native web tools disabled; subprocess seccomp)" \
+        "Task write boundary: $MANDIFUEL_PROJECT_ROOT (Landlock; external file contents protected)" \
         "RAG retrieval: local lexical/taxonomy ranking; no external provider calls" \
         "OFFBEAT: $(command -v offbeat)" \
         "Task python3: $(command -v python3)" \

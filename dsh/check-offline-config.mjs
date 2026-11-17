@@ -18,16 +18,21 @@ export function verifyOfflineRows(document, expectedAdapter) {
     if (matches.length!==1) throw new Error(`MANDiFuel offline configuration: expected exactly one ${id} row`);
     return matches[0];
   }
-  for (const id of ['tool-web','web-search-deepseek','web-fetch-http','subprocess']) {
+  for (const id of ['tool-web','web-search-deepseek','web-fetch-http','subprocess','fs-sandbox','sandbox-policy','sandbox']) {
     if (row(id).disabled!==true) throw new Error(`MANDiFuel offline configuration: ${id} must be disabled`);
   }
   const offline=row('mandifuel-offline-subprocess');
   if (offline.disabled===true || offline.name!==expectedAdapter)
     throw new Error('MANDiFuel offline configuration: required offline subprocess backend is not active');
+  for (const [id,file] of [['mandifuel-project-fs','mandifuel-project-fs.mjs'],['mandifuel-project-policy','mandifuel-project-policy.mjs'],['mandifuel-project-sandbox','mandifuel-project-sandbox.mjs']]) {
+    const required=row(id);
+    if(required.disabled===true || required.name!==new URL(file,import.meta.url).pathname)
+      throw new Error(`MANDiFuel configuration: required project boundary ${id} is not active`);
+  }
   const expectedPersona=readFileSync(new URL('./run-assistant-persona.md',import.meta.url),'utf8');
   if (row('system-prompt').config?.persona!==expectedPersona)
     throw new Error('MANDiFuel configuration: run-assistant persona must be active');
-  return { task_network:'offline', web_tools:false, subprocess_backend:offline.id };
+  return { task_network:'offline', web_tools:false, subprocess_backend:offline.id,project_write_boundary:true };
 }
 
 if (process.argv[1] && import.meta.url===pathToFileURL(process.argv[1]).href) {
@@ -40,5 +45,5 @@ if (process.argv[1] && import.meta.url===pathToFileURL(process.argv[1]).href) {
   });
   if (document.errors.length) throw new Error('MANDiFuel offline configuration: cannot parse native dump');
   verifyOfflineRows(document.toJS(),process.argv[3]);
-  console.log('MANDiFuel offline configuration: PASS (run-assistant persona active; web tools off; task subprocess backend active)');
+  console.log('MANDiFuel offline configuration: PASS (persona; offline subprocess; project filesystem and policy active)');
 }

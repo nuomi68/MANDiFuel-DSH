@@ -1,0 +1,192 @@
+[
+  {
+    "id": "kernel",
+    "code": "M01",
+    "title": "颗粒扩散",
+    "shape": "sphere",
+    "geometry": "球形颗粒",
+    "description": "Cs 扩散",
+    "status": "completed",
+    "duration": 298.226,
+    "solverStarts": 1,
+    "eventCount": 75,
+    "cells": 70,
+    "radius": 350,
+    "innerRadius": 0,
+    "radialUnit": "μm",
+    "timeUnit": "s",
+    "fields": [
+      {
+        "id": "Cs",
+        "label": "Cs 浓度",
+        "symbol": "Cs",
+        "unit": "mol/m³",
+        "range": [
+          0,
+          0.6
+        ]
+      }
+    ],
+    "parameters": [
+      [
+        "外半径",
+        "350 μm"
+      ],
+      [
+        "温度",
+        "1650 K"
+      ],
+      [
+        "扩散系数",
+        "2.5 × 10⁻¹⁴ m²/s"
+      ],
+      [
+        "初始浓度",
+        "0.60 mol/m³"
+      ],
+      [
+        "结束时间",
+        "30,000 s"
+      ]
+    ]
+  },
+  {
+    "id": "rod",
+    "code": "G01",
+    "title": "燃料棒传热",
+    "shape": "rod",
+    "geometry": "燃料棒",
+    "description": "稳态温度",
+    "status": "completed",
+    "duration": 345.32,
+    "solverStarts": 2,
+    "eventCount": 82,
+    "cells": 52,
+    "radius": 4.85,
+    "innerRadius": 0,
+    "radialUnit": "mm",
+    "timeUnit": null,
+    "fields": [
+      {
+        "id": "T",
+        "label": "温度",
+        "symbol": "T",
+        "unit": "K",
+        "range": [
+          600,
+          1160
+        ]
+      }
+    ],
+    "parameters": [
+      [
+        "燃料半径",
+        "4.10 mm"
+      ],
+      [
+        "包壳内半径",
+        "4.25 mm"
+      ],
+      [
+        "包壳外半径",
+        "4.85 mm"
+      ],
+      [
+        "长度",
+        "120 mm"
+      ],
+      [
+        "径向单元",
+        "燃料 40 / 包壳 12"
+      ]
+    ],
+    "length": 120,
+    "radialBands": [
+      [
+        0,
+        4.1,
+        40
+      ],
+      [
+        4.25,
+        4.85,
+        12
+      ]
+    ]
+  },
+  {
+    "id": "shell",
+    "code": "G02",
+    "title": "空心球受压",
+    "shape": "shell",
+    "geometry": "空心球",
+    "description": "应力与位移",
+    "status": "completed",
+    "duration": 455.729,
+    "solverStarts": 2,
+    "eventCount": 82,
+    "cells": 60,
+    "radius": 1.8,
+    "innerRadius": 1.2,
+    "radialUnit": "mm",
+    "timeUnit": null,
+    "fields": [
+      {
+        "id": "hoop",
+        "label": "环向应力",
+        "symbol": "σθθ",
+        "unit": "MPa",
+        "range": [
+          40,
+          80
+        ]
+      },
+      {
+        "id": "radial",
+        "label": "径向应力",
+        "symbol": "σrr",
+        "unit": "MPa",
+        "range": [
+          -80,
+          0
+        ]
+      },
+      {
+        "id": "u",
+        "label": "径向位移",
+        "symbol": "ur",
+        "unit": "μm",
+        "range": [
+          0.3,
+          0.55
+        ]
+      }
+    ],
+    "parameters": [
+      [
+        "内半径",
+        "1.20 mm"
+      ],
+      [
+        "外半径",
+        "1.80 mm"
+      ],
+      [
+        "内压",
+        "80 MPa"
+      ],
+      [
+        "外压",
+        "5 MPa"
+      ],
+      [
+        "弹性模量",
+        "180 GPa"
+      ],
+      [
+        "泊松比",
+        "0.28"
+      ]
+    ]
+  }
+]

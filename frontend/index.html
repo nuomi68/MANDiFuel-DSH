@@ -1,0 +1,88 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f4f7fc">
+  <title>OFFBEAT · 计算工作台</title>
+  <link rel="icon" href="assets/mark.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="assets/styles.css">
+  <link rel="stylesheet" href="assets/adaptive-ui.css">
+  <link rel="stylesheet" href="assets/theme-modern.css">
+  <script type="module" src="assets/app.js"></script>
+</head>
+<body>
+  <main class="workspace" id="workspace" aria-busy="true">
+    <section class="workspace-heading">
+      <div class="task-heading"><button class="task-picker" id="task-picker" disabled popovertarget="task-menu" aria-label="切换任务"><h1 id="task-title">新任务</h1><svg><use href="assets/icons.svg#chevron"/></svg></button><div id="task-progress" class="task-progress" hidden><span class="progress-mark"></span><span id="progress-summary"></span><span class="progress-stages" id="progress-stages"></span></div></div>
+      <div class="workspace-actions"><button class="text-button" id="dsh-button" aria-label="打开 DSH 对话" aria-controls="dsh-window" aria-expanded="false" aria-pressed="false"><svg><use href="assets/icons.svg#chat"/></svg><span>DSH</span></button><button class="text-button" id="process-button" aria-controls="execution-process" aria-expanded="false" aria-pressed="false" disabled><svg><use href="assets/icons.svg#activity"/></svg><span>执行过程</span></button><button class="text-button" id="export-button" disabled popovertarget="export-menu"><svg><use href="assets/icons.svg#download"/></svg><span>导出</span></button><button class="icon-button" id="new-task-button" type="button" aria-label="新建任务" title="新建任务"><svg aria-hidden="true"><use href="assets/icons.svg#plus"/></svg></button></div>
+    </section>
+    <section id="execution-process" class="execution-process" aria-labelledby="execution-title" aria-busy="false" hidden>
+      <header class="execution-header"><div class="execution-heading"><h2 id="execution-title">执行过程</h2><span data-process-count>0 次进度更新</span></div><div class="execution-actions"><span data-process-status></span><button class="process-retry" data-process-retry hidden>重新读取</button><button class="icon-button" data-process-close aria-label="收起执行过程" title="收起"><svg><use href="assets/icons.svg#close"/></svg></button></div></header>
+      <p class="execution-note" data-process-note hidden></p><div class="execution-list" data-process-list role="log" aria-label="任务进度更新记录" aria-live="off" tabindex="0"></div>
+    </section>
+    <div class="workspace-body chat-open" id="workspace-body"><div class="model-column">
+    <div id="study-navigation" class="study-navigation" hidden>
+      <div class="study-tabs" aria-label="任务展示"><button id="study-overview-tab" aria-pressed="true">结果总览</button><button id="study-model-tab" aria-pressed="false">模型</button></div>
+      <div class="study-run-picker"><label class="sr-only" for="study-run-select">当前参数组</label><select id="study-run-select"></select><button id="study-run-list" class="text-button compact">参数组</button></div>
+    </div>
+    <p id="study-delivery-error" class="study-delivery-error" role="status" hidden></p>
+    <p id="study-model-context" class="study-model-context" hidden></p>
+    <section id="study-overview" class="study-overview" aria-label="多次求解汇总" hidden>
+      <div class="study-chart-toolbar"><label><span class="sr-only">图表</span><select id="study-chart-select"></select></label><label id="study-x-control"><span>横轴</span><select id="study-x-select"></select></label><label><span>响应</span><select id="study-y-select"></select></label></div>
+      <div id="study-chart" class="study-chart"></div><div class="study-chart-footer"><span id="study-counts"></span><span id="study-chart-note"></span></div>
+      <div id="study-statistics" class="study-statistics"></div>
+      <div class="study-selection"><div><strong id="study-selected-label"></strong><span id="study-selected-status"></span><p id="study-selected-values"></p></div><button id="study-open-model">查看模型</button></div>
+    </section>
+    <div id="adaptive-ui" class="adaptive-ui" aria-label="任务展示面板" hidden></div>
+    <div id="model-content">
+    <section class="model-stage unready" id="model-stage" aria-label="求解模型">
+      <canvas id="model-canvas" aria-label="结果模型，可拖动旋转或平移、滚轮缩放"></canvas>
+      <canvas id="compare-canvas" class="compare-canvas" aria-label="右侧变量比较模型" hidden></canvas>
+      <div class="compare-picker" id="compare-picker" hidden><label class="sr-only" for="compare-field-select">右侧变量</label><select id="compare-field-select"></select></div>
+      <div class="legend compare-legend" id="compare-legend" hidden><div class="legend-heading"><span id="compare-symbol"></span><span id="compare-unit"></span></div><div class="legend-gradient"></div><div class="legend-numbers"><span id="compare-min"></span><span id="compare-max"></span></div></div>
+      <div class="view-topline"><div class="variable-picker"><span class="field-dot"></span><label class="sr-only" for="field-select">结果变量</label><select id="field-select" disabled><option value="">结果变量</option></select></div></div>
+      <div class="viewer-tools" aria-label="模型工具"><button id="cut-button" class="icon-button" aria-label="剖切" title="剖切" aria-pressed="true"><svg><use href="assets/icons.svg#slice"/></svg></button></div>
+      <div class="view-orientation" aria-hidden="true"><svg id="axis-svg" viewBox="0 0 75 75"></svg></div>
+      <div class="view-navigation"><button class="icon-button" id="zoom-in" aria-label="放大" title="放大"><svg><use href="assets/icons.svg#plus"/></svg></button><button class="icon-button" id="zoom-out" aria-label="缩小" title="缩小"><svg><use href="assets/icons.svg#minus"/></svg></button><button class="icon-button" id="reset-view" aria-label="重置视角" title="重置视角"><svg><use href="assets/icons.svg#focus"/></svg></button></div>
+      <div class="legend" id="legend"><div class="legend-heading"><span id="legend-symbol">—</span><span id="legend-unit"></span></div><div class="legend-gradient"></div><div class="legend-numbers"><span id="legend-min">—</span><span id="legend-max">—</span></div></div>
+      <div class="empty-model" id="empty-model"><svg><use href="assets/icons.svg#mesh"/></svg><span id="empty-model-label">在右侧 DSH 描述计算任务</span></div>
+      <div class="loading-state" id="loading-state"><span class="spinner"></span><span>正在连接工作台</span></div>
+      <div class="viewer-error" id="viewer-error" role="alert" hidden></div>
+    </section>
+    <section hidden class="result-bar" aria-label="当前结果">
+      <div class="result-metrics"><div class="metric" data-extrema-metric hidden><span>最高</span><strong id="metric-max">—</strong><small class="metric-unit"></small></div><div class="metric" data-extrema-metric hidden><span>最低</span><strong id="metric-min">—</strong><small class="metric-unit"></small></div><div class="metric" id="release-metric"><span>累计释放</span><strong id="metric-release">—</strong></div></div>
+      <div class="result-actions"><button class="text-button compact" id="parameters-button" disabled aria-controls="drawer" aria-expanded="false"><svg><use href="assets/icons.svg#file"/></svg><span>模型参数</span></button><button class="text-button compact" id="settings-button" disabled aria-label="显示设置" title="显示设置" aria-controls="drawer" aria-expanded="false"><svg><use href="assets/icons.svg#sliders"/></svg><span>显示设置</span></button></div>
+    </section>
+    <section class="time-panel" id="time-panel" hidden aria-label="时间播放">
+      <button id="play-button" class="play-button" aria-label="播放时间序列"><svg><use href="assets/icons.svg#play"/></svg></button>
+      <div class="timeline"><div class="timeline-labels"><span>时间</span><output id="time-value" for="time-range">—</output></div><label for="time-range" class="sr-only">求解时间帧</label><input id="time-range" type="range" min="0" max="0" value="0" step="1"><div class="timeline-endpoints"><span id="time-start">—</span><span id="time-end">—</span></div></div>
+      <span class="frame-count" id="frame-count"></span>
+    </section>
+    </div>
+    </div>
+    <aside id="conversation-column" class="conversation-column"><dialog id="dsh-window" class="dsh-window" aria-label="原生 DSH 对话">
+      <div class="native-frame-wrap">
+        <iframe id="native-dsh" title="原生 DeepSeek Harness Web" allow="clipboard-read; clipboard-write"></iframe>
+        <div id="native-connection" class="native-connection" role="status"><span class="spinner" id="native-spinner"></span><p id="native-connection-label">正在连接原生 DSH…</p><div class="native-connection-actions" id="native-connection-actions" hidden><button id="retry-native">重新连接</button></div></div>
+      </div>
+    </dialog><section id="adaptive-aside" class="adaptive-ui adaptive-aside" aria-label="补充结果面板" hidden></section></aside></div>
+    <section id="presentation-skeletons" class="presentation-skeletons" aria-label="展示生成中" aria-busy="false" hidden>
+      <div class="presentation-placeholder" aria-hidden="true"><span class="presentation-placeholder-bar"></span><span class="presentation-placeholder-bar"></span><span class="presentation-placeholder-bar"></span><span class="presentation-placeholder-bar"></span><span class="presentation-placeholder-bar"></span></div>
+      <div class="presentation-placeholder" aria-hidden="true"><span class="presentation-placeholder-bar"></span><span class="presentation-placeholder-bar"></span><span class="presentation-placeholder-bar"></span><span class="presentation-placeholder-bar"></span><span class="presentation-placeholder-bar"></span></div>
+    </section>
+    <details id="delivery-panel" class="delivery-panel" aria-busy="false" hidden>
+      <summary><span><svg aria-hidden="true"><use href="assets/icons.svg#file"/></svg>交付文件 <small id="delivery-count">0</small></span><svg class="delivery-chevron" aria-hidden="true"><use href="assets/icons.svg#chevron"/></svg></summary>
+      <div class="delivery-browser">
+        <aside class="delivery-directory" aria-label="交付文件目录"><label class="sr-only" for="delivery-search">查找文件</label><input id="delivery-search" type="search" placeholder="查找文件"><nav id="delivery-tree" class="delivery-tree" aria-label="文件目录"></nav></aside>
+        <section class="delivery-preview" aria-label="文件预览"><div class="delivery-preview-heading"><span id="delivery-path"></span><small id="delivery-size"></small><button id="delivery-refresh" class="icon-button" aria-label="刷新交付文件" title="刷新"><svg><use href="assets/icons.svg#activity"/></svg></button><a id="delivery-download" class="icon-button" aria-label="下载当前文件" title="下载" download hidden><svg><use href="assets/icons.svg#download"/></svg></a></div><label class="sr-only" for="delivery-content">交付文件内容</label><textarea id="delivery-content" readonly wrap="off" spellcheck="false" aria-busy="false">选择左侧文件查看</textarea></section>
+      </div>
+    </details>
+  </main>
+  <div popover id="task-menu" class="popover task-menu" aria-label="切换任务"><div id="task-menu-items"></div><div class="menu-divider"></div><button class="menu-item subtle" id="all-tasks-menu"><svg><use href="assets/icons.svg#grid"/></svg>全部任务</button></div>
+  <div popover id="export-menu" class="popover export-menu" aria-label="导出结果"><button class="menu-item" id="export-image"><svg><use href="assets/icons.svg#image"/></svg><span id="export-image-label" class="menu-label">模型截图</span><span>PNG</span></button><button class="menu-item" id="export-field"><svg><use href="assets/icons.svg#table"/></svg><span id="export-field-label" class="menu-label">当前场数据</span><span>CSV</span></button><button class="menu-item" id="export-history"><svg><use href="assets/icons.svg#chart"/></svg>释放历史<span>CSV</span></button></div>
+  <dialog id="drawer" class="drawer" aria-labelledby="drawer-title"><div class="drawer-header"><h2 id="drawer-title">任务</h2><button id="close-drawer" class="icon-button" aria-label="关闭抽屉"><svg><use href="assets/icons.svg#close"/></svg></button></div><div id="drawer-content" class="drawer-content"></div></dialog>
+  <div class="toast" id="toast" role="status" hidden></div>
+  <div id="live-region" class="sr-only" aria-live="polite"></div>
+</body>
+</html>

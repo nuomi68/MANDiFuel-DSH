@@ -67,3 +67,10 @@ Desktop.ini
 /source-manifest.json
 **/.credentials.yaml
 **/.anonymous-user-id
+
+# 本机调试、验收截图、生成文档和报告不进入代码版本。
+/work/
+/output/
+/*.docx
+.mandifuel-tmp/
+.mandifuel-cache/

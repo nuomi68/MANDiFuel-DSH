@@ -1,5 +1,20 @@
 # Changelog
 
+## Unreleased — 2026-11-17 workbench snapshot
+
+- Add the native DSH workbench with an isolated frontend agent, revisioned slot
+  operations, interactive charts, tables, model fields and on-demand controls.
+- Observe mesh and saved-field arrivals independently of the calculation agent;
+  keep execution progress separate from generated UI and verify browser rendering.
+- Synchronize loading placeholders across computation, frontend retries and final
+  browser acknowledgement; recover missed events without accepting older states.
+- Restrict task writes to the configured project using Landlock and scoped native
+  file operations, including subprocesses and PTYs.
+- Reuse unchanged mesh geometry within a single result-history extraction.
+- Refresh benchmark physical specifications and their static contract checks.
+- Include self-contained frontend parser fixtures and exclude local QA workspaces,
+  generated documents and runtime histories from Git.
+
 ## 0.4.0-alpha.8
 
 - Share RAG query-mapping and embedding caches in the installation's .cache/rag directory by default.

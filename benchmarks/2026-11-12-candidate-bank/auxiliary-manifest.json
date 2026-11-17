@@ -1,86 +1,115 @@
 {
-  "description": "准备、已有结果处理及说明类辅助任务；不进入默认物理计算清单。",
+  "schema_version": 2,
+  "benchmark_revision": "physical-spec-v2-20261117",
+  "execution_contract": "physical_spec_v2",
+  "description": "题面只有物理任务；新建模/研究继续/已有数据处理按input_mode区分，运行环境单独配置",
   "task_count": 10,
+  "runtime_contract": {
+    "workspace_managed_by_software": true,
+    "solver_start_cap_from_runtime": true,
+    "default_source_case_injection": false,
+    "legacy_source_case_runner_compatible": false
+  },
   "tasks": [
     {
       "id": "P01",
-      "title": "全功能 TRISO 与裂变产物扩散模型的选型辨别",
+      "title": "TRISO两类物理模型的建模方案",
       "prompt_file": "prompts/P01.txt",
-      "prompt_sha256": "bf2a9d786b4bc488a449f2161b758cc97ee4824976576194b62f963907237564",
+      "prompt_sha256": "d66cdd6ab4b3dc18034690061692d98ac0bf97b56f0985d3f6f89fd4c9ea32c7",
       "solver_start_cap": 0,
-      "task_kind": "auxiliary"
+      "task_kind": "auxiliary",
+      "input_mode": "design_or_explanation",
+      "ready_for_formal_run": false
     },
     {
       "id": "P02",
-      "title": "燃料棒几何修改与冷态尺寸同步",
+      "title": "燃料棒几何与冷态材料尺寸建模",
       "prompt_file": "prompts/P02.txt",
-      "prompt_sha256": "986d51e2b57da6602be43d776ff1ab65732b02f3816612419ac15eb16da3b92b",
+      "prompt_sha256": "9232deb83300169c2a68b4adf04545fe5794a87e8aafccf7696e4ec150b81fa9",
       "solver_start_cap": 0,
-      "task_kind": "auxiliary"
+      "task_kind": "auxiliary",
+      "input_mode": "design_or_explanation",
+      "ready_for_formal_run": false
     },
     {
       "id": "P03",
-      "title": "轴向载荷表与平均功率归一化准备",
+      "title": "燃料棒时空功率载荷建模",
       "prompt_file": "prompts/P03.txt",
-      "prompt_sha256": "3fb9329e408dc379c48edbd43b6df045001b67915867860e3b0f990c18f1e34e",
+      "prompt_sha256": "8e28f76d383f45fd685ca554062496322247f0486ae9aa0a1a33438929656208",
       "solver_start_cap": 0,
-      "task_kind": "auxiliary"
+      "task_kind": "auxiliary",
+      "input_mode": "design_or_explanation",
+      "ready_for_formal_run": false
     },
     {
       "id": "R01",
-      "title": "时间窗口内的材料区历史峰值",
+      "title": "已有瞬态数据的材料区历史峰值",
       "prompt_file": "prompts/R01.txt",
-      "prompt_sha256": "a78cfbbfb3db3bbc8bd4d75df32d20ff5d68a573a5578ef7fee3c4cd93cd141f",
+      "prompt_sha256": "1ea3467788bdd91143cc68c925067a4fca6600e6bd4f6094c0f529d431bfb8f1",
       "solver_start_cap": 0,
-      "task_kind": "auxiliary"
+      "task_kind": "auxiliary",
+      "input_mode": "supplied_research_data",
+      "ready_for_formal_run": false
     },
     {
       "id": "R02",
-      "title": "张量主应力、环向应力与带符号极值",
+      "title": "应力数据的主应力与带符号极值",
       "prompt_file": "prompts/R02.txt",
-      "prompt_sha256": "0cae80f191d9a605a73aa9aafd3b070a88b39a9af945a682ec9659d3f2712720",
+      "prompt_sha256": "4fcfe7bfa1cfe562f7d8da103bfef7a772bee472f327c4a1ffb69938ff3ca8de",
       "solver_start_cap": 0,
-      "task_kind": "auxiliary"
+      "task_kind": "auxiliary",
+      "input_mode": "supplied_research_data",
+      "ready_for_formal_run": false
     },
     {
       "id": "R03",
-      "title": "两阶段裂变产物释放的库存闭合",
+      "title": "两阶段迁移数据的库存与外释量",
       "prompt_file": "prompts/R03.txt",
-      "prompt_sha256": "a071855bff02d3f019d45fcb35508a019ad7e7ba0b8b290e918a51c5957cb2ef",
+      "prompt_sha256": "deb06cee77c2fe4f28323085ab92618445ca315d49d080ef8f2d666a5597d0d7",
       "solver_start_cap": 0,
-      "task_kind": "auxiliary"
+      "task_kind": "auxiliary",
+      "input_mode": "supplied_research_data",
+      "ready_for_formal_run": false
     },
     {
       "id": "W02",
-      "title": "有终态场但执行失败的状态判定",
+      "title": "已有运行的完成状态审查",
       "prompt_file": "prompts/W02.txt",
-      "prompt_sha256": "d325f9cd1c7c2f5c87f5ddf3e3f38cfa7702d7bc9c86f341c7a690fa3fda267e",
+      "prompt_sha256": "18b0b594f4c3db8d8ff8f59a03584c4426773dc993ffa6ce8c1b4c8c2617632e",
       "solver_start_cap": 0,
-      "task_kind": "auxiliary"
+      "task_kind": "auxiliary",
+      "input_mode": "supplied_research_data",
+      "ready_for_formal_run": false
     },
     {
       "id": "W03",
-      "title": "正常求解后只修复提取器",
+      "title": "已有结果的材料区提取修复",
       "prompt_file": "prompts/W03.txt",
-      "prompt_sha256": "0dbe15a67897140490e9a5c8b7580982ef14d263ef387cc3202de26d96e22dde",
+      "prompt_sha256": "38420d85b78dfea2f05f40ce242d378c04a99b009b58b0df2f3f1effd9b28191",
       "solver_start_cap": 0,
-      "task_kind": "auxiliary"
+      "task_kind": "auxiliary",
+      "input_mode": "supplied_research_data",
+      "ready_for_formal_run": false
     },
     {
       "id": "N01",
-      "title": "线功率与热流物理量说明",
+      "title": "燃料棒热源与热流量纲说明",
       "prompt_file": "prompts/N01.txt",
-      "prompt_sha256": "d7e1f185766dc1743b9103dce359a5c46ff462c0f8f62cb1a6a512a1375bcf9a",
+      "prompt_sha256": "65f5e7114fa3c80e47a6d67ca9c9c0ea5669680c24f699a6eddf406979b58ce7",
       "solver_start_cap": 0,
-      "task_kind": "auxiliary"
+      "task_kind": "auxiliary",
+      "input_mode": "design_or_explanation",
+      "ready_for_formal_run": false
     },
     {
       "id": "N02",
       "title": "有界一维数学搜索示例",
       "prompt_file": "prompts/N02.txt",
-      "prompt_sha256": "30bc7153722dca1f76c7fb30f6be5e362e26f623af4f646af8cba81bc0589e2d",
+      "prompt_sha256": "0fd019e5d74990fd76f0190524b88aebe850839e146a592903b091e3b64261cf",
       "solver_start_cap": 0,
-      "task_kind": "auxiliary"
+      "task_kind": "auxiliary",
+      "input_mode": "design_or_explanation",
+      "ready_for_formal_run": false
     }
   ]
 }

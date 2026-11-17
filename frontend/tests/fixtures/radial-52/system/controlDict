@@ -1,0 +1,51 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     |                                                 |
+|   \\  /    A nd           |                                                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "system";
+    object      controlDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+libs ("libsciantix.so");
+libs ("liboffbeat.so");
+
+application     offbeat;
+
+//- Run options (model time in seconds, steady discretization):
+startFrom       startTime;
+startTime       0;
+stopAt          endTime;
+endTime         1;
+deltaT          1;
+
+//- Write options:
+writeControl    timeStep;
+writeInterval   1;
+purgeWrite      0;
+writeFormat     ascii;
+writeCompression off;
+timeFormat      general;
+timePrecision   6;
+writePrecision  6;
+
+userTime
+{
+    // type is seconds by default
+    type seconds;
+}
+
+//- Steady discretization: ddtSchemes/default is steadyState in fvSchemes
+adjustableTimeStep false;
+
+runTimeModifiable true;
+
+// ************************************************************************* //

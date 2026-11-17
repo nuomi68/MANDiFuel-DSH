@@ -71,15 +71,16 @@ def _principal_max(values: Sequence[Decimal | float | int]) -> float:
 
 
 def _principal_frame(root: Path, variable: str, time: str, scope: Scope,
-                     include_volumes: bool, *, resolved_mesh=None) -> FieldFrame:
-    directory = _backend.select_numeric_directory(root, exact=time)
+                     include_volumes: bool, *, resolved_mesh=None,
+                     geometry_cache=None, selected_directory=None) -> FieldFrame:
+    directory = selected_directory or _backend.select_numeric_directory(root, exact=time)
     path, _ = _backend._selected_field_path(root, directory, variable)
     field = _backend.parse_field(path)
     if field.object_name != variable or field.class_name != "volSymmTensorField":
         raise ValueError("principal_max requires the selected volSymmTensorField")
     mesh = resolved_mesh or _backend.resolve_mesh_for_time(root, exact=directory.value)
     if scope in ("internal", "all"):
-        geometry = _geometry(mesh, prevalidated=resolved_mesh is not None)
+        geometry = _geometry(mesh, prevalidated=resolved_mesh is not None, cache=geometry_cache)
         labels = tuple(range(len(geometry.cell_centres)))
         scope_name = "internal"
     elif isinstance(scope, tuple) and len(scope) == 2 and scope[0] == "cellZone":
@@ -96,11 +97,26 @@ def _principal_frame(root: Path, variable: str, time: str, scope: Scope,
                       tuple(float(geometry.cell_volumes[i]) for i in labels) if include_volumes else None)
 
 
-def _geometry(mesh: _backend.MeshResolution, *, prevalidated: bool):
+def _geometry(mesh: _backend.MeshResolution, *, prevalidated: bool, cache=None):
+    # A history is a single read operation. Reuse geometry only for the same
+    # primitive provenance AND file versions, never across separate API calls.
+    key = None
+    if cache is not None:
+        files=[]
+        for source in mesh.primitive_sources:
+            stat=(Path(mesh.result_root)/source.relative_path).stat()
+            files.append((source,stat.st_dev,stat.st_ino,stat.st_size,stat.st_mtime_ns,stat.st_ctime_ns))
+        key=(mesh.result_root,tuple(files))
+        if key in cache:return cache[key]
     if prevalidated:
-        return _backend.reconstruct_poly_mesh_geometry(
+        geometry = _backend.reconstruct_poly_mesh_geometry(
             *_backend._load_mesh_primitives_from_provenance(mesh))
-    return _backend.load_resolved_poly_mesh_geometry(mesh)
+    else:
+        geometry = _backend.load_resolved_poly_mesh_geometry(mesh)
+    if cache is not None:
+        if len(cache)>=2:cache.pop(next(iter(cache)))
+        cache[key]=geometry
+    return geometry
 
 
 def _mesh_path(mesh: _backend.MeshResolution, primitive: str) -> Path | None:
@@ -225,11 +241,11 @@ def _internal_frame(
     time: str,
     component: str,
     include_volumes: bool,
-    *, resolved_mesh=None,
+    *, resolved_mesh=None, geometry_cache=None, selected_directory=None,
 ) -> FieldFrame:
-    directory = _backend.select_numeric_directory(root, exact=time)
+    directory = selected_directory or _backend.select_numeric_directory(root, exact=time)
     mesh = resolved_mesh or _backend.resolve_mesh_for_time(root, exact=directory.value)
-    geometry = _geometry(mesh, prevalidated=resolved_mesh is not None)
+    geometry = _geometry(mesh, prevalidated=resolved_mesh is not None, cache=geometry_cache)
     field = _backend.parse_field(directory.path / variable)
     if field.object_name != variable or not field.class_name.startswith("vol"):
         raise ValueError(f"{variable!r} is not the requested volume field")
@@ -355,7 +371,7 @@ def iter_fields(
         _backend.select_numeric_directory(root, **_time_kwargs(time)).name,
     )
     component = _component_name(component)
-    meshes = {}
+    meshes = {}; geometry_cache = {}; selected_directories = {}
     cell_scope = scope in ("internal", "all") or (
         isinstance(scope, tuple) and len(scope) == 2 and scope[0] == "cellZone")
     if time == "all" and times and cell_scope:
@@ -363,6 +379,7 @@ def iter_fields(
         # snapshot for a completed result tree, not a cache surviving later calls.
         directories = tuple(d for d in _backend.discover_numeric_directories(root)
                             if d.value <= Decimal(times[-1]))
+        selected_directories = {d.name:d for d in directories}
         try:
             _backend.resolve_mesh_for_time(root, exact=directories[0].value)
         except _backend.OpenFOAMParseError:
@@ -376,10 +393,12 @@ def iter_fields(
     for selected_time in times:
         if component == "principal_max":
             frame = _principal_frame(root, variable, selected_time, scope, include_volumes,
-                                     resolved_mesh=meshes.get(selected_time))
+                                     resolved_mesh=meshes.get(selected_time),
+                                     geometry_cache=geometry_cache,selected_directory=selected_directories.get(selected_time))
         elif scope in ("internal", "all"):
             frame = _internal_frame(root, variable, selected_time, component, include_volumes,
-                                    resolved_mesh=meshes.get(selected_time))
+                                    resolved_mesh=meshes.get(selected_time),
+                                    geometry_cache=geometry_cache,selected_directory=selected_directories.get(selected_time))
         elif isinstance(scope, tuple) and len(scope) == 2 and scope[0] == "cellZone":
             frame = _zone_frame(root, variable, selected_time, scope[1], component, include_volumes,
                                 resolved_mesh=meshes.get(selected_time))

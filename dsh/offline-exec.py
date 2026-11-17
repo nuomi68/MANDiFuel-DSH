@@ -1,11 +1,74 @@
 #!/usr/bin/env python3
-"""为任务子进程及其后代安装 Linux seccomp 离线过滤器，再执行原 argv。"""
+"""Task-only Landlock write boundary and seccomp offline execution; fail closed."""
 from __future__ import annotations
 import ctypes
 import errno
 import os
 import platform
 import sys
+from pathlib import Path
+
+
+class Ruleset(ctypes.Structure):
+    _fields_ = [("handled_access_fs", ctypes.c_uint64)]
+
+
+class PathBeneath(ctypes.Structure):
+    _pack_ = 1
+    _fields_ = [("allowed_access", ctypes.c_uint64), ("parent_fd", ctypes.c_int32)]
+
+
+def restrict_filesystem(project_root: str) -> Path:
+    root = Path(project_root).resolve(strict=True)
+    if not root.is_dir() or root == Path('/'):
+        raise RuntimeError("project root must be an existing directory other than /")
+    if not Path.cwd().resolve().is_relative_to(root):
+        raise RuntimeError("task working directory is outside the project root")
+    if sys.platform != 'linux' or platform.machine() not in {'x86_64', 'aarch64'}:
+        raise RuntimeError("Linux Landlock is required for the project write boundary")
+    libc = ctypes.CDLL(None, use_errno=True)
+    libc.syscall.restype = ctypes.c_long
+    abi = libc.syscall(444, None, 0, 1)
+    # ABI 3 is mandatory: earlier kernels cannot restrict truncate(2).
+    if abi < 3:
+        raise RuntimeError("Landlock ABI >= 3 is required; refusing unconfined execution")
+    handled = (1 << (16 if abi >= 5 else 15)) - 1
+    ruleset = Ruleset(handled)
+    fd = libc.syscall(444, ctypes.byref(ruleset), ctypes.sizeof(ruleset), 0)
+    if fd < 0:
+        raise OSError(ctypes.get_errno(), "Landlock ruleset creation failed")
+
+    def allow(path: str, access: int) -> None:
+        path_fd = os.open(path, os.O_PATH | os.O_CLOEXEC)
+        try:
+            rule = PathBeneath(access, path_fd)
+            if libc.syscall(445, fd, 1, ctypes.byref(rule), 0) != 0:
+                raise OSError(ctypes.get_errno(), "Landlock path rule failed", path)
+        finally:
+            os.close(path_fd)
+
+    try:
+        allow('/', (1 << 0) | (1 << 2) | (1 << 3))  # read and execute dependencies
+        allow(str(root), handled)
+        allow('/dev/null', (1 << 1) | (1 << 2))  # shell redirection, no disk storage
+        if libc.prctl(38, 1, 0, 0, 0) != 0:
+            raise OSError(ctypes.get_errno(), "PR_SET_NO_NEW_PRIVS failed")
+        if libc.syscall(446, fd, 0) != 0:
+            raise OSError(ctypes.get_errno(), "Landlock enforcement failed")
+    finally:
+        os.close(fd)
+    # Create only AFTER confinement, including when an ancestor was replaced by
+    # a symlink. Neither shared /tmp nor a caller-controlled TMPDIR is granted.
+    temporary = root / '.mandifuel-tmp'
+    temporary.mkdir(mode=0o700, exist_ok=True)
+    if not temporary.resolve(strict=True).is_relative_to(root):
+        raise RuntimeError("project temporary directory escapes the project")
+    for key in ('TMPDIR', 'TMP', 'TEMP'):
+        os.environ[key] = str(temporary)
+    os.environ['XDG_CACHE_HOME'] = str(root / '.mandifuel-cache')
+    os.environ['MANDIFUEL_RAG_CACHE_DIR'] = str(root / '.mandifuel-cache' / 'rag')
+    os.environ['MANDIFUEL_PROJECT_ROOT'] = str(root)
+    return root
 
 
 class Filter(ctypes.Structure):
@@ -62,12 +125,18 @@ def deny_network() -> None:
 
 def main() -> int:
     args = sys.argv[1:]
+    project_root = os.environ.get('MANDIFUEL_PROJECT_ROOT')
+    if args[:1] == ['--project-root'] and len(args) >= 2:
+        project_root, args = args[1], args[2:]
+    if not project_root:
+        project_root = str(Path(__file__).resolve().parents[1])
     if args[:1] == ["--"]:
         args = args[1:]
     if not args:
         print("usage: offline-exec.py -- command [args...]", file=sys.stderr)
         return 64
     try:
+        restrict_filesystem(project_root)
         deny_network()
         os.environ["MANDIFUEL_TASK_OFFLINE"] = "1"
         os.execvp(args[0], args)

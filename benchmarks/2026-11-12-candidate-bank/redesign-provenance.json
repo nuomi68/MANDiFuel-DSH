@@ -1,0 +1,233 @@
+{
+  "revision": "physical-spec-v2-20261117",
+  "revised_at_beijing": "2026-11-17T10:50:52.419875+08:00",
+  "request": "重设问题，补足新建模型所需物理条件，移除source-case继承和工作目录等软件自带要求，保留表达差异",
+  "original_snapshot": "runs/benchmark-redesign-20261117-01/original-bank",
+  "current_authoring": "本会话单代理重设；无新增多模型调用/审查声明",
+  "changes": [
+    {
+      "id": "KTH01",
+      "before_sha256": "4cdf136cdb15fa7720d80d982a5400d0c4e5b7b3ed040322243d7023390114c9",
+      "after_sha256": "62506a369f6b42ca97ef47a9bdf4d6f76a282bd1376996de8a6250c35680153d",
+      "new_model": true,
+      "requires_supplied_data": false
+    },
+    {
+      "id": "P01",
+      "before_sha256": "bf2a9d786b4bc488a449f2161b758cc97ee4824976576194b62f963907237564",
+      "after_sha256": "d66cdd6ab4b3dc18034690061692d98ac0bf97b56f0985d3f6f89fd4c9ea32c7",
+      "new_model": false,
+      "requires_supplied_data": false
+    },
+    {
+      "id": "P02",
+      "before_sha256": "986d51e2b57da6602be43d776ff1ab65732b02f3816612419ac15eb16da3b92b",
+      "after_sha256": "9232deb83300169c2a68b4adf04545fe5794a87e8aafccf7696e4ec150b81fa9",
+      "new_model": false,
+      "requires_supplied_data": false
+    },
+    {
+      "id": "P03",
+      "before_sha256": "3fb9329e408dc379c48edbd43b6df045001b67915867860e3b0f990c18f1e34e",
+      "after_sha256": "8e28f76d383f45fd685ca554062496322247f0486ae9aa0a1a33438929656208",
+      "new_model": false,
+      "requires_supplied_data": false
+    },
+    {
+      "id": "C01",
+      "before_sha256": "5095f9494067823ee83e689b4c2b64bf17cf4aeb0fed72eb0a7b924309cf829e",
+      "after_sha256": "f3d8ec44d57715fee389197648f8352c43a509bf495a57f5c25554d71342af15",
+      "new_model": true,
+      "requires_supplied_data": false
+    },
+    {
+      "id": "C02",
+      "before_sha256": "bd1f40da00df1bf8c1008d9d5c53074b18f52f8ad68b9da77c303060e7f59f4c",
+      "after_sha256": "412282f1bf2cab66b5d70f23a86d7e819bb228cb3a2254ee49498ffaa9c18536",
+      "new_model": true,
+      "requires_supplied_data": false
+    },
+    {
+      "id": "C03",
+      "before_sha256": "ec0570772ca78495a7b70e75a1606b9ce4f67d6999f76351f295197fcc859aef",
+      "after_sha256": "35e7322cb17ec4a22d4ad38c3c82151abb6ae9d8328178ecb69828e5735126ba",
+      "new_model": true,
+      "requires_supplied_data": false
+    },
+    {
+      "id": "C04",
+      "before_sha256": "4e6b5800b93041673a32b4bf94bfbec8f15e8575454fd0fb4824819d5d6f7b12",
+      "after_sha256": "12d3c4723d48e80f64fc5cc5ae001b6c6263c0452693a99cd8099311a8f64566",
+      "new_model": true,
+      "requires_supplied_data": false
+    },
+    {
+      "id": "C05",
+      "before_sha256": "3c0bf0e745de2afad75ccc5e380591a2c148dfb39946c24b68d0820bcf5cd9b8",
+      "after_sha256": "b6e0ce557291c830550df111fa8c2417cd3bfc9e0a0835088cd9739dfb9afa8e",
+      "new_model": true,
+      "requires_supplied_data": false
+    },
+    {
+      "id": "C06",
+      "before_sha256": "2cee203c1fb2781625896b54628ee7d38c2f18c0ba7f20c0e6ee60979443825e",
+      "after_sha256": "cf7511c6f8450436d14511051f7a802731b49eaf4bc0bc83f365b16089844e28",
+      "new_model": true,
+      "requires_supplied_data": false
+    },
+    {
+      "id": "C07",
+      "before_sha256": "273702b1b259c1dc887bec5097186135d95e6e0a1f743c17d8bd24ba7f204433",
+      "after_sha256": "0fbca0fa3f0a19620285f488e9cf8b5e512115275de05548095f28b5a5b9adc1",
+      "new_model": true,
+      "requires_supplied_data": false
+    },
+    {
+      "id": "C08",
+      "before_sha256": "7215b9f80c7d8cd144e9399e8ec75e083e52eaf86f2c634a5ea06b3ed3bf06c8",
+      "after_sha256": "b7a14a0995fe0a06f7609f41e5e8e08da9adbd8736de0edced4948faebf0a054",
+      "new_model": true,
+      "requires_supplied_data": false
+    },
+    {
+      "id": "F01",
+      "before_sha256": "02601e35c4d05a4267bd1e2187c3532636fb59d36980ae7b0d46efdf1a22c2c7",
+      "after_sha256": "f96f35c67e5ece54885e6573df46225170c0c8f9ffb8544b87fc3334a9387fef",
+      "new_model": true,
+      "requires_supplied_data": false
+    },
+    {
+      "id": "F02",
+      "before_sha256": "a5e5ea3dee508e6d98bc37efc5571c6c07d46a47db41a4b2442fd02842f8fdd1",
+      "after_sha256": "d0adb8826d976aff3e2b14f562841c351c483421a029bef27cd6db223cbdea2e",
+      "new_model": true,
+      "requires_supplied_data": false
+    },
+    {
+      "id": "F03",
+      "before_sha256": "105591ccd6f089e36fd3348c6b429004e858f09217ca801deb17c6ccc6d975cb",
+      "after_sha256": "3c762500b2bb2f9fa15ff9c47f1b48888e6113e1a65f231f29b064c8ee357bb9",
+      "new_model": true,
+      "requires_supplied_data": false
+    },
+    {
+      "id": "F04",
+      "before_sha256": "e844b50e05ba9dddaff15c9a22c058ff4ea2044feb4852cb4c14e61f05aaa3b8",
+      "after_sha256": "3adf43f970062b61ba9a0cad9ec2dea72fcdaefceea0278c1a18898298c1f009",
+      "new_model": true,
+      "requires_supplied_data": false
+    },
+    {
+      "id": "U01",
+      "before_sha256": "373ffae860409ce637dfb2f3ee992b0aaa0805ad5cbf2fbe92288e9e8a43d985",
+      "after_sha256": "254d4dffb72218f34abee9f12129a41f091d1aa449dd912d1a05651418807d95",
+      "new_model": true,
+      "requires_supplied_data": false
+    },
+    {
+      "id": "U02",
+      "before_sha256": "13b4194ab4aed7148565c9f94fecc44810ed753fe5e82f4da5c3eecf49fa2663",
+      "after_sha256": "bb8b2a6405cbcdb0d054b1f45cfe008ff9fc6fbf0093b813b900f3c41c36bfe2",
+      "new_model": true,
+      "requires_supplied_data": false
+    },
+    {
+      "id": "A01",
+      "before_sha256": "4dae1dd7d8130f948837585f6ff26256ddb2863a139f99aea0b1d49165ffa5e9",
+      "after_sha256": "3766fd402e9aaa8d104ac05579175a15e5d6554fe022d3ced943fe7607e41a35",
+      "new_model": true,
+      "requires_supplied_data": false
+    },
+    {
+      "id": "A02",
+      "before_sha256": "b7a6e9cc9ce1b4f3ca0eb568112740605a03179a91d2a0b9f7b4c5237cc26c69",
+      "after_sha256": "6c614586535e440e1879b0fed4d1c14e816a444a36c07fc197598e75b84635f6",
+      "new_model": true,
+      "requires_supplied_data": false
+    },
+    {
+      "id": "R01",
+      "before_sha256": "a78cfbbfb3db3bbc8bd4d75df32d20ff5d68a573a5578ef7fee3c4cd93cd141f",
+      "after_sha256": "1ea3467788bdd91143cc68c925067a4fca6600e6bd4f6094c0f529d431bfb8f1",
+      "new_model": false,
+      "requires_supplied_data": true
+    },
+    {
+      "id": "R02",
+      "before_sha256": "0cae80f191d9a605a73aa9aafd3b070a88b39a9af945a682ec9659d3f2712720",
+      "after_sha256": "4fcfe7bfa1cfe562f7d8da103bfef7a772bee472f327c4a1ffb69938ff3ca8de",
+      "new_model": false,
+      "requires_supplied_data": true
+    },
+    {
+      "id": "R03",
+      "before_sha256": "a071855bff02d3f019d45fcb35508a019ad7e7ba0b8b290e918a51c5957cb2ef",
+      "after_sha256": "deb06cee77c2fe4f28323085ab92618445ca315d49d080ef8f2d666a5597d0d7",
+      "new_model": false,
+      "requires_supplied_data": true
+    },
+    {
+      "id": "W01",
+      "before_sha256": "d47060383e9063f76aae6773b6436e50917f2bb93549d03cd14573cc5cbd9606",
+      "after_sha256": "feaaa6a1b1ec4f93f93a6955a8ff2f0c9ca32c6a1b4c43d98e7674ba864f8f56",
+      "new_model": true,
+      "requires_supplied_data": false
+    },
+    {
+      "id": "W02",
+      "before_sha256": "d325f9cd1c7c2f5c87f5ddf3e3f38cfa7702d7bc9c86f341c7a690fa3fda267e",
+      "after_sha256": "18b0b594f4c3db8d8ff8f59a03584c4426773dc993ffa6ce8c1b4c8c2617632e",
+      "new_model": false,
+      "requires_supplied_data": true
+    },
+    {
+      "id": "W03",
+      "before_sha256": "0dbe15a67897140490e9a5c8b7580982ef14d263ef387cc3202de26d96e22dde",
+      "after_sha256": "38420d85b78dfea2f05f40ce242d378c04a99b009b58b0df2f3f1effd9b28191",
+      "new_model": false,
+      "requires_supplied_data": true
+    },
+    {
+      "id": "W04",
+      "before_sha256": "e74b49f12717dae3c39bddbc2ad36db3a806089629bef71b0b5c0f1b01c119d7",
+      "after_sha256": "3633875e40fa9458bd1e05d14346749566da2cf226f76e693a26db99fce0d390",
+      "new_model": false,
+      "requires_supplied_data": true
+    },
+    {
+      "id": "N01",
+      "before_sha256": "d7e1f185766dc1743b9103dce359a5c46ff462c0f8f62cb1a6a512a1375bcf9a",
+      "after_sha256": "65f5e7114fa3c80e47a6d67ca9c9c0ea5669680c24f699a6eddf406979b58ce7",
+      "new_model": false,
+      "requires_supplied_data": false
+    },
+    {
+      "id": "N02",
+      "before_sha256": "30bc7153722dca1f76c7fb30f6be5e362e26f623af4f646af8cba81bc0589e2d",
+      "after_sha256": "0fd019e5d74990fd76f0190524b88aebe850839e146a592903b091e3b64261cf",
+      "new_model": false,
+      "requires_supplied_data": false
+    }
+  ],
+  "changed_physics_requires_new_oracles": [
+    "C01",
+    "C03",
+    "C04",
+    "C07",
+    "C08",
+    "F01",
+    "F03",
+    "U01",
+    "U02",
+    "W01",
+    "W04"
+  ],
+  "legacy_results_reused_as_new_validation": false,
+  "dsh_runs_performed": 0,
+  "offbeat_starts_performed": 0,
+  "notes": [
+    "来源路径仅为组织者调研线索，不是受测方必须继承的算例",
+    "辅助题仍需受控数据，不强行要求重建模型",
+    "W01已明确3600s转折处分段步长，792000s交接节点与两条路径网格对齐；未复用旧重启裁判"
+  ]
+}

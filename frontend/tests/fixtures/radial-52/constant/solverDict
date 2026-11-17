@@ -1,0 +1,107 @@
+/*--------------------------------*- C++ -*----------------------------------*\
+| =========                 |                                                 |
+| \\      /  F ield         | OpenFOAM: The Open Source CFD Toolbox           |
+|  \\    /   O peration     |                                                 |
+|   \\  /    A nd           |                                                 |
+|    \\/     M anipulation  |                                                 |
+\*---------------------------------------------------------------------------*/
+FoamFile
+{
+    version     2.0;
+    format      ascii;
+    class       dictionary;
+    location    "constant";
+    object      solverDict;
+}
+// * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * //
+
+// Thermal and mechanical solver selection: thermal conduction only
+thermalSolver           solidConduction;
+mechanicsSolver         constant;
+neutronicsSolver        fromLatestTime;
+elementTransport        fromLatestTime;
+
+// Material and rheology treatment:
+materialProperties      byZone;
+rheology                byMaterial;
+
+heatSource              timeDependentLhgr;
+burnup                  none;
+fastFlux                fromLatestTime;
+corrosion               fromLatestTime;
+gapGas                  none;
+fgr                     none;
+sliceMapper             autoAxialSlices;
+
+
+globalOptions
+{
+    pinDirection            (0 0 1);
+    reactorType             "LWR";
+}
+
+
+heatSourceOptions
+{
+    // constant 15000 W/m over the requested window; tail point kept outside
+    // [0,1] s so the time-dependent table always has a valid next marker
+    timePoints  ( 0  2 );
+    lhgr        ( 15000 15000 );
+    timeInterpolationMethod linear;
+
+    axialProfile
+    {
+        type flat;
+    }
+
+    radialProfile
+    {
+        type    flat;
+    }
+
+    materials ( fuel );
+}
+
+
+materials
+{
+    fuel
+    {
+        material                    UO2;
+
+        conductivityModel           constant;
+        k                           k  [1 1 3 -1 0] 3;
+
+        Tref                        Tref [ 0 0 0 1 0 ] 293;
+
+        enrichment                  0.045;
+        rGrain                      2.8e-05;
+        GdContent                   0.0;
+        theoreticalDensity          10960;
+        densityFraction             0.95;
+        dishFraction                0.0;
+
+        densificationModel          none;
+        swellingModel               none;
+        relocationModel             none;
+        isotropicCracking           off;
+
+        rheologyModel               elasticity;
+    }
+
+    cladding
+    {
+        material                    zircaloy;
+        Tref                        Tref [ 0 0 0 1 0 ] 293;
+
+        conductivityModel           constant;
+        k                           k  [1 1 3 -1 0] 16;
+
+        swellingModel               none;
+        phaseTransitionModel        none;
+
+        rheologyModel               elasticity;
+    }
+}
+
+// ************************************************************************* //

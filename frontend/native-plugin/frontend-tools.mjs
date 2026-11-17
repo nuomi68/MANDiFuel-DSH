@@ -1,0 +1,68 @@
+import {SKILL,readSkill} from './frontend-agent.mjs';
+
+const object=(properties={},required=[])=>({type:'object',properties,required,additionalProperties:false});
+export const TOOL_SCHEMAS={
+ ui_read_skill:object({resource:{type:'string'}}),
+ ui_inspect:object({target:{type:'string',enum:['page','main','aside','settings','model','data','capabilities']},node:{type:'string'}},['target']),
+ ui_apply:object({expectedRevision:{type:'string'},operations:{type:'array',items:{type:'object'}},update:{type:'object'}},['expectedRevision']),
+ ui_wait_for_render:object({timeoutMs:{type:'integer'}}),
+};
+const descriptions={ui_read_skill:'Read the registered frontend skill or one of its references. Read SKILL.md before mutations.',ui_inspect:'Inspect the actual current page, one slot, models, data or capabilities. Returns the revision required by ui_apply.',ui_apply:'Apply bounded slot operations and/or a presentation update to this task, using an inspected expectedRevision. Never writes solver inputs or saved fields.',ui_wait_for_render:'Check the browser acknowledgement and actual errors for the last mutation. Saving a configuration alone is not confirmation.'};
+export function renderConfirmation(page,wanted){
+ const browser=page.browser||{};
+ if(!browser.connected)return'offline';
+ if(browser.revision>wanted.uiRevision)return'stale';
+ if((browser.errors||[]).length||page.viewer?.rendererError)return'error';
+ if(page.modelRequirement?.required){
+  if(browser.model?.visible===false)return'error';
+  if(!browser.model?.ready||browser.model.kind!==page.modelRequirement.kind)return'pending';
+ }
+ return browser.ready!==false&&browser.presentationVersion>=wanted.presentationVersion&&browser.revision===wanted.uiRevision&&(!wanted.interactionRevision||browser.interactionRevision===wanted.interactionRevision)&&(!wanted.viewStateRevision||page.viewer?.revision===wanted.viewStateRevision)?'confirmed':'pending';
+}
+const sleep=(ms,signal)=>new Promise((resolve,reject)=>{
+ if(signal?.aborted)return reject(signal.reason||new Error('frontend operation cancelled'));
+ const abort=()=>{clearTimeout(timer);reject(signal.reason||new Error('frontend operation cancelled'));};
+ const timer=setTimeout(()=>{signal?.removeEventListener('abort',abort);resolve();},ms);signal?.addEventListener('abort',abort,{once:true});
+});
+
+export function attachFrontendTools(agent,{id,call,current,session}){
+ const revisions=new Set();let calls=0,mutations=0,skillLoaded=false;
+ session.toolsAttached=true;
+ for(const [name,parameters]of Object.entries(TOOL_SCHEMAS))agent.ctx.tools.register({
+  name,description:descriptions[name],parameters,
+  output:{schema:{type:'object'},render:(_args,value)=>[{type:'text',text:JSON.stringify(value)}]},
+  async execute(args,exec){
+   if(exec.agent!==agent||!current()||session.closed||exec.signal.aborted)throw new Error('前端操作会话已失效');
+   if(++calls>24)throw new Error('本轮前端操作超过 24 次，请保留已完成部分并结束');
+   session.toolCalls=calls;
+   if(name==='ui_read_skill'){
+    const value=readSkill(args.resource);if(value.resource==='SKILL.md'){skillLoaded=true;session.skillLoaded=true;}return value;
+   }
+   if(name==='ui_inspect'){
+    const value=await call(`/api/tasks/${id}/frontend?target=${encodeURIComponent(args.target)}${args.node?'&node='+encodeURIComponent(args.node):''}`,undefined,exec.signal);
+    if(session.request!==undefined&&value.task?.request!==session.request){session.cancel?.();throw new Error('已有新的用户请求，请结束旧前端会话');}
+    revisions.add(value.revision);session.observed=true;if(args.target==='page')session.pageObserved=true;return value;
+   }
+   if(name==='ui_apply'){
+    if(!skillLoaded)throw new Error('先 ui_read_skill 读取 '+SKILL.name+' 的 SKILL.md');
+    if(!revisions.has(args.expectedRevision))throw new Error('必须先 ui_inspect 获取本轮实际状态版本');
+    if(!session.pageObserved)throw new Error('先 ui_inspect(target="page") 获取当前实际页面布局、内容与物理场状态');
+    if(++mutations>8)throw new Error('本轮前端修改超过 8 次，请保留已完成部分并结束');
+    const value=await call(`/api/tasks/${id}/frontend`,{...args,...session.request!==undefined?{expectedRequest:session.request}:{}},exec.signal);
+    session.lastPublished=value;session.mutations=mutations;session.confirmed=false;return value;
+   }
+   const timeout=args.timeoutMs??8000;
+   if(!Number.isInteger(timeout)||timeout<0||timeout>10000)throw new Error('等待时间必须为 0–10000 毫秒');
+   const deadline=Date.now()+timeout,expected=session.lastPublished;
+   do{
+    const page=await call(`/api/tasks/${id}/frontend?target=page`,undefined,exec.signal),browser=page.browser||{};
+    const wanted=expected||page;
+    session.renderExpected=wanted;
+    const status=renderConfirmation(page,wanted);
+    if(status!=='pending'||Date.now()>=deadline){revisions.add(page.revision);session.confirmed=status==='confirmed';session.renderStatus=status;return{status,revision:page.revision,presentationVersion:page.presentationVersion,browser,viewer:page.viewer||{}};}
+    await sleep(250,exec.signal);
+   }while(current());
+   throw new Error('前端操作会话已结束');
+  },
+ });
+}

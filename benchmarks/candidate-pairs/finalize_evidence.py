@@ -19,6 +19,20 @@ def hashes(root):return {p.relative_to(root).as_posix():sha(p) for p in root.rgl
 def load(path):return json.loads(path.read_text())
 
 
+
+def frozen_prompt_checks(root, task):
+    """Audit the prompt frozen at launch; later bank revisions are independent."""
+    folder=root/task['id'];effective_path=folder/'task.txt'
+    if 'original_task_sha256' in task:
+        original=folder/'task-original.txt'
+        if not original.is_file():
+            return {'original_prompt_preserved':False,'effective_prompt_matches_declared_override':False}
+        effective,policy=render_prompt(original.read_text(),task['original_solver_start_cap'],task['solver_start_cap'])
+        return {'original_prompt_preserved':sha(original)==task['original_task_sha256'],
+                'effective_prompt_matches_declared_override':effective_path.read_text()==effective and sha(effective_path)==task['task_sha256'] and policy==task['prompt_override']}
+    return {'prompt_matches_frozen_record':sha(effective_path)==task['task_sha256']}
+
+
 def main():
     p=argparse.ArgumentParser();p.add_argument('run_root',type=Path);args=p.parse_args();root=args.run_root.resolve();manifest=load(root/'manifest.json');verification=load(root/'verification.json');exposure=load(root/'exposure-audit.json')
     checks=[]
@@ -28,17 +42,10 @@ def main():
     check('frozen_launch_definitions_unchanged',hashes(root/'definition')==manifest['launch_file_hashes'])
     check('whole_process_isolation_preflights',exposure['all_arm_isolation_preflights_passed'])
     check('no_observed_organizer_or_bare_skill_content_exposure',not exposure['organizer_or_bare_skill_exposure_observed'])
-    # The bank's absolute location is fixed in the launch script; compare original text too.
-    bank=Path('/home/lwz/MANDiFuel-DSH-lwz/benchmarks/2026-11-12-candidate-bank/prompts')
     for task in manifest['tasks']:
         tid=task['id']; source=root/tid/'source-case'; original=Path(task['source'])
-        if 'original_task_sha256' in task:
-            original_prompt_text=(bank/(tid+'.txt')).read_text()
-            effective,policy=render_prompt(original_prompt_text,task['original_solver_start_cap'],task['solver_start_cap'])
-            check(tid+'_original_prompt_preserved',sha(root/tid/'task-original.txt')==task['original_task_sha256']==sha(bank/(tid+'.txt')))
-            check(tid+'_effective_prompt_matches_declared_override',(root/tid/'task.txt').read_text()==effective and sha(root/tid/'task.txt')==task['task_sha256'] and policy==task['prompt_override'])
-        else:
-            check(tid+'_prompt_matches_reviewed_original',sha(root/tid/'task.txt')==task['task_sha256']==sha(bank/(tid+'.txt')))
+        for label,passed in frozen_prompt_checks(root,task).items():
+            check(tid+'_'+label,passed)
         check(tid+'_original_source_unchanged',hashes(original)==task['source_evidence']['original_source_hashes'])
         check(tid+'_curated_source_unchanged',hashes(source)==task['source_evidence']['actor_source_hashes'])
         for arm in manifest.get('arms',['bare','skill']):

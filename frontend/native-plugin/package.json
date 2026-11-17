@@ -1,0 +1,1 @@
+{"name":"mandifuel-native-workbench","version":"0.1.0","type":"module","main":"index.mjs","exports":{".":"./index.mjs","./client":"./client.js"},"dsh":{"client":{"platform":"web","inject":["@deepseek-ai/dsh-api-session-controller"]}}}

@@ -24,8 +24,10 @@ export function apply(ctx) {
   const persona = readFileSync(new URL("./run-assistant-persona.md", import.meta.url), "utf8");
   // Presets shadow the global deployment persona. Replace the assembled
   // persona slot too, so Web standard cannot restore its coding-agent identity.
-  ctx.on("system-prompt/assemble", async (_assembly, _context, next) => {
+  ctx.on("system-prompt/assemble", async (_assembly, context, next) => {
     const assembly = await next();
+    // Preserve the assigned role of private presentation and other subagents.
+    if (context?.agent?.session?.header?.origin === 'subagent') return assembly;
     return { ...assembly, sections: assembly.sections.map(section =>
       section.name === "deployment:persona" ? { ...section, text: persona } : section) };
   });
@@ -37,6 +39,7 @@ export function apply(ctx) {
         `OFFBEAT 入口：${JSON.stringify(process.env.MANDIFUEL_OFFBEAT_EXECUTABLE || "offbeat")}`,
         `插件根：${JSON.stringify(process.env.MANDIFUEL_PLUGIN_ROOT || "")}`,
         `只读算例库：${JSON.stringify(process.env.MANDIFUEL_CASE_LIBRARY_ROOT || "")}`,
+        `任务可写项目根：${JSON.stringify(process.env.MANDIFUEL_PROJECT_ROOT || "")}。项目外的文件内容不可写入、创建、删除或移动；临时文件由启动器放在项目内。权限提升不能扩大该项目边界。`,
         "任务工具已关闭联网；只使用准备的本地资料与软件，不用 curl、浏览器或 Python 请求绕过。DSH 宿主的模型 API 连接单独保留。普通计算先加载所需技能，再一次读取本题相关输入、批量构建输入卡并执行公共接口。不要重复 env/which/ldd/strings、安装目录搜索、帮助查询或求解器源码巡检；也不要改用另一个二进制入口。",
         "该准备状态不代表输入和物理结果已经验证。普通运行遇到环境故障时保留日志并报告缺口，不自动检查安装或查看实现；仅用户明确指定的软件开发任务按其范围处理。",
       ].join("\n")

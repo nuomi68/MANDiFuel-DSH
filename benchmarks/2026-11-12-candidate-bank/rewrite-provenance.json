@@ -414,5 +414,8 @@
     }
   ],
   "tested_dsh_runs": 0,
-  "offbeat_starts": 0
+  "offbeat_starts": 0,
+  "applies_to": "2026-11-12旧版；完整题面位于runs/benchmark-redesign-20261117-01/original-bank/",
+  "superseded_by": "redesign-provenance.json",
+  "current_prompts_not_attributed_to_historical_authors": true
 }

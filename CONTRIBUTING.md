@@ -20,3 +20,17 @@ updating examples/manifest.json before building. Preserve failure records;
 host exits and file-existence checks are not proof of physical validity.
 Never commit local configuration, API keys, solver outputs or host histories.
 The source packager uses an explicit allowlist; it does not include unit tests.
+
+The workbench source and its frontend agent contracts live in `frontend/`.
+Run its checks without a solver or local task history:
+
+```bash
+python3 -m unittest discover -s frontend/tests -p 'test_*.py'
+node --test frontend/tests/*.test.mjs
+```
+
+`frontend/tests/fixtures/` contains small parser fixtures, including explicitly
+synthetic fields. Keep production task histories in ignored `runs/`, and local
+QA workspaces, screenshots and generated documents in ignored `work/` and
+`output/`. Retain actual inputs, results and receipts when cleaning old QA
+copies; the running workbench uses `runs/workbench/`.

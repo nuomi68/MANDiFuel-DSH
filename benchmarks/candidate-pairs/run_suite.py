@@ -145,11 +145,17 @@ def run_arm(task,arm,root,timeout,env):
 
 
 def main():
+    global BANK
     p=argparse.ArgumentParser(); p.add_argument('--output',required=True,type=Path); p.add_argument('--ids',nargs='+',default=['P02','C04','W01']); p.add_argument('--arms',nargs='+',choices=['bare','skill'],default=['bare','skill']); p.add_argument('--snapshot',type=Path,default=DEFAULT_SNAPSHOT); p.add_argument('--timeout',type=int,default=1800); p.add_argument('--preflight-only',action='store_true'); p.add_argument('--design-file',type=Path); p.add_argument('--solver-start-limit',type=int,help='Optional explicit cap for solve tasks; default: unlimited. No-solve tasks remain at zero.')
+    p.add_argument('--bank',type=Path,default=BANK,help='Frozen legacy source-case bank; physical-spec-v2 needs a new-model runner and oracle')
     args=p.parse_args();
     if args.solver_start_limit is not None and args.solver_start_limit < 1:p.error('--solver-start-limit must be positive')
+    BANK=args.bank.resolve()
+    bank=json.loads((BANK/'candidates.json').read_text())
+    if bank.get('execution_contract')=='physical_spec_v2':
+        p.error('physical-spec-v2题库要求按物理规格新建模型；此旧执行器会注入source-case并使用旧裁判，已在创建运行目录前中止。历史复现请用--bank显式指定归档旧题库；新版需逐题预检并适配执行器和参考。')
     args.arms=list(dict.fromkeys(args.arms)); root=args.output.resolve(); root.mkdir(parents=True,exist_ok=False)
-    bank=json.loads((BANK/'candidates.json').read_text()); entries={t['id']:t for t in bank['tasks']}
+    entries={t['id']:t for t in bank['tasks']}
     tasks=[]
     shutil.copytree(args.snapshot,root/'frozen-plugin'); (root/'frozen-plugin/configs').mkdir(exist_ok=True)
     shutil.copyfile(REPO/'configs/launcher.env',root/'frozen-plugin/configs/launcher.env')

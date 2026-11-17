@@ -67,7 +67,7 @@ extreme(result_root: str | Path, variable: str, *, operation: Literal['max', 'mi
 
 component：标量value；向量x/y/z；对称张量xx/xy/xz/yy/yz/zz或principal_max。没有mag；需要幅值时在同一选择上组合分量。sigmaCyl的radial/hoop/axial便利分量按其坐标约定使用。
 
-read_field(time="all")会物化全部帧；iter_fields可逐帧消费。同一场的统计与表复用已读结果，长提取从首次提交就使用原生后台句柄。当前大网格/重复几何解析可能耗时，不重复前台测时直到超时。
+read_field(time="all")会物化全部帧；iter_fields可逐帧消费。同一次历史读取中，未变化的网格几何只重建一次；缓存按真实网格来源和文件版本区分，移动网格或文件变化仍使用对应几何，且不跨调用保留。同一场的统计与表复用已读结果，长提取从首次提交就使用原生后台句柄。当前大网格/重复几何解析可能耗时，不重复前台测时直到超时。
 
 面场不由list_variables完整列出。仅需原始均匀/列表边界条目时可用foamDictionary读取dimensions和boundaryField/<patch>/value，避免重建网格。需要面积/坐标/标签时仍要有相应几何证据。
 

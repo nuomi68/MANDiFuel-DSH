@@ -61,7 +61,8 @@ with tempfile.TemporaryDirectory(prefix='recovery-check-') as temp:
  for t in entries:
   text=(bank/t['prompt_file']).read_text();effective,policy=render_prompt(text,t['solver_start_cap'],None)
   if t['solver_start_cap']==0:check(t['id']+'零启动范围保持',effective==text and policy['effective_cap']==0)
-  else:check(t['id']+'默认无限且不包含专题答案',policy['effective_cap'] is None and '不设次数上限' in effective and ('fuelRodGap' not in effective or 'fuelRodGap' in text))
+  elif t['solver_start_cap'] is None:check(t['id']+'无题面限额时不注入环境尾注',effective==text and policy['effective_cap'] is None)
+  else:check(t['id']+'旧版默认无限且不包含专题答案',policy['effective_cap'] is None and '不设次数上限' in effective and ('fuelRodGap' not in effective or 'fuelRodGap' in text))
  original=(bank/'prompts/C08.txt').read_text();effective,policy=render_prompt(original,2,None)
  check('C08物理要求保留',all(s in effective for s in ['18000 W/m','300 K','Euler','步长 1 s','外边界全部绝热','内部导热耦合保留']))
  check('C08旧启动上限撤销','真实启动至多 2 次' not in effective and '预算不够或运行失败' not in effective)
