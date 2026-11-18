@@ -36,10 +36,16 @@ test('presentation admission changes the transcript and wakes only the private p
 test('native command admission uses the same router if the gateway bound a public method early',async()=>{
  const h=await setup();try{await h.commands.prompt(request());assert.deepEqual(h.counts(),{admitted:0,requested:1});}finally{h.close();}
 });
-test('compute or mixed requests and unavailable routing preserve ordinary native admission',async()=>{
- for(const answer of [false,new Error('provider unavailable')]){
+test('compute or mixed requests preserve ordinary native admission',async()=>{
+ for(const answer of [false]){
   const h=await setup(answer);try{await h.controller.prompt(request('修改真实外壁温度并计算'),new AbortController().signal);assert.deepEqual(h.counts(),{admitted:1,requested:0});assert.equal(h.events.length,0);}finally{h.close();}
  }
+});
+test('a failed routing provider cannot accidentally start a solver turn',async()=>{
+ const h=await setup(new Error('provider unavailable'));try{await assert.rejects(h.controller.prompt(request('把曲线和模型联动'),new AbortController().signal),/尚未提交给计算助手/);assert.deepEqual(h.counts(),{admitted:0,requested:0});}finally{h.close();}
+});
+test('an explicit display admission does not depend on a routing model',async()=>{
+ const h=await setup(new Error('provider unavailable'));try{await h.controller.prompt(request('仅前端展示：将三种结构的图表和物理场联动'),new AbortController().signal);assert.deepEqual(h.counts(),{admitted:0,requested:1});}finally{h.close();}
 });
 test('ordinary native execution does not depend on the UI backend being available',async()=>{
  const h=await setup(true,true);try{await h.controller.prompt(request('修改材料后计算'),new AbortController().signal);assert.deepEqual(h.counts(),{admitted:1,requested:0});}finally{h.close();}

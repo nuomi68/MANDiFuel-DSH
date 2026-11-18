@@ -15,8 +15,10 @@ def frontend_revision(meta):
     state={k:meta.get(k) for k in ('presentationVersion','workspaceRevision','promptRevision','displayPromptRevision','defaultView','modelVersion')}
     state['workspaceWatch']=meta.get('workspaceWatch',{}).get('revision')
     state['parameters']=meta.get('presentation',{}).get('parameterValues',{})
+    state['evidence']=meta.get('evidence',{}).get('revision')
     state['viewer']=meta.get('viewerState',{})
     state['browserParameters']=meta.get('uiState',{}).get('parameters',{})
+    state['pickedPoint']=meta.get('uiState',{}).get('pickedPoint')
     state['browserDisplay']=meta.get('uiState',{}).get('display',{})
     observation=meta.get('uiState',{})
     state['browserSelection']={k:v for k,v in observation.get('selection',{}).items() if k!='settingsOpen'}
@@ -61,7 +63,7 @@ def patch_slots(presentation,request):
             elif op=='remove' and set(operation)=={'op','slot','id'}:
                 if not any(c.get('id')==operation['id'] for c in controls):raise ValueError('设置控件不存在')
                 controls=[c for c in controls if c.get('id')!=operation['id']]
-            else:raise ValueError('设置插槽支持 replace/upsert/remove')
+            else:raise ValueError('设置插槽支持 replace/upsert/remove；upsert 格式为 {op,slot,value:{id,...定义}}，外层不要 id；只改当前参数值用 update.parameterValues')
             changed.add(slot);continue
         if 'ui' in update:raise ValueError('不能同时通过 update.ui 和插槽操作修改组件树')
         if ui is None:ui={'version':1,'mode':'above','root':{'id':'mainModel','type':'model'}}

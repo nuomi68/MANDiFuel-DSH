@@ -168,7 +168,12 @@ def export_case(case, output, *, title='OFFBEAT 结果', selectors=None, time='l
             if shape=='rod' and (length is None or length<=0):raise ValueError('燃料棒需要 --length')
             r=[math.hypot(p[0],p[1]) if shape=='rod' else math.sqrt(sum(v*v for v in p)) for p in coords]
             order=sorted(range(len(r)),key=r.__getitem__);r=[r[i] for i in order]
-            values={k:[vs[i] for i in order] for k,vs in values.items()};frame={'time':float(t),'fields':values}
+            values={k:[vs[i] for i in order] for k,vs in values.items()};frame={'time':float(t),'fields':values,'mesh':'samples'}
+            # Display reconstruction still samples the original saved cells.
+            # Retain their coordinates/order for linked profiles and probes.
+            if 'samples' not in meshes:
+                centres=[list(coords[i]) for i in order]
+                meshes['samples']={'points':centres,'cellCenters':centres,'cellIds':order,**({'samplingGeometry':'spherical'} if shape in {'sphere','shell'} else {})}
         if radial is None:radial=r
         elif shape not in {'mesh','revolve'} and any(abs(a-b)>max(radius*1e-8,1e-14) for a,b in zip(radial,r,strict=True)):raise ValueError('移动网格需要按原始网格导出 --shape mesh')
         for key,vs in values.items():

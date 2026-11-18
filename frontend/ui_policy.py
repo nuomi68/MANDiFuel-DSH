@@ -16,17 +16,41 @@ def content_key(node):
 def clean_document(document):
     if not document:return None,[]
     document=copy.deepcopy(document);seen=set();removed=[]
-    def visit(node):
+    # Keep the citation at the conclusion. Alternate tabs and conditional
+    # panels still need their own evidence when the other panel is hidden.
+    inline=set();used=set()
+    def scopes(node,scope):
+        for child in node.get('children',[]):
+            local=scope+(child['id'],) if node['type']=='tabs' or 'visible' in child else scope
+            yield child,local
+    def collect_inline(node,scope):
+        if node['type']=='metric' or node['type']=='text' and SCALAR_TEXT.fullmatch(node.get('text','')):return
+        inline.update((scope,k) for k in node.get('evidence',[]))
+        for child,local in scopes(node,scope):collect_inline(child,local)
+    for slot in ('root','aside'):
+        if document.get(slot):collect_inline(document[slot],(document[slot]['id'],) if 'visible' in document[slot] else ())
+    def visit(node,scope=()):
         if node['type']=='metric' or node['type']=='text' and SCALAR_TEXT.fullmatch(node.get('text','')):removed.append(node['id']);return None
+        original_key=content_key(node) if 'children' not in node and node['type'] not in {'controls','button'} else None
+        if original_key and (scope,original_key) in seen:
+            removed.append(node['id']);return None
+        for key in ('evidence','claims'):
+            if key not in node:continue
+            keep=[]
+            for claim in node[key]:
+                ref=(scope,claim)
+                if ref in used or key=='claims' and ref in inline:continue
+                keep.append(claim);used.add(ref)
+            if keep:node[key]=keep
+            else:node.pop(key)
+            if key=='claims' and not keep:removed.append(node['id']);return None
         if 'children' in node:
-            node['children']=[child for child in (visit(c) for c in node['children']) if child]
+            node['children']=[value for child,local in scopes(node,scope) if (value:=visit(child,local))]
             if not node['children']:removed.append(node['id']);return None
-        elif node['type'] not in {'controls','button'}:
-            key=content_key(node)
-            if key in seen:removed.append(node['id']);return None
-            seen.add(key)
+        elif original_key:seen.add((scope,original_key))
         return node
-    root=visit(document['root']);aside=visit(document['aside']) if document.get('aside') else None
+    def visit_slot(node):return visit(node,(node['id'],) if 'visible' in node else ()) if node else None
+    root=visit_slot(document['root']);aside=visit_slot(document.get('aside'))
     if root is None:
         # Keep the native renderer available when a generated pane became empty.
         if aside:

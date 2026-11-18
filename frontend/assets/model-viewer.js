@@ -92,7 +92,7 @@ export class ModelViewer {
   const points=this.native?this.markerPoints:radial?.map(r=>[r,0,0]);
   this.annotations=enabled&&!this.geometryOnly?{markers:extrema(values,points).filter(m=>mode==='both'||m.kind===mode||m.kind==='constant'),unit}:null;this.draw();
  }
- setSceneAnnotations(program,parameters,values,metadata,selected){this.sceneMarkers=program?.annotations?.length?sceneAnnotations(this.sourceMesh,program,parameters,values,metadata,selected):[];this.draw();}
+ setSceneAnnotations(program,parameters,values,metadata,selected,{mesh=this.sourceMesh,view}={}){const source=!this.native&&mesh?{...mesh,...['sphere','shell'].includes(this.model?.shape)?{samplingGeometry:'spherical'}:{}}:mesh;this.sceneMarkers=program?.annotations?.length?sceneAnnotations(source,program,parameters,values,metadata,selected,view):[];this.draw();}
  setProgramCamera(options){
   const camera=Object.fromEntries(['zoom','yaw','tilt'].filter(k=>options[k]!==undefined).map(k=>[k,options[k]])),key=JSON.stringify([camera,options.cameraDirectiveRevision||0]);
   if(key!==this.programCameraKey){this.programCameraKey=key;for(const[k,v]of Object.entries(camera))this.camera[k]=k==='zoom'?v:v*Math.PI/180;this.draw();}
@@ -154,20 +154,21 @@ export class ModelViewer {
   this.drawAnnotations();
  }
  drawAnnotations(){
-  const overlay=this.overlay,markers=[...(this.annotations?.markers||[]),...(this.sceneMarkers||[])];overlay.hidden=!this.model||!markers.length||this.canvas.hidden;if(overlay.hidden)return;
+  const overlay=this.overlay,markers=[...(this.annotations?.markers||[]),...(this.sceneMarkers||[])];overlay.hidden=!this.model||!markers.length||this.canvas.hidden;overlay.dataset.markers=JSON.stringify(markers);if(overlay.hidden){overlay.removeAttribute('aria-label');return;}
   const box=this.canvas.getBoundingClientRect(),w=box.width,h=box.height,ratio=this.canvas.width/w;
   Object.assign(overlay.style,{left:this.canvas.offsetLeft+'px',top:this.canvas.offsetTop+'px',width:w+'px',height:h+'px'});overlay.width=this.canvas.width;overlay.height=this.canvas.height;
   const ctx=overlay.getContext('2d');ctx.setTransform(ratio,0,0,ratio,0,0);ctx.clearRect(0,0,w,h);ctx.font='11px "Workbench CJK",system-ui';ctx.textBaseline='middle';
   const descriptions=[],boxes=[];
   const project=point=>{
-   let p=point;if(this.native)p=p.map((v,i)=>(v-this.nativeCenter[i])/this.nativeScale);else{const r=p[0]/this.model.radius,phi=this.cut?-this.cutAngle*Math.PI/360:0;p=[r*Math.cos(phi),r*Math.sin(phi),0];}
+   let p=point;if(this.native)p=p.map((v,i)=>(v-this.nativeCenter[i])/this.nativeScale);else{p=p.map(v=>v/this.model.radius);if(this.model.shape==='rod')p[2]*=this.axialScale;}
    const {scale,aspect,stretch}=this.projection,{yaw,tilt,panX=0,panY=0}=this.camera;p=p.map((v,i)=>v*stretch[i]);const qx=p[0]*Math.cos(yaw)-p[1]*Math.sin(yaw),qy=p[0]*Math.sin(yaw)+p[1]*Math.cos(yaw),qz=p[2]*Math.cos(tilt)-qy*Math.sin(tilt);
    return{x:(qx*scale/aspect+panX+1)*w/2,y:(1-qz*scale-panY)*h/2};
   };
   for(const marker of markers){
    let {x,y}=project(marker.point),label=marker.text??markerText(marker,this.annotations?.unit||'');const color=marker.color||(marker.kind==='min'?'#3b4cc0':marker.kind==='max'?'#b40426':'#476a9c');
+   if(marker.path){ctx.strokeStyle=color;ctx.lineWidth=1.2;ctx.setLineDash([4,3]);ctx.beginPath();marker.path.forEach((p,i)=>{const q=project(p);if(i)ctx.lineTo(q.x,q.y);else ctx.moveTo(q.x,q.y);});ctx.stroke();ctx.setLineDash([]);}
    if(marker.end){const end=project(marker.end);ctx.strokeStyle=color;ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(end.x,end.y);ctx.stroke();if(marker.type==='arrow'){const angle=Math.atan2(end.y-y,end.x-x);ctx.beginPath();ctx.moveTo(end.x,end.y);ctx.lineTo(end.x-9*Math.cos(angle-.4),end.y-9*Math.sin(angle-.4));ctx.moveTo(end.x,end.y);ctx.lineTo(end.x-9*Math.cos(angle+.4),end.y-9*Math.sin(angle+.4));ctx.stroke();}x=(x+end.x)/2;y=(y+end.y)/2;}
-   descriptions.push(label+(marker.index!==undefined?'，原始单元 '+marker.index:'')+(marker.sourcePoint?'，坐标 '+marker.sourcePoint.join(', '):''));
+   descriptions.push(label+(marker.index!==undefined?'，原始单元 '+(marker.sourceCell??marker.index):'')+(marker.sourcePoint?'，坐标 '+marker.sourcePoint.join(', '):''));
    if(x<0||x>w||y<0||y>h){if(!marker.id)continue;label+='（视野外）';x=Math.max(8,Math.min(w-8,x));y=Math.max(70,Math.min(h-80,y));}
    const width=Math.min(w-16,ctx.measureText(label).width+16),height=26,left=Math.max(8,Math.min(w-width-8,x+12)),safeBottom=Math.max(70,h-90-height);let top=Math.max(70,Math.min(safeBottom,y+(marker.kind==='min'?14:-38)));
    while(boxes.some(b=>left<b.x+b.w&&left+width>b.x&&top<b.y+b.h&&top+height>b.y)&&top+34<=safeBottom)top+=34;

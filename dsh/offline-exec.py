@@ -18,11 +18,17 @@ class PathBeneath(ctypes.Structure):
     _fields_ = [("allowed_access", ctypes.c_uint64), ("parent_fd", ctypes.c_int32)]
 
 
-def restrict_filesystem(project_root: str) -> Path:
+def restrict_filesystem(project_root: str, runs_root: str | None = None) -> Path:
     root = Path(project_root).resolve(strict=True)
     if not root.is_dir() or root == Path('/'):
         raise RuntimeError("project root must be an existing directory other than /")
-    if not Path.cwd().resolve().is_relative_to(root):
+    writable = [root]
+    if runs_root:
+        runs = Path(runs_root)
+        if runs != runs.resolve(strict=True) or not runs.is_dir() or root.is_relative_to(runs):
+            raise RuntimeError("invalid canonical runs root")
+        writable.append(runs)
+    if not any(Path.cwd().is_relative_to(directory) for directory in writable):
         raise RuntimeError("task working directory is outside the project root")
     if sys.platform != 'linux' or platform.machine() not in {'x86_64', 'aarch64'}:
         raise RuntimeError("Linux Landlock is required for the project write boundary")
@@ -49,7 +55,8 @@ def restrict_filesystem(project_root: str) -> Path:
 
     try:
         allow('/', (1 << 0) | (1 << 2) | (1 << 3))  # read and execute dependencies
-        allow(str(root), handled)
+        for directory in writable:
+            allow(str(directory), handled)
         allow('/dev/null', (1 << 1) | (1 << 2))  # shell redirection, no disk storage
         if libc.prctl(38, 1, 0, 0, 0) != 0:
             raise OSError(ctypes.get_errno(), "PR_SET_NO_NEW_PRIVS failed")
@@ -130,13 +137,16 @@ def main() -> int:
         project_root, args = args[1], args[2:]
     if not project_root:
         project_root = str(Path(__file__).resolve().parents[1])
+    runs_root = None
+    if args[:1] == ['--runs-root'] and len(args) >= 2:
+        runs_root, args = args[1], args[2:]
     if args[:1] == ["--"]:
         args = args[1:]
     if not args:
         print("usage: offline-exec.py -- command [args...]", file=sys.stderr)
         return 64
     try:
-        restrict_filesystem(project_root)
+        restrict_filesystem(project_root, runs_root)
         deny_network()
         os.environ["MANDIFUEL_TASK_OFFLINE"] = "1"
         os.execvp(args[0], args)

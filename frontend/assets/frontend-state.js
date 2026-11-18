@@ -6,18 +6,21 @@ function coverage(element){
  if(visible(element)&&inViewport)for(const f of [.25,.5,.75]){
   const x=Math.max(1,Math.min(innerWidth-1,r.left+r.width*f)),y=Math.max(1,Math.min(innerHeight-1,r.top+r.height*f)),top=document.elementFromPoint(x,y);
   if(!top||element.contains(top)||top.contains(element))continue;
-  const owner=top.closest('[data-ui-node]');if(owner)covered.add(owner.dataset.uiNode);else if(top.closest('#drawer'))covered.add('settings-drawer');
+  const owner=top.closest('[data-ui-node]');if(owner)covered.add(owner.dataset.uiNode);else if(top.closest('#drawer'))covered.add('settings-drawer');else if(top.closest('#evidence-dialog'))covered.add('evidence-drawer');
  }
  return{inViewport,coveredBy:[...covered].slice(0,3)};
 }
-export function captureFrontendState({task,state,adaptive,style}){
+export function captureFrontendState({task,state,adaptive,style,modelReady=true}){
  const nodes=[...(adaptive?.nodes?.values()||[])].slice(0,64).map(entry=>({id:entry.node.id,type:entry.node.type,visible:visible(entry.element),rect:box(entry.element),...coverage(entry.element),...(entry.activeTab?{activeTab:entry.activeTab}:{}),...(entry.node.type==='table'?{table:{query:(entry.query||'').slice(0,200),page:entry.page||0,rows:Math.min(20000,entry.table?.rows?.length||0),sort:entry.sort||null}}:{}),...(entry.interaction?{chart:{viewport:entry.interaction.viewport,hiddenSeries:[...entry.interaction.hidden]}}:{})}));
  const slot=id=>{const element=document.querySelector(id);return{visible:visible(element),rect:box(element)};};
  const selection=Object.fromEntries(['run','panel','field','view','frame'].map(k=>[k,state[k]??null]));selection.settingsOpen=document.querySelector('#drawer')?.open===true&&document.querySelector('#drawer')?.dataset.view==='settings';
+ const fieldAvailable=modelReady&&!document.querySelector('#model-stage')?.classList.contains('mesh-preview');
+ if(!fieldAvailable){selection.field=null;selection.frame=null;}
+ if(fieldAvailable&&Number.isFinite(adaptive?.context?.time)){selection.time=adaptive.context.time;selection.timeUnit=adaptive.context.timeUnit||null;}
  const display=Object.fromEntries(['mesh','extrema','cut','cutAngle','cameraView','aspectMode','displayMode','sliceAxis','slicePosition','compare','compareField','scale','colorMin','colorMax'].map(k=>[k,state[k]??null]));if(style)display.appearance=style;
  const mapping=document.querySelector('#model-canvas')?.dataset.fieldMapping;if(mapping)display.fieldMapping=JSON.parse(mapping);
- const stage=document.querySelector('#model-stage'),model={visible:visible(stage),ready:!!stage&&!stage.classList.contains('unready')&&document.querySelector('#viewer-error')?.hidden!==false,kind:stage?.classList.contains('unready')?'pending':stage?.classList.contains('mesh-preview')?'mesh':'fields',view:state.view||null,field:state.field||null};
- return{model,revision:task.presentation?.uiRevision||0,presentationVersion:task.presentationVersion||0,interactionRevision:task.presentation?.interactionRevision||0,ready:!adaptive?.document||adaptive.ready,panels:nodes.map(n=>n.id),errors:[...(adaptive?.nodes?.values()||[])].filter(e=>e.error||e.visibilityError).map(e=>({id:e.node.id,message:e.error||e.visibilityError})),viewport:{width:window.innerWidth,height:window.innerHeight,dpr:window.devicePixelRatio,scrollX:window.scrollX,scrollY:window.scrollY},slots:{main:slot('.model-column'),aside:slot('#adaptive-aside'),settings:slot('#drawer'),model:slot('#model-stage'),conversation:slot('#conversation-column')},nodes,selection,parameters:{...state.parameters},display};
+ const stage=document.querySelector('#model-stage'),model={visible:visible(stage),ready:modelReady&&!!stage&&!stage.classList.contains('unready')&&document.querySelector('#viewer-error')?.hidden!==false,kind:stage?.classList.contains('unready')?'pending':stage?.classList.contains('mesh-preview')?'mesh':'fields',view:state.view||null,field:fieldAvailable?state.field||null:null};
+ return{model,pickedPoint:state.pickedPoint||null,revision:task.presentation?.uiRevision||0,presentationVersion:task.presentationVersion||0,interactionRevision:task.presentation?.interactionRevision||0,ready:!adaptive?.document||adaptive.ready,panels:nodes.map(n=>n.id),errors:[...(adaptive?.nodes?.values()||[])].filter(e=>e.error||e.visibilityError).map(e=>({id:e.node.id,message:e.error||e.visibilityError})),viewport:{width:window.innerWidth,height:window.innerHeight,dpr:window.devicePixelRatio,scrollX:window.scrollX,scrollY:window.scrollY},slots:{main:slot('.model-column'),aside:slot('#adaptive-aside'),settings:slot('#drawer'),model:slot('#model-stage'),conversation:slot('#conversation-column'),evidence:slot('#evidence-dialog')},nodes,selection,parameters:{...state.parameters},display};
 }
 
 export class FrontendStateObserver{

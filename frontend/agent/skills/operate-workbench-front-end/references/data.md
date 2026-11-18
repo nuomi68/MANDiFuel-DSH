@@ -33,3 +33,22 @@ table 是可放在主区域的真实表格，不只存在于参数组弹窗。so
 text:{text}、controls:{ids}、button:{label,action:{type:view,state}}、model:{state?} 继续可用；生成组件必须符合 uiCapabilities，不输出任意HTML/JS。source.study 的 status 列是中文显示文字，筛选代码应使用 source.status 或 statusCode 列，不用 status 列筛选 completed。best:<目标响应ID> 只增加 best.<该目标ID>，不会增加其他参数或响应的 best 列。要显示最佳工况的参数及其他响应时，使用 source:{kind:"study",best:"实际目标ID",select:"best"}，column 仍为 parameter.<参数ID> 或 response.<响应ID>，遵守可行性约束；没有可行工况时保持缺失，不冒充最优值。列名在发布前验证，必须使用数据源的真实列。
 
 多求解任务使用独立study交付，包含参数组、响应值及每组的viewIds。已有ui_inspect(data).studyFile时可用study:该相对路径登记研究汇总；不得凭需求或操作描述编造响应值。扫描/优化/不确定度展示研究图表并保留当前工况的模型窗口，不要把多个参数组混成同一个view选择列表；不同组的结果必须有普通历史数据中的明确归属。ui_inspect(data).study已存在时，exports 必须填写实际 runId、caseRoot，宿主会独立绑定该组，不能覆盖其他组。已有满足需求的视图不要重复导出。没有研究交付但 workspaceHistory 有普通终端 Study 历史时，可输出 studyMapping:{history:实际 history 文件,study:{kind,parameters:[{id,label,unit,source:如point.E_GPa}],responses:[{id,label,unit,source:如response.u_interface_um}],preview?:{fields:[实际字段及分量],time:"latest"}}}。source 是样本记录中真实字段路径，单位来自用户要求或已核验材料，不能猜测或填造响应。宿主只读取历史并在观察侧建立研究，之后自动累计，无需让主 agent 认识 UI 协议。workspaceChanges 是独立本地监听器检测到的网格、保存场、执行回执、输入卡和结构化报告变化，不依赖主 agent 提醒。studyRuns 返回有明确 caseRoot 的参数组；研究组缺少模型时，可通过 exports 加 runId 与完全一致的 caseRoot 导出并绑定本组网格或已保存场，不按目录名猜归属。每组 fields/time 会保留为后续自动预览提示；保存场是已有时间帧，不代表求解正常结束。未绑定目录只报告缺口，不擅自把它挂给某组。仅计算进度改变时无需写 UI，标题流程由独立 process-observer 更新；设置/参数有变化时再修改相应内容。请求失败会由宿主显示，不影响主求解。
+
+## 图、表与物理场共享选择
+
+数据源可声明 `selection:{view:"真实视图ID"}` 或 `selection:{viewColumn:"保存视图ID的列"}`。
+时间曲线加 `timeColumn:"时间列",timeUnit:"s"`（也可 d，必须与目标一致）；点击数据点/表格行会切换模型与最近真实保存帧。不要把数组行号当时间，不混用另一次计算的曲线。
+需要随当前视图、时刻更新的表格用 `filter:[{column:"view_id",op:"eq",context:"view"},{column:"t_s",op:"eq",context:"time"}]`。
+各序列绑定真实视图后，当前结构和时刻会高亮；结构 selector 可用已有 view 控件或有明确目标的按钮，禁止为联动重新求解。
+
+当前浓度剖面可用 `source:{kind:"profile",field:"Cs",axis:"r",selection:{timeColumn:"time",timeUnit:"s",positionColumns:["positionX","positionY","positionZ"]}}`。
+它使用当前模型、当前帧的真实原始单元中心；点击后 `ui_inspect(page).browser.pickedPoint` 给出米制坐标、视图、时刻和字段。
+用户说“标注这个位置”时先读取该位置，为它生成合适的坐标或位置参数，并将 probe 标注绑定参数；未点选位置时再依据用户描述或询问坐标。
+点值为最近保存单元，不宣称空间插值。对称重建仍按真实单元取值，球对称模型按半径采样。
+
+局部修改说明、配色或新增测点时保留当前结构、时刻、页签、表格检索、图表范围与已有参数。
+不要重发带默认选择的模型 state/viewState；复用现有视图，保留界面导引等已生效标注。
+
+曲线联动的当前时刻交给原生保存帧选择，不要再用固定 program.options.time 覆盖点击选择。结构选择用实际 view 控件/按钮；数据绑定应与所用视图完全同源。
+
+数据观察采用分层读取：`ui_inspect(target="data")` 返回简短索引；再用 `ui_inspect(target="data",node="postprocessing/example/history.json")` 读取该文件的真实列名、单位、类别和样本。需要未导出场的分量时用 node="case:实际caseRoot"。不要因为索引省略了样本就声称数据缺失或要求用户另行确认；先打开指定条目。工具结果不可用时不要尝试终端/文件工具或扩大权限。

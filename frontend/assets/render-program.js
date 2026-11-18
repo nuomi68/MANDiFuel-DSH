@@ -46,7 +46,7 @@ export function compileProgram(program){
  const vertex=program.vertex?.map(compileExpression),style=Object.fromEntries(Object.entries(program.style||{}).map(([key,value])=>[key,compileExpression(value)]));
  const options=Object.fromEntries(Object.entries(program.options||{}).map(([key,value])=>[key,compileExpression(value)]));
  const fields=Object.fromEntries(Object.entries(program.fields||{}).map(([id,values])=>[id,Object.fromEntries(Object.entries(values).map(([key,value])=>[key,key==='range'?value.map(compileExpression):compileExpression(value)]))]));
- const annotations=(program.annotations||[]).map(a=>({...a,position:a.position.map(compileExpression),end:a.end?.map(compileExpression),text:a.text?compileExpression(a.text):null,color:a.color?compileExpression(a.color):null,visible:a.visible?compileExpression(a.visible):null}));
+ const annotations=(program.annotations||[]).map(a=>({...a,position:a.position.map(compileExpression),end:a.end?.map(compileExpression),text:a.text?compileExpression(a.text):null,color:a.color?compileExpression(a.color):null,visible:a.visible?compileExpression(a.visible):null,radius:a.radius?compileExpression(a.radius):null}));
  return {label:program.label||'显示变换',vertex,style,options,fields,annotations,source:program,vertexParameters:[...new Set((vertex||[]).flatMap(f=>f.parameters))]};
 }
 

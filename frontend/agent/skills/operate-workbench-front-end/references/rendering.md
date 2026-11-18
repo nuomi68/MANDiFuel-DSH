@@ -25,3 +25,8 @@ rendering 还支持基础样式 scale:[X,Y,Z]、palette（coolwarm/viridis/infer
 deliveryRequirements:{reconstruction?:"axisymmetric-revolve",axis?,angle?,extrema?:true} 用于声明这次必须交付的能力；优先遵循 ui_inspect(data).deliveryRequirements。完成阶段须有满足要求的真实默认视图和有效标注配置，不能只修改进度文字或生成到临时目录就报告完成。纯显示请求直接复用已保存场，禁止重算。字段缺失保留原语义并反馈；需要等效应力时可显式选择 sigma:von_mises（从实际张量派生），不要替换成 principal_max 后沿用等效应力标签。
 
 默认保留真实网格视图；只有确认是一维径向模型、尺寸确切且单位已换成米时才能额外交付 rod/sphere/shell 对称重建；这时保留原始网格和重建两个可选视图并增加 view 控件。燃料与包壳之间有气隙时，根据明确的区域尺寸及格数提供 radialBands，避免把气隙填成实体。radialBands 只列实体区，空隙直接省略，不要列0格空隙段；各区格数是正整数，总和等于 cells；radius 必须取所有实体的最外半径，含包壳棒使用包壳外半径，不是燃料半径；棒形重建可默认剖切以显示内部场。优先遵循 task.latestRequest 中最新的展示要求。不能把计算域积分当全模型结果，不能发明参数或浓度/温度数值。
+
+材料界面可用通用圆形导引标注：`{id:"interfaceA",type:"circle",position:["0","0","0"],radius:"2.5e-4",axis:"y",label:"材料界面 · 250 μm",views:["真实视图ID"]}`。
+axis 为圆平面的法向轴，半径和位置单位与原始网格相同（通常米）；圆仅为几何导引，不是新的计算结果。
+按实际材料区域声明 views，裸核不显示不存在的涂层。半径来自真实网格/模型记录，不能按外观猜测。
+新增 probe 时保留原有 annotations；不要用只含新测点的列表覆盖已有界面。

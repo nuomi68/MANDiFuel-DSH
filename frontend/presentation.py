@@ -134,6 +134,8 @@ def validate_delivery(config, views, preferred, previous=None, workspace=None, s
     models=[v['task'] for v in views.values()]
     merged={**(previous or {}),**config}
     rendering=merge_rendering((previous or {}).get('rendering'),config.get('rendering',{}))
+    for annotation in (rendering.get('program') or {}).get('annotations',[]):
+        if set(annotation.get('views',[]))-views.keys():raise ValueError('标注引用尚未交付的模型视图')
     parameters={c['id']:c for c in merged.get('controls',[]) if c.get('parameter')}
     missing=program_parameters(rendering.get('program'))-parameters.keys()
     if missing:raise ValueError('显示程序引用未定义参数：'+', '.join(sorted(missing)))
@@ -166,11 +168,14 @@ def validate_delivery(config, views, preferred, previous=None, workspace=None, s
     if (bound_options.get('revolve') or 'revolveAngle' in bound_options) and not (active.get('shape')=='mesh' and (active.get('dimensionality')==2 or active.get('reconstruction',{}).get('sourceDimension')==2)):raise ValueError('旋转显示需要二维轴对称网格')
     if bound_options.get('displayMode')=='slice' and (active.get('shape')!='mesh' or active.get('supportsSlice') is False):raise ValueError('当前视图没有内部切片拓扑，请使用原始网格视图')
     if bound_options.get('extrema') and not active.get('supportsExtrema'):raise ValueError('极值标注需要真实单元中心，请重新导出已有结果')
-    if program.get('annotations') and active.get('shape')!='mesh':raise ValueError('坐标标注需要网格视图')
     for annotation in program.get('annotations',[]):
-        if annotation['type']=='probe':
-            if not active_fields or not active.get('supportsExtrema'):raise ValueError('点值标注需要实际字段和原始单元中心，请重新导出已有结果')
-            if annotation.get('field','selected')!='selected' and annotation['field'] not in active_fields:raise ValueError('点值标注字段不可用')
+        targets=[views[v]['task'] for v in annotation.get('views',[preferred]) if v in views]
+        for target in targets:
+            if target.get('shape') not in {'mesh','sphere','shell','rod'}:raise ValueError('坐标标注需要已交付的几何视图')
+            if annotation['type']=='probe':
+                fields={f['id'] for f in target.get('fields',[])}
+                if not fields or not target.get('supportsExtrema'):raise ValueError('点值标注需要实际字段和原始单元中心，请重新导出已有结果')
+                if annotation.get('field','selected')!='selected' and annotation['field'] not in fields:raise ValueError('点值标注字段不可用')
     for c in config.get('controls',[]):
         if c.get('parameter'):continue
         ident=c['id']
@@ -384,16 +389,24 @@ class Dashboard:
                         if metadata:reports.append({'file':spec['path'],'metadata':metadata})
                     for rows_path,rows in arrays:
                         if not rows or not all(isinstance(row,dict) for row in rows[:2]):continue
-                        sample=rows[:2]
-                        if len(json.dumps(sample))>6000:continue
+                        # Scalar summaries often share records with thousands
+                        # of profile points. Keep a bounded sample of useful
+                        # fields instead of hiding the entire result table.
+                        sample=[];omitted=set()
+                        for row in rows[:2]:
+                            preview={}
+                            for key,item in row.items():
+                                if len(json.dumps(item))>1600 or len(json.dumps(sample+[{**preview,key:item}]))>6000:omitted.add(key)
+                                else:preview[key]=item
+                            sample.append(preview)
                         context={}
                         if isinstance(value,dict):
                             for key,item in value.items():
                                 if key==rows_path or isinstance(item,list) and any(isinstance(x,dict) for x in item):continue
                                 if len(json.dumps(item))<=1600 and len(json.dumps({**context,key:item}))<=4000:context[key]=item
-                        record_files.append({'file':spec['path'],'rowsPath':rows_path,'count':len(rows),'sample':sample,'context':context})
+                        record_files.append({'file':spec['path'],'rowsPath':rows_path,'count':len(rows),'sample':sample,'context':context,**({'omittedFields':sorted(omitted)} if omitted else {})})
                 except (ValueError,OSError):continue
-        observed={'studyVersion':m.get('studyVersion',0),'status':status,'stage':stage,'cases':cases,'promptRevision':m.get('promptRevision',0),'displayPromptRevision':m.get('displayPromptRevision',0),'workspaceRevision':m.get('workspaceWatch',{}).get('revision',0)}
+        observed={'studyVersion':m.get('studyVersion',0),'status':status,'stage':stage,'cases':cases,'promptRevision':m.get('promptRevision',0),'displayPromptRevision':m.get('displayPromptRevision',0),'workspaceRevision':m.get('workspaceWatch',{}).get('revision',0),'evidenceRevision':m.get('evidence',{}).get('revision')}
         data_revision=hashlib.sha256(json.dumps(observed,sort_keys=True).encode()).hexdigest()[:20]
         ui_state=m.get('uiState',{})
         if ui_state.get('revision')==m.get('presentation',{}).get('uiRevision',0) and ui_state.get('errors'):observed['uiErrors']=ui_state['errors']
@@ -416,6 +429,11 @@ class Dashboard:
         if 'ui' in config:
             from ui_policy import clean_document
             config['ui'],_=clean_document(config['ui'])
+            from adaptive_ui import walk_ui
+            requested={i for node in walk_ui(config['ui']) for i in node.get('evidence',[])+node.get('claims',[])}
+            if requested:
+                known={q['id'] for q in r.evidence.index(ident)['claims']}
+                if requested-known:raise ValueError('引用了当前任务不存在的核查结论；请先 ui_inspect(target="evidence")')
         with r.lock:job=r._job(ident);work=job['workspace'];title=job['meta']['title']
         if config.get('progress'):
             req=requested_delivery(latest_request(job['meta']))
@@ -557,7 +575,7 @@ class Dashboard:
             if not any(n['type']=='image' and n['file']==relative for n in walk_ui(document)):raise ValueError('展示图片尚未声明')
             return image_file(job['workspace'],relative)
     def ui_state(self,ident,state):
-        if not isinstance(state,dict) or set(state)-{'revision','presentationVersion','interactionRevision','ready','panels','errors','viewport','slots','nodes','selection','parameters','display','model'} or type(state.get('revision')) is not int:raise ValueError('界面观察无效')
+        if not isinstance(state,dict) or set(state)-{'revision','presentationVersion','interactionRevision','ready','panels','errors','viewport','slots','nodes','selection','parameters','display','model','pickedPoint','browserId'} or type(state.get('revision')) is not int:raise ValueError('界面观察无效')
         if not isinstance(state.get('panels',[]),list) or len(state.get('panels',[]))>64 or not all(isinstance(v,str) and len(v)<=100 for v in state.get('panels',[])):raise ValueError('面板观察无效')
         errors=state.get('errors',[])
         if not isinstance(errors,list) or len(errors)>64 or any(not isinstance(e,dict) or set(e)!={'id','message'} or not isinstance(e['id'],str) or len(e['id'])>100 or not isinstance(e['message'],str) or len(e['message'])>500 for e in errors):raise ValueError('界面错误观察无效')

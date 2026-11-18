@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {hasWorkspaceContent,settingsControlGroups,groupSettingsControls,uiInScope} from '../assets/ui-placement.js';
+import {hasWorkspaceContent,settingsControlGroups,groupSettingsControls,uiInScope,caseTabs} from '../assets/ui-placement.js';
 import {fieldSummary} from '../assets/field-summary.js';
 
 test('single-case pages remain visible for model/overview scopes while studies retain separate tabs',()=>{
@@ -28,4 +28,12 @@ test('uniformity is a property of actual frame values and never of the expanded 
  assert.deepEqual(fieldSummary([650,650,650]),{min:650,max:650,uniform:true});
  assert.equal(fieldSummary([650,650.000001]).uniform,false);
  assert.equal(fieldSummary([]).uniform,false);
+});
+
+test('only distinct single-view panels steer the model from a case tab',()=>{
+ const chart=(id,views)=>({id,series:views.map(view=>({source:{view}}))});
+ const table={id:'table',source:{kind:'dataset',selection:{view:'b'}}};
+ assert.deepEqual([...caseTabs([chart('first',['a','a']),{id:'second',children:[table]}])],[['first','a'],['second','b']]);
+ assert.deepEqual([...caseTabs([chart('first',['a']),table,chart('comparison',['a','b']),{id:'notes',type:'text'}])],[['first','a'],['table','b']]);
+ for(const panels of [[chart('a',['a','b']),table],[chart('a',['b']),table],[chart('a',['a']),{id:'table',source:{kind:'dataset'}}]])assert.equal(caseTabs(panels),null);
 });

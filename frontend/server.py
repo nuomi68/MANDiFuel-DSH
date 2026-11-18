@@ -20,6 +20,18 @@ ROOT=Path(__file__).resolve().parent
 TOKEN=secrets.token_urlsafe(32)
 
 
+def presenter_directory(runtime,project):
+    # Historical runs can be mounted outside the solver's write boundary.
+    # The private UI operator needs only its own empty, project-local cwd.
+    workspace=runtime/'presenter-workspace'
+    if not workspace.resolve().is_relative_to(project.resolve()):
+        workspace=project/'.mandifuel-tmp'/'presenter-workspace'
+    if not workspace.resolve().is_relative_to(project.resolve()):
+        raise ValueError('前端操作工作目录须位于项目内')
+    workspace.mkdir(parents=True,exist_ok=True)
+    return workspace.resolve()
+
+
 class Handler(SimpleHTTPRequestHandler):
     def send_json(self,value,status=200,head=False):
         body=json.dumps(value,ensure_ascii=False,allow_nan=False,separators=(',',':')).encode()
@@ -48,6 +60,9 @@ class Handler(SimpleHTTPRequestHandler):
                     if resource=='fields':return self.send_json(manager.fields(ident,parse_qs(parsed.query).get('view',[None])[0]),head=head)
                     if resource=='study':return self.send_json(manager.study(ident),head=head)
                     if resource=='observe':return self.send_json(manager.dashboard.inspect(ident),head=head)
+                    if resource=='evidence':
+                        query=parse_qs(parsed.query)
+                        return self.send_json(manager.evidence.index(ident,query.get('claim',[None])[0],query.get('source',[None])[0]),head=head)
                     if resource=='frontend':
                         from frontend_session import snapshot
                         query=parse_qs(parsed.query)
@@ -87,6 +102,10 @@ class Handler(SimpleHTTPRequestHandler):
             if path=='/api/adopt':return self.send_json(manager.adopt(str(data['cwd']),str(data['sessionId'])))
             if path=='/api/tasks':return self.send_json(manager.prepare(str(data.get('prompt','')),str(data.get('title','')),data.get('source')),201)
             if len(parts)==4 and parts[:2]==['api','tasks']:
+                if parts[3] in {'selection-check','selection-check-result'}:
+                    from frontend_session import selection_check,selection_check_result
+                    operation=selection_check if parts[3]=='selection-check' else selection_check_result
+                    return self.send_json(operation(manager,parts[2],data))
                 if parts[3]=='present':return self.send_json(manager.dashboard.publish(parts[2],data))
                 if parts[3]=='frontend':
                     from frontend_session import apply
@@ -134,7 +153,7 @@ def main():
     threading.Thread(target=server.serve_forever,daemon=True).start()
     runtime=manager.root/'native-host';runtime.mkdir(exist_ok=True);patch=runtime/'workbench.patch.yml'
     patch.write_text('- insert:\n    - id: mandifuel-native-workbench\n      name: '+json.dumps(str(ROOT/'native-plugin/index.mjs'))+'\n')
-    presenter_work=runtime/'presenter-workspace';presenter_work.mkdir(exist_ok=True)
+    presenter_work=presenter_directory(runtime,REPO)
     env=dict(os.environ,MANDIFUEL_PRESENTATION_ENABLED='0' if args.no_presenter else '1',MANDIFUEL_PRESENTER_WORKSPACE=str(presenter_work),MANDIFUEL_WORKBENCH_BACKEND=f'http://127.0.0.1:{server.server_port}',MANDIFUEL_WORKBENCH_TOKEN=TOKEN)
     process=None
     def terminate(signum,frame):raise KeyboardInterrupt

@@ -1,3 +1,4 @@
+import {EvidenceBrowser} from './evidence-browser.js';
 import {ModelViewer} from './model-viewer.js';
 import {gradient,stops,showScaleControls} from './render-style.js';
 import {compileProgram,bindStyle,bindOptions,bindField,meshContext} from './render-program.js';
@@ -14,8 +15,11 @@ import {fieldSummary} from './field-summary.js';
 import {FrontendStateObserver} from './frontend-state.js';
 import {rangeControls,resolveRange} from './display-controls.js';
 import {PresentationActivity} from './presentation-activity.js';
+import {checkLinkedSelection} from './selection-check.js';
 const BASE='/workbench';
-let settingsPlacementKey=null,frontendObserver=null,presentationActivity=null;
+const browserId=crypto.randomUUID();
+let checkingSelection=false;
+let settingsPlacementKey=null,frontendObserver=null,presentationActivity=null,evidenceBrowser=null,selectionIntent=0;
 
 const $=id=>document.getElementById(id);
 const els=Object.fromEntries([...document.querySelectorAll('[id]')].map(el=>[el.id,el]));
@@ -53,7 +57,7 @@ function applyProgramOptions(){
  return {...pendingCamera,...options,cameraDirectiveRevision,cameraPresetRevision};
 }
 function syncViewerState(error=''){
- if(!task||!fields||!model||!dsh?.token||loadedVersion!==modelLoadKey())return;
+ if(checkingSelection||!task||!fields||!model||!dsh?.token||loadedVersion!==modelLoadKey())return;
  const observation={revision:task.presentation?.viewStateRevision||0,view:state.view,cameraView:state.cameraView,displayMode:state.displayMode,sliceAxis:state.sliceAxis,slicePosition:state.slicePosition,compare:state.compare,revolve:rotationActive(),revolveAngle:state.rotation?.angle||270,camera:{...viewer.camera},rendererError:error};
  if(fields.kind!=='mesh'){observation.field=state.field;observation.compareField=state.compareField;observation.time=frame().time;}
  pendingViewerObservation={id:task.id,observation};if(viewerSyncTimer)return;
@@ -72,21 +76,22 @@ function syncAdaptiveChrome(){
 function syncAdaptiveUI(){
  if(!adaptive)return;
  const wasActive=adaptive.active;
- const selectedTask=task,selectedView=activeView(),selectedFields=fields,selectedModel=model,currentVersion=loadedVersion,views=currentViews();
+ const selectedTask=task,selectedView=activeView(),selectedFields=fields,selectedModel=model,currentVersion=loadedVersion;
  adaptive.update(selectedTask?.presentation?.ui||null,{
   taskId:selectedTask?.id||null,uiRevision:selectedTask?.presentation?.uiRevision||0,deliveryVersion:selectedTask?.deliveryVersion||0,
-  dataKey:JSON.stringify([currentVersion,selectedTask?.study?.version,selectedTask?.deliveryVersion,state.panel,state.field,state.frame,state.view,state.run]),
+  dataKey:JSON.stringify([currentVersion,selectedTask?.study?.version,selectedTask?.deliveryVersion,evidenceBrowser?.data?.revision,state.panel,state.field,state.frame,state.view,state.run]),
   state:{...state},parameters:{...state.parameters},bounds:model?programContext():{},time:frame()?.time,timeUnit:model?.timeUnit,
   interactions:selectedTask?.presentation?.interactions||[],interactionRevision:selectedTask?.presentation?.interactionRevision||0,
-  modelHidden:false,
+  modelHidden:selectedTask?.modelExpected===false,
   controls:availableControls().map(c=>({...c,options:c.id==='view'?viewOptions(c):c.id==='compareField'?(model?.fields||[]).map(f=>({value:f.id,label:f.label})):c.options})),
   getStudyData:async()=>studyData||await api(`/api/tasks/${selectedTask.id}/study`),
   study:studyData,
+  evidenceClaims:evidenceBrowser?.map||new Map(),evidenceState:evidenceBrowser?.data?.state||'pending',openEvidence:id=>evidenceBrowser.open(id),evidenceRevision:evidenceBrowser?.data?.revision,
   imageURL:file=>`${BASE}/api/tasks/${selectedTask.id}/ui-image?file=${encodeURIComponent(file)}&revision=${selectedTask.presentation?.uiRevision||0}`,
   hasStudy:!!selectedTask?.study,
   getDataset:id=>api(`/api/tasks/${selectedTask.id}/ui-data?dataset=${encodeURIComponent(id)}&revision=${selectedTask.presentation?.uiRevision||0}`),
   getViewData:async id=>{
-   const view=id?views.find(v=>v.id===id):selectedView;if(!view)throw new Error('当前面板数据源尚无模型交付');
+   const view=id?selectedTask?.views?.find(v=>v.id===id):selectedView;if(!view)throw new Error('当前面板数据源尚无模型交付');
    const key=`${selectedTask.id}:${view.version||selectedTask.modelVersion||selectedTask.resultVersion||0}:${view.id}`;
    const data=currentVersion===key&&selectedFields?selectedFields:await cached(fieldCache,selectedTask.id,`fields?view=${encodeURIComponent(view.id)}`,key);
    return{data,meta:currentVersion===key&&selectedModel?selectedModel:view.task};
@@ -101,18 +106,34 @@ function syncAdaptiveUI(){
 async function applyUIAction(action){
  if(!task)throw new Error('请先选择任务');
  const ident=task.id;
+ if(action.type==='selection'){
+  const pick=action.selection,target=task.views?.find(v=>v.id===pick.view);
+  if(!target)throw new Error('联动目标视图已失效');
+  if(pick.time!==undefined&&(!Number.isFinite(pick.time)||pick.timeUnit!==target.task.timeUnit))throw new Error('联动时间单位与物理场不一致');
+  const intent=++selectionIntent;stop();await applyUIAction({type:'view',intent,state:{view:pick.view,...pick.time!==undefined?{time:pick.time}:{}}});
+  if(task?.id!==ident||intent!==selectionIntent)return;
+  state.pickedPoint=pick.position?{position:pick.position,view:state.view,time:frame()?.time,timeUnit:model.timeUnit,field:state.field}:null;
+  syncAdaptiveUI();frontendObserver?.schedule();return;
+ }
  if(action.type==='parameter'){
   const control=task.presentation?.controls?.find(c=>c.id===action.id&&c.parameter);if(!control)throw new Error('按钮引用的参数已不存在');
   state.parameters[action.id]=action.value;refresh();syncParameterValues(true);return;
  }
  if(action.type!=='view')throw new Error('未注册的界面动作');
+ const intent=action.intent??++selectionIntent,current=()=>task?.id===ident&&intent===selectionIntent;
  const next=action.state;
+ if(next.view&&task.study&&!currentViews().some(v=>v.id===next.view)){
+  const owners=studyData?.runs.filter(run=>run.viewIds.includes(next.view))||[];
+  if(owners.length!==1)throw new Error('联动视图没有唯一工况');
+  await selectStudyRun(owners[0].id,{openModel:true});
+  if(!current())return;
+ }
  if(next.view&&next.view!==state.view){state.view=next.view;overrides.set(`${task.id}:viewPinned`,true);await loadCurrentFields();}
- if(task?.id!==ident)return;
+ if(!current())return;
  if(task.study&&state.panel!=='model')await selectStudyPanel('model');
- if(task?.id!==ident)return;
+ if(!current())return;
  if(!fields||!model)await loadCurrentFields();
- if(task?.id!==ident)return;
+ if(!current())return;
  if(!fields||!model)throw new Error('当前任务尚无模型结果');
  for(const key of Object.keys(next))if(viewOptionBound(key))throw new Error('该选项由参数联动控制，请更新对应参数：'+key);
  if(next.time!==undefined){if(!fields.frames?.length)throw new Error('当前没有保存的时间帧');state.frame=nearestFrame(fields.frames,next.time);}
@@ -159,7 +180,7 @@ const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&g
 const fmt=x=>Math.abs(x)>=1e5||Math.abs(x)>0&&Math.abs(x)<0.01?x.toExponential(2):Math.abs(x)>=100?x.toFixed(1):Math.abs(x)>=1?x.toFixed(2):x.toFixed(3);
 const clock=x=>Number(x).toLocaleString('en-US');
 function clamp(n,a,b){return Math.max(a,Math.min(b,n));}
-function remember(){try{localStorage.setItem(storageKey,JSON.stringify(state));}catch{}}
+function remember(){if(checkingSelection)return;try{localStorage.setItem(storageKey,JSON.stringify(state));}catch{}}
 function notify(text){els.toast.textContent=text;els.toast.hidden=false;clearTimeout(toastTimer);toastTimer=setTimeout(()=>els.toast.hidden=true,2500);}
 function announce(text){els['live-region'].textContent=text;}
 async function api(path){const response=await fetch(BASE+path,{credentials:'same-origin'});if(!response.ok)throw new Error('结果暂时无法读取，请重试。');return response.json();}
@@ -197,10 +218,10 @@ function values(id=state.field){return fields.series?fields.frames[state.frame].
 function frame(){return fields?.frames?.[state.frame];}
 function timeText(){return frame()?`${clock(frame().time)} ${model?.timeUnit||'s'}`:'稳态';}
 function mergeTask(meta){if(meta.draft)return;const i=tasks.findIndex(t=>t.id===meta.id);if(i<0)tasks.unshift(meta);else tasks[i]={...tasks[i],...meta};if(task?.id===meta.id){const directive=meta.presentation?.viewState||{},selectionKey=JSON.stringify([meta.id,meta.presentation?.viewStateRevision||0,directive]);if(directive.view&&selectionKey!==selectedViewDirectiveKey&&meta.views?.some(v=>v.id===directive.view)){selectedViewDirectiveKey=selectionKey;state.view=directive.view;overrides.set(`${meta.id}:viewPinned`,true);}if(!meta.study&&meta.defaultView&&meta.defaultView!==task.defaultView&&!overrides.has(`${meta.id}:viewPinned`))state.view=meta.defaultView;if(!meta.study&&!task.resultReady&&meta.resultReady){const current=(meta.views||[]).find(v=>v.id===state.view);if(current?.kind==='mesh')state.view=(meta.views||[]).find(v=>v.kind==='results'&&v.caseRoot===current.caseRoot)?.id||meta.defaultView;}task={...task,...meta};}taskMenu();updateHeading();applyPresentation();}
-function updateHeading(){presentationActivity?.update(task);document.title=(task?.title||'OFFBEAT')+' · 计算工作台';execution?.setTask(task);delivery?.setTask(task);els['task-title'].textContent=task?.title||'新任务';els['process-button'].disabled=!task;els['task-picker'].disabled=!tasks.length;
+function updateHeading(){evidenceBrowser?.setTask(task);presentationActivity?.update(task);document.title=(task?.title||'OFFBEAT')+' · 计算工作台';execution?.setTask(task);delivery?.setTask(task);els['task-title'].textContent=task?.title||'新任务';els['process-button'].disabled=!task;els['task-picker'].disabled=!tasks.length;
  const progress=task?.progress,summary=progress?.summary||'';els['task-progress'].hidden=!summary;els['progress-summary'].textContent=summary;els['task-progress'].dataset.state=task?.status||'';els['task-progress'].title='计算流程与子过程，由执行事件及求解日志更新';els['progress-stages'].innerHTML=(progress?.stages||[]).map(s=>`<span class="progress-stage" data-state="${escape(s.status)}">${escape(s.label)}</span>`).join('');
 }
-function showDraft(){studyData=null;studyKey=null;syncStudyChrome();loadToken++;stop();task=null;model=null;presentationKey=null;studyData=null;syncStudyChrome();state.task=null;state.view=null;if(els.drawer.open)els.drawer.close();emptyModel();updateHeading();taskMenu();els['viewer-error'].hidden=true;els['loading-state'].hidden=true;els.workspace.setAttribute('aria-busy','false');remember();}
+function showDraft(){studyData=null;studyKey=null;syncStudyChrome();loadToken++;stop();task=null;model=null;presentationKey=null;studyData=null;syncStudyChrome();state.task=null;state.view=null;state.field=null;state.compareField=null;state.pickedPoint=null;if(els.drawer.open)els.drawer.close();emptyModel();updateHeading();taskMenu();els['viewer-error'].hidden=true;els['loading-state'].hidden=true;els.workspace.setAttribute('aria-busy','false');remember();}
 function rangeKey(){return `${task.id}:${state.view}:${state.field}`;}
 function restoreCustomRange(){
  if(state.scale!=='custom'||!model?.fields?.some(f=>f.id===state.field))return;
@@ -231,8 +252,8 @@ async function loadCurrentFields(){
  if(sequence){els['time-range'].max=data.frames.length-1;els['time-start'].textContent=`${clock(data.frames[0].time)} ${model.timeUnit||'s'}`;els['time-end'].textContent=`${clock(data.frames.at(-1).time)} ${model.timeUnit||'s'}`;}
  els['export-history'].hidden=geometryOnly||!data.frames?.some(f=>Number.isFinite(f.release));if(!geometryOnly)restoreCustomRange();refresh();remember();if(els.drawer.open&&drawerView==='settings')renderSettings();
 }
-function emptyModel(){fields=null;model=null;rotationSource=null;loadedVersion=null;viewer?.clear();compareViewer?.clear();els['model-stage'].classList.remove('comparing');for(const id of ['compare-canvas','compare-picker','compare-legend'])els[id].hidden=true;els['model-stage'].classList.add('unready');els['empty-model'].hidden=false;els['empty-model-label'].textContent=!task?'在右侧 DSH 描述计算任务':task.study?(activeRun()?.status==='failed'?'本组求解失败，未展示其他组的结果':activeRun()?.status==='completed'?'本组尚未交付模型':'本组模型尚未就绪'):task.status==='failed'?'查看 DSH 执行记录':'等待模型结果';els['field-select'].disabled=true;els['export-button'].disabled=true;els['parameters-button'].disabled=true;document.querySelector('.result-bar').hidden=!task?.presentation?.parameters?.length;document.querySelector('.result-metrics').hidden=true;els['parameters-button'].disabled=!task?.presentation?.parameters?.length&&!studyData;els['time-panel'].hidden=true;syncAdaptiveUI();}
-async function showTask(id){const selected=tasks.find(t=>t.id===id);if(!selected)return;const token=++loadToken;stop();closeMenus();if(els.drawer.open)els.drawer.close();if(state.task!==id){Object.assign(state,{cut:false,mesh:false,compare:false,displayMode:'surface',cameraView:'auto',aspectMode:'physical',scale:'fixed',extrema:false,extremaMode:'both'});pendingCamera={};viewDirectiveKey=null;cameraDirectiveRevision++;cameraPresetRevision++;pendingStudyTime=null;state.frame=0;if(state.task)studySelections.set(state.task,{run:state.run,panel:state.panel});state.view=null;presentationKey=null;Object.assign(state,studySelections.get(id)||{run:null,panel:'overview'});}studyData=null;studyKey=null;task=selected;state.task=id;syncStudyChrome();emptyModel();updateHeading();taskMenu();els['loading-state'].hidden=false;els['viewer-error'].hidden=true;els.workspace.setAttribute('aria-busy','true');
+function emptyModel(){fields=null;model=null;rotationSource=null;loadedVersion=null;viewer?.clear();compareViewer?.clear();els['model-stage'].classList.remove('comparing','mesh-preview');els['field-select'].innerHTML='<option value="">结果变量</option>';els['compare-field-select'].replaceChildren();els['model-canvas'].removeAttribute('data-field-mapping');for(const id of ['compare-canvas','compare-picker','compare-legend'])els[id].hidden=true;els['model-stage'].classList.add('unready');els['empty-model'].hidden=false;els['empty-model-label'].textContent=!task?'在右侧 DSH 描述计算任务':task.study?(activeRun()?.status==='failed'?'本组求解失败，未展示其他组的结果':activeRun()?.status==='completed'?'本组尚未交付模型':'本组模型尚未就绪'):task.status==='completed'?'本次任务尚无可显示的模型':task.status==='failed'?'查看 DSH 执行记录':'等待模型结果';els['field-select'].disabled=true;els['export-button'].disabled=true;els['parameters-button'].disabled=true;document.querySelector('.result-bar').hidden=!task?.presentation?.parameters?.length;document.querySelector('.result-metrics').hidden=true;els['parameters-button'].disabled=!task?.presentation?.parameters?.length&&!studyData;els['time-panel'].hidden=true;syncAdaptiveUI();}
+async function showTask(id){const selected=tasks.find(t=>t.id===id);if(!selected)return;const token=++loadToken;stop();closeMenus();if(els.drawer.open)els.drawer.close();if(state.task!==id){selectionIntent++;Object.assign(state,{field:null,compareField:null,pickedPoint:null,cut:false,mesh:false,compare:false,displayMode:'surface',cameraView:'auto',aspectMode:'physical',scale:'fixed',extrema:false,extremaMode:'both'});pendingCamera={};viewDirectiveKey=null;cameraDirectiveRevision++;cameraPresetRevision++;pendingStudyTime=null;state.frame=0;if(state.task)studySelections.set(state.task,{run:state.run,panel:state.panel});state.view=null;presentationKey=null;Object.assign(state,studySelections.get(id)||{run:null,panel:'overview'});}studyData=null;studyKey=null;task=selected;evidenceBrowser?.setTask(task);state.task=id;syncStudyChrome();emptyModel();updateHeading();taskMenu();els['loading-state'].hidden=false;els['viewer-error'].hidden=true;els.workspace.setAttribute('aria-busy','true');
  try{await dsh.select(task);if(token!==loadToken)return;await syncTaskContent();remember();announce(`${task.title}，${statusLabel[task.status]||'已完成'}`);}catch(error){if(token===loadToken)showError(error.message);}finally{if(token===loadToken){els['loading-state'].hidden=true;els.workspace.setAttribute('aria-busy','false');}}
 }
 function showError(message){els['viewer-error'].textContent=message;els['viewer-error'].hidden=false;syncViewerState(message);}
@@ -242,11 +263,11 @@ function syncUniformLegend(legend,actual,unit){
  note.hidden=!actual.uniform;note.textContent=actual.uniform?`当前保存场全域均匀 · ${actual.min} ${unit}`:'';
  legend.querySelector('.legend-gradient').hidden=actual.uniform;legend.querySelector('.legend-numbers').hidden=actual.uniform;
 }
-function refresh(){if(!task||!fields||!viewer||!model)return;try{const programOptions=applyProgramOptions(),geometryOnly=fields.kind==='mesh',comparing=!geometryOnly&&state.compare&&model.fields.length>1;
+function refresh(){if(!task||!fields||!viewer||!model)return;if(state.pickedPoint&&(state.pickedPoint.view!==state.view||state.pickedPoint.time!==frame()?.time))state.pickedPoint=null;try{const programOptions=applyProgramOptions(),geometryOnly=fields.kind==='mesh',comparing=!geometryOnly&&state.compare&&model.fields.length>1;
  els['model-stage'].classList.toggle('comparing',comparing);for(const id of ['compare-canvas','compare-picker','compare-legend'])els[id].hidden=!comparing;
  const mesh=model.shape==='mesh'?renderedMesh():null,revolved=!!mesh?.reconstruction,geometry=displayGeometry(),displayedModel={...model,geometry,reconstruction:mesh?.reconstruction};
  const mode=state.cameraView==='auto'?(revolved?'3d':model.shape==='mesh'&&state.displayMode==='slice'?{x:'yz',y:'xz',z:'xy'}[state.sliceAxis]:mesh?.preferredView||model.preferredView||'3d'):state.cameraView;
- els['model-stage'].style.background=renderStyle().background;const render=(v,id)=>{v.setDisplayProgram(currentProgram(),state.parameters);v.setStyle(renderStyle(id));v.cut=state.cut&&!revolved&&(model.shape!=='mesh'||model.dimensionality!==1);v.mesh=state.mesh;v.cutAngle=state.cutAngle;v.axialScale=state.axialScale;v.displayMode=model.shape==='mesh'&&model.supportsSlice!==false?state.displayMode:'surface';v.sliceAxis=state.sliceAxis;v.slicePosition=state.slicePosition;v.aspectMode=state.aspectMode;if(v.cameraPresetRevision!==programOptions.cameraPresetRevision){v.camera.zoom=1;v.setView(mode,true);v.cameraPresetRevision=programOptions.cameraPresetRevision;}else v.setView(mode);v.setProgramCamera(programOptions);const key=`${task.id}:${state.view}:${modelVersion()}:${revolved?state.rotation.angle:'flat'}`;if(geometryOnly)v.setMeshPreview(displayedModel,mesh,key);else if(model.shape==='mesh')v.setNativeModel(displayedModel,mesh,values(id),range(id),`${key}:${frame().mesh}`);else v.setModel(model,sampler(fields.r,values(id)),range(id),key);v.setAnnotations(!geometryOnly&&state.extrema,!geometryOnly?values(id):[],model.fields?.find(f=>f.id===id)?.unit||'',fields.r,state.extremaMode);v.setSceneAnnotations(geometryOnly?null:currentProgram(),state.parameters,geometryOnly?{}:frame()?.fields||fields,model.fields||[],id);};
+ els['model-stage'].style.background=renderStyle().background;const render=(v,id)=>{v.setDisplayProgram(currentProgram(),state.parameters);v.setStyle(renderStyle(id));v.cut=state.cut&&!revolved&&(model.shape!=='mesh'||model.dimensionality!==1);v.mesh=state.mesh;v.cutAngle=state.cutAngle;v.axialScale=state.axialScale;v.displayMode=model.shape==='mesh'&&model.supportsSlice!==false?state.displayMode:'surface';v.sliceAxis=state.sliceAxis;v.slicePosition=state.slicePosition;v.aspectMode=state.aspectMode;if(v.cameraPresetRevision!==programOptions.cameraPresetRevision){v.camera.zoom=1;v.setView(mode,true);v.cameraPresetRevision=programOptions.cameraPresetRevision;}else v.setView(mode);v.setProgramCamera(programOptions);const key=`${task.id}:${state.view}:${modelVersion()}:${revolved?state.rotation.angle:'flat'}`;if(geometryOnly)v.setMeshPreview(displayedModel,mesh,key);else if(model.shape==='mesh')v.setNativeModel(displayedModel,mesh,values(id),range(id),`${key}:${frame().mesh}`);else v.setModel(model,sampler(fields.r,values(id)),range(id),key);v.setAnnotations(!geometryOnly&&state.extrema,!geometryOnly?values(id):[],model.fields?.find(f=>f.id===id)?.unit||'',fields.r,state.extremaMode);v.setSceneAnnotations(geometryOnly?null:currentProgram(),state.parameters,geometryOnly?{}:frame()?.fields||fields,model.fields||[],id,{mesh:fields.meshes?.[frame()?.mesh],view:state.view});};
  try{render(viewer,state.field);if(comparing){render(compareViewer,state.compareField);compareViewer.camera={...viewer.camera};compareViewer.draw();}else compareViewer?.clear();els['viewer-error'].hidden=true;}catch(error){showError(error.message);return;}
  els['cut-button'].disabled=model.shape==='mesh'&&state.displayMode==='slice';els['cut-button'].setAttribute('aria-pressed',String(state.cut));syncViewerShortcuts();
  if(geometryOnly){drawAxis();syncViewerState();syncAdaptiveUI();return;}
@@ -343,7 +364,7 @@ async function handleControlInput(e){
  if(key==='scale'&&value==='custom'){[state.colorMin,state.colorMax]=customRanges.get(rangeKey())||range();}
  overrides.set(`${task.id}:${state.view}:${key}`,value);
  if(key==='view'){
-  const previous=state.view;overrides.set(`${task.id}:viewPinned`,true);state.view=value;
+  selectionIntent++;const previous=state.view;overrides.set(`${task.id}:viewPinned`,true);state.view=value;
   try{await loadCurrentFields();remember();if(els.drawer.open&&drawerView==='settings')renderSettings();}
   catch(error){if(state.view===value){state.view=previous;await loadCurrentFields();renderSettings();}notify(error.message);}
   return;
@@ -360,22 +381,54 @@ els['drawer-content'].addEventListener('change',handleControlChange);
 els['compare-field-select'].addEventListener('change',()=>{state.compareField=els['compare-field-select'].value;refresh();remember();});
 els['field-select'].addEventListener('change',()=>{state.field=els['field-select'].value;restoreCustomRange();refresh();remember();if(els.drawer.open&&drawerView==='settings')renderSettings();announce(`${selectedField().label}，单位 ${selectedField().unit}`);});
 els['cut-button'].addEventListener('click',()=>{state.cut=!state.cut;overrides.set(`${task.id}:${state.view}:cut`,state.cut);refresh();remember();});els['zoom-in'].addEventListener('click',()=>viewer?.zoom(1.15));els['zoom-out'].addEventListener('click',()=>viewer?.zoom(1/1.15));els['reset-view'].addEventListener('click',()=>viewer?.reset());els['play-button'].addEventListener('click',play);
-els['time-range'].addEventListener('input',()=>{stop();state.frame=Number(els['time-range'].value);refresh();});els['time-range'].addEventListener('change',()=>{remember();announce(`求解时间 ${timeText()}`);});
+els['time-range'].addEventListener('input',()=>{selectionIntent++;stop();state.frame=Number(els['time-range'].value);refresh();});els['time-range'].addEventListener('change',()=>{remember();announce(`求解时间 ${timeText()}`);});
 els['export-image'].addEventListener('click',exportImage);els['export-field'].addEventListener('click',()=>exportCSV());els['export-history'].addEventListener('click',()=>exportCSV(true));
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&els.drawer.open&&drawerView!=='settings'&&!els.drawer.matches(':modal'))els.drawer.close();});
 document.addEventListener('visibilitychange',()=>{if(document.hidden){stop();remember();}});
 
+async function verifySelection(id,request){
+ if(request.browserId!==browserId||checkingSelection||Date.now()>request.expires)return;
+ const current=()=>task?.id===id&&task.presentation?.uiRevision===request.uiRevision;
+ const read=()=>{
+  const mapping=JSON.parse(els['model-canvas'].dataset.fieldMapping||'null'),field=els['field-select'].value;
+  return {ready:current()&&loadedVersion===modelLoadKey()&&!!fields?.frames?.length&&adaptive.ready&&els['viewer-error'].hidden&&field===state.field&&mapping?.vertices>0,view:state.view,run:state.run,field,time:frame()?.time,timeUnit:model?.timeUnit,range:mapping?.sampledRange};
+ };
+ let result={status:'unavailable'};
+ if(current()&&!interval){
+  checkingSelection=true;
+  const picked=state.pickedPoint,camera={...viewer.camera},panel=state.panel,compareField=state.compareField;
+  const tips=[...adaptive.nodes.values()].filter(e=>e.interaction).map(e=>[e,e.interaction.pinned]);
+  const pinKey=id+':viewPinned',pinned=overrides.get(pinKey);
+  try{
+   result=await checkLinkedSelection({current,read,restore:async (before,active)=>{
+    if(before.run&&before.run!==state.run)await selectStudyRun(before.run);
+    if(!active())return;
+    await applyUIAction({type:'view',state:{view:before.view,time:before.time}});
+    if(!active())return;
+    state.field=before.field;state.compareField=compareField;state.pickedPoint=picked;
+    if(task.study&&state.panel!==panel)await selectStudyPanel(panel);
+    if(!active())return;
+    if(pinned===undefined)overrides.delete(pinKey);else overrides.set(pinKey,pinned);
+    Object.assign(viewer.camera,camera);refresh();
+    for(const [entry,pin] of tips){const chart=entry.interaction;chart.pinned=pin;if(!pin)chart.hideTip();else{const el=entry.body.querySelector('[data-chart-point="'+pin+'"]');if(el)chart.showTip(el);}}
+   }});
+  }catch(error){result={status:'failed',message:String(error.message).slice(0,180)};}
+  finally{checkingSelection=false;if(current()){remember();syncViewerState();frontendObserver.schedule();}}
+ }
+ await fetch(BASE+'/api/tasks/'+id+'/selection-check-result',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-Workbench-Token':dsh.token},body:JSON.stringify({nonce:request.nonce,browserId,result})}).catch(()=>{});
+}
 async function loadTasks(){tasks=(await api('/api/tasks')).filter(t=>!t.draft);if(tasks.length)await showTask(tasks.some(t=>t.id===state.task)?state.task:tasks[0].id);else await dsh.newTask();}
 async function init(){try{
+ evidenceBrowser=new EvidenceBrowser({button:els['evidence-button'],dialog:els['evidence-dialog'],onData:()=>syncAdaptiveUI()});
  presentationActivity=new PresentationActivity(els['presentation-skeletons']);
- frontendObserver=new FrontendStateObserver({context:()=>({task,state,adaptive,style:task&&model&&fields?renderStyle():null}),send:(id,observation)=>{if(dsh?.token)return fetch(`${BASE}/api/tasks/${id}/ui-state`,{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-Workbench-Token':dsh.token},body:JSON.stringify(observation)}).catch(()=>{});}});
+ frontendObserver=new FrontendStateObserver({context:()=>({task,state,adaptive,modelReady:!!task&&loadedVersion===modelLoadKey(),style:task&&model&&fields?renderStyle():null}),send:(id,observation)=>{if(!checkingSelection&&dsh?.token)return fetch(`${BASE}/api/tasks/${id}/ui-state`,{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-Workbench-Token':dsh.token},body:JSON.stringify({...observation,browserId})}).catch(()=>{});}});
  adaptive=new AdaptiveUI({host:els['adaptive-ui'],aside:els['adaptive-aside'],model:els['model-content'],onAction:applyUIAction,onRun:selectStudyRun,onControlInput:handleControlInput,onControlChange:handleControlChange,onRendered:()=>{syncAdaptiveChrome();presentationActivity.update(task);frontendObserver.schedule();},getModelImage:()=>viewer?.screenshot(),onObserve:()=>frontendObserver.schedule()});
  studyPanel=new StudyPanel({onRun:selectStudyRun,onPanel:selectStudyPanel,onRuns:ids=>{studyPanel.pendingBinIds=ids||null;openDrawer('runs');},onError:showError});
  delivery=new DeliveryBrowser(els['delivery-panel']);
  execution=new ExecutionProcess({button:els['process-button'],panel:els['execution-process'],workspace:els.workspace,statusLabel});
  viewer=new ModelViewer(els['model-canvas'],{onCameraChange:()=>{if(compareViewer&&state.compare){compareViewer.camera={...viewer.camera};compareViewer.draw();}drawAxis();syncViewerState();},onError:showError});
  compareViewer=new ModelViewer(els['compare-canvas'],{onCameraChange:()=>{viewer.camera={...compareViewer.camera};viewer.draw();drawAxis();syncViewerState();},onError:showError});
- dsh=new NativeHarness({onError:notify,getTasks:()=>tasks,onDraft:showDraft,selectTask:showTask,onReconnect:loadTasks,onMeta:meta=>{mergeTask(meta);if(task?.id===meta.id)syncTaskContent().catch(e=>showError(e.message));},onResult:()=>syncTaskContent().catch(e=>showError(e.message))});
+ dsh=new NativeHarness({onSelectionCheck:verifySelection,onError:notify,getTasks:()=>tasks,onDraft:showDraft,selectTask:showTask,onReconnect:loadTasks,onMeta:meta=>{mergeTask(meta);if(task?.id===meta.id)syncTaskContent().catch(e=>showError(e.message));},onResult:()=>syncTaskContent().catch(e=>showError(e.message))});
  emptyModel();await dsh.init();await loadTasks();
  }catch(error){els['loading-state'].hidden=true;els.workspace.setAttribute('aria-busy','false');showError(error.message);}}
 init();

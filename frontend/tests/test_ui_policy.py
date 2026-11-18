@@ -10,6 +10,14 @@ class UIPolicyTests(unittest.TestCase):
         note={'id':'note','type':'text','text':'结果来源与对照说明'}
         ui={'version':1,'root':{'id':'root','type':'column','children':[{'id':'value','type':'metric','source':{'kind':'history','field':'T'}},note]},'aside':{'id':'copy','type':'column','children':[{**note,'id':'duplicate','title':'另一标题'}]}}
         value,removed=clean_document(ui);self.assertEqual(value['root']['children'],[note]);self.assertNotIn('aside',value);self.assertIn('value',removed);self.assertIn('duplicate',removed);self.assertEqual(len(ui['root']['children']),2)
+    def test_evidence_keeps_one_inline_citation_per_visible_scope(self):
+        note=lambda key:{'type':'text','id':key,'text':'说明 '+key,'evidence':['e1']}
+        doc={'root':{'type':'column','id':'main','children':[{'type':'evidence','id':'extra','claims':['e1','e2']},note('a'),note('b')]}}
+        value,removed=clean_document(doc);children=value['root']['children']
+        self.assertEqual(children[0]['claims'],['e2']);self.assertEqual(children[1]['evidence'],['e1']);self.assertNotIn('evidence',children[2])
+        doc['root']={'id':'alternate','type':'tabs','children':[note('a'),note('b')]}
+        self.assertEqual(clean_document(doc)[0],doc)
+
     def test_different_data_or_display_semantics_are_preserved(self):
         chart={'id':'a','type':'chart','series':[{'source':{'kind':'dataset','dataset':'data'},'x':'time','y':'stress'}]}
         other={**chart,'id':'b','series':[{'source':{'kind':'dataset','dataset':'data'},'x':'time','y':'temperature'}]}

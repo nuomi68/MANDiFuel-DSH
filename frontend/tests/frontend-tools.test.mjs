@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {attachFrontendTools,renderConfirmation} from '../native-plugin/frontend-tools.mjs';
+import {attachFrontendTools,renderConfirmation,verifyRenderedSelection} from '../native-plugin/frontend-tools.mjs';
 
 function setup(){
  const tools=new Map(),session={request:'调整显示'},signal=new AbortController().signal;
@@ -38,4 +38,12 @@ test('a settings snapshot alone cannot authorize editing an unseen page',async()
 test('completion requires the actual physical field window when fields are available',()=>{
  const page={modelRequirement:{required:true,kind:'fields'},browser:{connected:true,ready:true,presentationVersion:1,revision:1,errors:[],model:{visible:true,ready:true,kind:'mesh'}}};
  const wanted={presentationVersion:1,uiRevision:1};assert.equal(renderConfirmation(page,wanted),'pending');page.browser.model.kind='fields';assert.equal(renderConfirmation(page,wanted),'confirmed');page.browser.model.visible=false;assert.equal(renderConfirmation(page,wanted),'error');
+});
+
+test('a generated layout gets one real selection check, also when the presenter confirms on its behalf',async()=>{
+ const session={checkSelection:true},page={revision:'seen',browser:{model:{kind:'fields'},browserId:'live'}};let count=0;
+ const call=async(path,body)=>{assert.equal(path,'/api/tasks/task/selection-check');assert.deepEqual(body,{revision:'seen'});count++;return{status:'verified',restored:true};};
+ await verifyRenderedSelection(session,page,call,'task');await verifyRenderedSelection(session,page,call,'task');
+ assert.equal(count,1);assert.equal(session.selectionCheck.status,'verified');
+ await verifyRenderedSelection({checkSelection:true},{browser:{model:{kind:'mesh'},browserId:'live'}},call,'task');assert.equal(count,1);
 });

@@ -3,9 +3,9 @@ import {SKILL,readSkill} from './frontend-agent.mjs';
 const object=(properties={},required=[])=>({type:'object',properties,required,additionalProperties:false});
 export const TOOL_SCHEMAS={
  ui_read_skill:object({resource:{type:'string'}}),
- ui_inspect:object({target:{type:'string',enum:['page','main','aside','settings','model','data','capabilities']},node:{type:'string'}},['target']),
+ ui_inspect:object({target:{type:'string',enum:['page','main','aside','settings','model','data','capabilities','evidence']},node:{type:'string'}},['target']),
  ui_apply:object({expectedRevision:{type:'string'},operations:{type:'array',items:{type:'object'}},update:{type:'object'}},['expectedRevision']),
- ui_wait_for_render:object({timeoutMs:{type:'integer'}}),
+ ui_wait_for_render:object({timeoutMs:{type:'integer'},verifySelection:{type:'boolean'}}),
 };
 const descriptions={ui_read_skill:'Read the registered frontend skill or one of its references. Read SKILL.md before mutations.',ui_inspect:'Inspect the actual current page, one slot, models, data or capabilities. Returns the revision required by ui_apply.',ui_apply:'Apply bounded slot operations and/or a presentation update to this task, using an inspected expectedRevision. Never writes solver inputs or saved fields.',ui_wait_for_render:'Check the browser acknowledgement and actual errors for the last mutation. Saving a configuration alone is not confirmation.'};
 export function renderConfirmation(page,wanted){
@@ -24,6 +24,14 @@ const sleep=(ms,signal)=>new Promise((resolve,reject)=>{
  const abort=()=>{clearTimeout(timer);reject(signal.reason||new Error('frontend operation cancelled'));};
  const timer=setTimeout(()=>{signal?.removeEventListener('abort',abort);resolve();},ms);signal?.addEventListener('abort',abort,{once:true});
 });
+
+export async function verifyRenderedSelection(session,page,call,id,signal){
+ if(session.checkSelection&&!session.selectionCheck&&page.browser?.model?.kind==='fields'&&page.browser.browserId){
+  const proof=await call('/api/tasks/'+id+'/selection-check',{revision:page.revision},signal);
+  session.selectionCheck=proof;
+ }
+ return session.selectionCheck;
+}
 
 export function attachFrontendTools(agent,{id,call,current,session}){
  const revisions=new Set();let calls=0,mutations=0,skillLoaded=false;
@@ -45,10 +53,11 @@ export function attachFrontendTools(agent,{id,call,current,session}){
    }
    if(name==='ui_apply'){
     if(!skillLoaded)throw new Error('先 ui_read_skill 读取 '+SKILL.name+' 的 SKILL.md');
-    if(!revisions.has(args.expectedRevision))throw new Error('必须先 ui_inspect 获取本轮实际状态版本');
+    if(!revisions.has(args.expectedRevision))throw new Error('必须先 ui_inspect 获取本轮实际状态版本；本轮已读取：'+[...revisions].join(', ')+'；收到：'+String(args.expectedRevision));
     if(!session.pageObserved)throw new Error('先 ui_inspect(target="page") 获取当前实际页面布局、内容与物理场状态');
     if(++mutations>8)throw new Error('本轮前端修改超过 8 次，请保留已完成部分并结束');
     const value=await call(`/api/tasks/${id}/frontend`,{...args,...session.request!==undefined?{expectedRequest:session.request}:{}},exec.signal);
+    if(args.update?.ui||args.operations?.some(op=>['main','aside'].includes(op.slot)&&op.op!=='interact')){session.checkSelection=true;delete session.selectionCheck;}
     session.lastPublished=value;session.mutations=mutations;session.confirmed=false;return value;
    }
    const timeout=args.timeoutMs??8000;
@@ -58,8 +67,12 @@ export function attachFrontendTools(agent,{id,call,current,session}){
     const page=await call(`/api/tasks/${id}/frontend?target=page`,undefined,exec.signal),browser=page.browser||{};
     const wanted=expected||page;
     session.renderExpected=wanted;
-    const status=renderConfirmation(page,wanted);
-    if(status!=='pending'||Date.now()>=deadline){revisions.add(page.revision);session.confirmed=status==='confirmed';session.renderStatus=status;return{status,revision:page.revision,presentationVersion:page.presentationVersion,browser,viewer:page.viewer||{}};}
+    let status=renderConfirmation(page,wanted);
+    if(args.verifySelection)session.checkSelection=true;
+    if(status==='confirmed')await verifyRenderedSelection(session,page,call,id,exec.signal);
+    if(status==='confirmed'&&session.selectionCheck?.status==='failed')status='error';
+    else if(status==='confirmed'&&session.selectionCheck&&!['verified','not-applicable'].includes(session.selectionCheck.status))status='selection-unconfirmed';
+    if(status!=='pending'||Date.now()>=deadline){revisions.add(page.revision);session.confirmed=status==='confirmed';session.renderStatus=status;return{status,revision:page.revision,presentationVersion:page.presentationVersion,browser,viewer:page.viewer||{},selectionCheck:session.selectionCheck};}
     await sleep(250,exec.signal);
    }while(current());
    throw new Error('前端操作会话已结束');

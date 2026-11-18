@@ -20,6 +20,7 @@ export async function classifyPresentation(llm,selection,message,signal,makeUser
 }
 
 const isPresentation=event=>event?.type==='user/message'&&(event.data.source?.surface==='presentation'||event.data.source?.plugin==='mandifuel-workbench');
+const explicitPresentation=text=>/^\s*(?:仅前端展示|仅前端显示|仅显示调整|仅展示调整)\s*[：:，,]/.test(text);
 
 /** Keep the human transcript, while durably restoring the prior model surface. */
 export function hidePresentationMessages(session){
@@ -55,13 +56,15 @@ export async function mountPresentationRouter(ctx,{call,sessions,presenter,class
       if(!snapshot.task.modelReady&&!snapshot.task.resultReady)return proceed();
       const agent=ctx.agents.get(request.sessionId),selection=agent?.options||ctx.agentDefaultModel.currentSelection();
       const timeout=AbortSignal.timeout(12000),cancel=signal?AbortSignal.any([signal,timeout]):timeout;
-      let render=false;
+      let render=explicitPresentation(text);
       try{
+       if(!render){
         const facts=await call(`/api/tasks/${id}/observe`);
         const context=JSON.stringify({request:text,previousRequest:facts.task?.latestRequest,controls:(facts.presentation?.controls||[]).map(c=>({id:c.id,label:c.label,group:c.group})),values:facts.presentation?.parameterValues});
         render=await(classify?classify(text):classifyPresentation(ctx.llm,selection,context,cancel,createUserMessage));
+       }
       }
-      catch(error){if(signal?.aborted)throw error;console.warn('Presentation routing unavailable; using ordinary admission:',String(error.message||error));return proceed();}
+      catch(error){if(signal?.aborted)throw error;console.warn('Presentation routing unavailable:',String(error.message||error));throw new Error('暂时无法判断本条请求用途，尚未提交给计算助手，请重试。已有计算继续运行。');}
       console.info('Presentation route:',render?'render':'compute',String(request.sessionId));
       if(!render)return proceed();
       const key=String(request.sessionId)+':'+request.requestId;

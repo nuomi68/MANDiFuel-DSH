@@ -8,6 +8,22 @@ export function hasWorkspaceContent(node){
  return node.children?node.children.some(hasWorkspaceContent):true;
 }
 
+// Case-specific tabs can sit beside a comparison or notes in the same tab list.
+export function caseTabs(children){
+ const targets=new Map();
+ function sources(node){
+  if(node.children)return node.children.flatMap(sources);
+  if(node.series)return node.series.map(series=>series.source);
+  return node.source?[node.source]:[];
+ }
+ for(const child of children){
+  const bound=sources(child).map(source=>source?.view||(!source?.selection?.viewColumn&&source?.selection?.view));
+  if(!bound.length||bound.some(view=>!view)||new Set(bound).size!==1)continue;
+  targets.set(child.id,bound[0]);
+ }
+ return targets.size>1&&new Set(targets.values()).size===targets.size?targets:null;
+}
+
 export function settingsControlGroups(document,isVisible=()=>true){
  const groups=[];
  function visit(node){

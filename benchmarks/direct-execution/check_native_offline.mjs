@@ -17,6 +17,7 @@ const { SessionProjectionRegistry }=await native('dsh-session-projection');
 const {default:Bash}=await native('dsh-bash-sandbox');
 const workspace=mkdtempSync(join(tmpdir(),'mandifuel-native-offline-workspace-'));
 const outside=mkdtempSync(join(tmpdir(),'mandifuel-native-offline-outside-'));
+delete process.env.MANDIFUEL_RUNS_ROOT;
 process.env.MANDIFUEL_PROJECT_ROOT=workspace;
 const {default:Offline}=await import('../../dsh/mandifuel-offline-subprocess.mjs');
 const ctx=new Context();

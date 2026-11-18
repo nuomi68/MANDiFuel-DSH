@@ -77,7 +77,9 @@ project_fs_json="$(python3 -P -B -c 'import json, sys; print(json.dumps(sys.argv
 project_policy_json="$(python3 -P -B -c 'import json, sys; print(json.dumps(sys.argv[1]))' "$project_policy_path")"
 project_sandbox_json="$(python3 -P -B -c 'import json, sys; print(json.dumps(sys.argv[1]))' "$project_sandbox_path")"
 # Probe the same fail-closed launcher used for task children; no solver/network call.
-(cd -- "$MANDIFUEL_DEFAULT_WORKDIR"; "$MANDIFUEL_TASK_PYTHON" -I -B "$plugin_root/dsh/offline-exec.py" --project-root "$MANDIFUEL_PROJECT_ROOT" -- true)
+root_args=(--project-root "$MANDIFUEL_PROJECT_ROOT")
+if [[ -n "$MANDIFUEL_RUNS_ROOT" ]]; then root_args+=(--runs-root "$MANDIFUEL_RUNS_ROOT"); fi
+(cd -- "$MANDIFUEL_DEFAULT_WORKDIR"; "$MANDIFUEL_TASK_PYTHON" -I -B "$plugin_root/dsh/offline-exec.py" "${root_args[@]}" -- true)
 adapter_json="$(python3 -P -B -c 'import json, sys; print(json.dumps(sys.argv[1]))' "$adapter_path")"
 
 {
@@ -139,7 +141,7 @@ fi
 if [[ "$mode" == web ]]; then
     cd -- "$MANDIFUEL_DEFAULT_WORKDIR"
 else
-    case "$PWD/" in "$MANDIFUEL_PROJECT_ROOT/"*) ;; *) cd -- "$MANDIFUEL_DEFAULT_WORKDIR";; esac
+    if ! mandifuel_writable_directory "$(pwd -P)"; then cd -- "$MANDIFUEL_DEFAULT_WORKDIR"; fi
 fi
 if [[ "$mode" == "web" ]]; then
     "$MANDIFUEL_NODE" "$dsh_executable" web --patch "$patch_file" --patch "$runtime_patch" --patch "$web_patch_file" "$@"

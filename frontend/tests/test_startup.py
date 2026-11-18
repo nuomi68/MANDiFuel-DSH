@@ -9,6 +9,15 @@ SERVER=Path(__file__).resolve().parents[1]/'server.py'
 
 
 class StartupTests(unittest.TestCase):
+    def test_private_operator_stays_in_project_with_external_result_storage(self):
+        sys.path.insert(0,str(SERVER.parent))
+        from server import presenter_directory
+        with tempfile.TemporaryDirectory() as tmp:
+            base=Path(tmp);project=base/'project';project.mkdir();store=base/'data';store.mkdir()
+            (project/'runs').symlink_to(store,target_is_directory=True)
+            self.assertTrue(presenter_directory(project/'runs/native-host',project).is_relative_to(project))
+            self.assertFalse((store/'native-host/presenter-workspace').exists())
+
     def test_occupied_port_exits_before_touching_task_storage(self):
         with tempfile.TemporaryDirectory() as folder, socket.socket() as listener:
             listener.bind(('127.0.0.1',0));listener.listen()

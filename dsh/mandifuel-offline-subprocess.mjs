@@ -2,7 +2,7 @@
 import { createRequire } from "node:module";
 import { fileURLToPath, pathToFileURL } from "node:url";
 import { readFileSync } from 'node:fs';
-import { projectRoot, checkedCwd } from './project-boundary.mjs';
+import { launcherRootArgs, checkedCwd } from './project-boundary.mjs';
 
 const executable = process.env.MANDIFUEL_DSH_EXECUTABLE;
 const python = process.env.MANDIFUEL_OFFLINE_PYTHON || process.env.MANDIFUEL_TASK_PYTHON;
@@ -20,7 +20,7 @@ const launcherSource=readFileSync(launcher,'utf8');
 export default class OfflineSubprocessRuntime extends LocalSubprocessRuntime {
   offline(spec) {
     return { ...spec, cwd:checkedCwd(spec.cwd), argv: [python, "-I", "-B", '-c', launcherSource,
-      '--project-root', projectRoot, "--", ...spec.argv] };
+      ...launcherRootArgs, "--", ...spec.argv] };
   }
   spawn(spec) { return super.spawn(this.offline(spec)); }
   spawnTerminal(spec) { return super.spawnTerminal(this.offline(spec)); }

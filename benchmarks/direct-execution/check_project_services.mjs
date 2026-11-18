@@ -7,6 +7,9 @@ import {tmpdir} from 'node:os';
 import {join} from 'node:path';
 const workspace=mkdtempSync(join(tmpdir(),'mandifuel-project-services-'));
 const outside=mkdtempSync(join(tmpdir(),'mandifuel-project-services-outside-'));
+const store=mkdtempSync(join(tmpdir(),'mandifuel-project-services-store-'));
+const runs=join(store,'runs');mkdirSync(runs);symlinkSync(runs,join(workspace,'runs'));
+process.env.MANDIFUEL_RUNS_ROOT=runs;
 process.env.MANDIFUEL_PROJECT_ROOT=workspace;
 process.env.MANDIFUEL_DEFAULT_WORKDIR=workspace;
 const require=createRequire(process.env.MANDIFUEL_DSH_EXECUTABLE);
@@ -63,17 +66,24 @@ try {
   assert.deepEqual(policy.resolve({mode:'danger-full-access'}),{mode:'workspace-write',workspaceRoot:workspace});
   assert.equal(policy.resolve({mode:'read-only'}).mode,'read-only');
   assert.throws(()=>policy.resolve({session:{id:'fake',header:{cwd:outside}},mode:'workspace-write'}),/outside/);
-  const sessionDir=join(workspace,'task','workspace');mkdirSync(sessionDir,{recursive:true});
+  const sessionDir=join(runs,'task','workspace');mkdirSync(sessionDir,{recursive:true});
   const resolved=policy.resolve({session:{id:'fake',header:{cwd:sessionDir}},mode:'workspace-write'});
   assert.equal(resolved.workspaceRoot,sessionDir,'project write grants must not replace the session cwd');
   const relative=await fs.resolve('relative.txt',{cwd:resolved.workspaceRoot});
   await fs.writeText(relative,'session-local');
   assert.equal(readFileSync(join(sessionDir,'relative.txt'),'utf8'),'session-local');
+  const viaLink=await fs.resolve(join(workspace,'runs','task','workspace','relative.txt'));
+  await fs.editText(viaLink,{oldString:'session-local',newString:'edited',replaceAll:false});
+  assert.equal(readFileSync(join(sessionDir,'relative.txt'),'utf8'),'edited');
+  await assert.rejects(fs.writeText(viaLink,'readonly',undefined,undefined,{mode:'read-only'}),/read-only/);
   const py=process.env.MANDIFUEL_TASK_PYTHON;
   const sibling=join(workspace,'shared.txt');
-  const wide=shell.resolve({command:`${quote(py)} -c ${quote(`from pathlib import Path; assert Path.cwd()==Path(${JSON.stringify(sessionDir)}); Path(${JSON.stringify(sibling)}).write_text('whole project')`)}`,workdir:resolved.workspaceRoot,sandboxPolicy:resolved});
+  const wide=shell.resolve({command:`${quote(py)} -c ${quote(`from pathlib import Path; assert Path.cwd()==Path(${JSON.stringify(sessionDir)}); Path('result').write_text('saved'); Path(${JSON.stringify(sibling)}).write_text('whole project')`)}`,workdir:resolved.workspaceRoot,sandboxPolicy:resolved});
   const written=await shell.run(wide);assert.equal(written.exitCode,0,written.stderr.text);
   assert.equal(readFileSync(sibling,'utf8'),'whole project');
+  assert.equal(readFileSync(join(sessionDir,'result'),'utf8'),'saved');
+  const readonly=await shell.run(shell.resolve({command:"printf changed > result",workdir:sessionDir,sandboxPolicy:{mode:'read-only',workspaceRoot:sessionDir}}));
+  assert.notEqual(readonly.exitCode,0);assert.equal(readFileSync(join(sessionDir,'result'),'utf8'),'saved');
   const spec=shell.resolve({command:`${quote(py)} -c ${quote(`from pathlib import Path; Path(${JSON.stringify(protectedPath)}).write_text('bad')`)}`,workdir:workspace,sandboxPolicy:full});
   const denied=await shell.run(spec);
   assert.notEqual(denied.exitCode,0);assert.match(denied.stderr.text,/Permission denied/);
@@ -85,5 +95,5 @@ try {
   console.log('PASS: native file create/edit/version guards; outside and symlink writes denied even with full access; read-only preserved; shell and PTY confined; cwd and policy cannot widen project');
 } finally {
   await runtime.disposeManagedProcesses();
-  rmSync(workspace,{recursive:true,force:true});rmSync(outside,{recursive:true,force:true});
+  rmSync(workspace,{recursive:true,force:true});rmSync(outside,{recursive:true,force:true});rmSync(store,{recursive:true,force:true});
 }

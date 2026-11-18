@@ -27,6 +27,7 @@ configs/launcher.env
 secrets/
 
 runs/
+/runs
 workspace/
 artifacts/
 case/

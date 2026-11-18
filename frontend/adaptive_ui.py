@@ -15,6 +15,7 @@ CATALOG = {
     'document': {'version': 1, 'mode': ['above', 'below', 'replace'], 'root': 'main component tree', 'aside':'optional component tree below DSH chat; moves below main content when chat is closed or on mobile', 'scope':['all','overview','model'], 'datasets': {'id': {'file': 'workspace-relative JSON or CSV with a header; optional rows:path and columns:[{id,path,label,unit}] map ordinary terminal records without changing source; CSV uses its actual header IDs, finite numeric cells and null for empty cells'}}},
     'containers': {'row': 'children', 'column': 'children', 'grid': 'columns 1–4, children', 'tabs': 'children with titles'},
     'components': {
+        'evidence':'claims:[ev-ID] renders verifier-owned quantity rows; no agent-supplied value or status. All components may add evidence:[ev-ID] for clickable source citations. Read ui_inspect(target="evidence") first.',
         'chart': 'mixed scientific marks: series [{label,source,x?,y?,mark:line|scatter|bar|interval,color?,dash:solid|dash|dot,marker:none|circle|square|triangle|diamond,width?,size?,opacity?,step?,order:source|x,xLow?,xHigh?,yLow?,yHigh?}]; xAxis/yAxis:{label?,scale:linear|log,min?,max?,reverse?,grid?,ticks?:numeric array}; references:[{axis:x|y,value or from/to,label?,color?,dash?,opacity?}]; height:220–800,legend:bottom|right|none,caption?',
         'lineChart': 'same as chart; default line mark',
         'barChart': 'same as chart; default bar mark, supports categorical x',
@@ -34,6 +35,7 @@ CATALOG = {
         'study': 'status:completed(default)|all|queued|running|failed|skipped; best?:objective response ID adds only best.<objective ID>; select:best with best:<objective ID> returns the best feasible run, using its parameter.<id>/response.<id> columns; filter?:[{column,op:eq|ne|lt|lte|gt|gte,value}]; columns record/runId/label/status(localized display)/statusCode(raw code)/iteration/caseRoot plus parameter.<id> and response.<id>; no model required',
         'dataset': 'dataset: ID declared in document.datasets; runId?:actual column containing real study run IDs enables linked chart/table selection and model navigation; optional rows/columns path mapping reads ordinary JSON records; table file {columns:[{id,label?,unit?}],rows:[objects]}',
     },
+    'linkedSelection': 'Any source may declare selection:{view:actual view ID OR viewColumn:column ID,timeColumn?:column ID,timeUnit:s|d,positionColumns?:[X,Y,Z columns in metres]}. Chart points/table rows select the real model and nearest saved frame; profile sources expose time/positionX/positionY/positionZ when linked. filter rules may use context:view|time|run instead of value. The shared current view/time drives filters and selection highlighting. Never mix cases or time units.',
     'bindings': 'visible: bounded boolean expression; probe coordinates may reference p.<control ID>',
     'limits': {'nodes': 64, 'depth': 8, 'seriesPerChart': 12, 'datasets': 8, 'rowsPerDataset': 20000, 'bytesPerDataset': 2*1024*1024},
     'codeExecution': False,
@@ -53,12 +55,21 @@ def validate_source(source):
     if not isinstance(source,dict): fail('数据源必须是对象')
     kind=source.get('kind')
     allowed={'study':{'kind','status','best','select'},'dataset':{'kind','dataset','runId'},'profile':{'kind','view','field','axis','time'},'history':{'kind','view','field','statistic'},'probeHistory':{'kind','view','field','position'}}.get(kind,set())
-    allowed|={'filter'}
+    allowed|={'filter','selection'}
     filters=source.get('filter',[])
     if not isinstance(filters,list) or len(filters)>8:fail('数据筛选条件无效')
     for row in filters:
-        if not isinstance(row,dict) or set(row)!={'column','op','value'} or row['op'] not in {'eq','ne','lt','lte','gt','gte'} or not (number(row['value']) or isinstance(row['value'],str)):fail('数据筛选条件无效')
+        if not isinstance(row,dict) or set(row) not in ({'column','op','value'},{'column','op','context'}) or row['op'] not in {'eq','ne','lt','lte','gt','gte'}:fail('数据筛选条件无效')
+        if 'context' in row and row['context'] not in {'view','time','run'}:fail('筛选只能绑定当前工况、视图或保存时刻')
+        if 'value' in row and not (number(row['value']) or isinstance(row['value'],str)):fail('数据筛选条件无效')
         string(row['column'])
+    if 'selection' in source:
+        binding=source['selection']
+        if not isinstance(binding,dict) or not binding or set(binding)-{'view','viewColumn','timeColumn','timeUnit','positionColumns'} or 'view' in binding and 'viewColumn' in binding:fail('联动选择映射无效')
+        for key in ['view','viewColumn','timeColumn']:
+            if key in binding:string(binding[key])
+        if 'timeColumn' in binding and binding.get('timeUnit') not in {'s','d'}:fail('时间联动必须明确 s 或 d 单位')
+        if 'positionColumns' in binding and (not isinstance(binding['positionColumns'],list) or len(binding['positionColumns'])!=3 or not all(isinstance(v,str) and 0<len(v)<=120 for v in binding['positionColumns'])):fail('位置联动需要三个真实坐标列')
     if kind not in CATALOG['sources'] or set(source)-allowed: fail('未知数据源或数据源属性')
     result=copy.deepcopy(source)
     if kind=='study':
@@ -118,7 +129,10 @@ def validate_ui(document):
             try:return validate_source(source)
             except ValueError as error:raise ValueError('展示组件 '+node['id']+'：'+str(error)) from error
         if kind not in TYPES: fail('未注册的组件类型：'+str(kind))
-        allowed={'id','type','title','visible'}
+        allowed={'id','type','title','visible','evidence'}
+        def evidence_ids(value):
+            if not isinstance(value,list) or not 1<=len(value)<=12 or any(not isinstance(v,str) or not re.fullmatch(r'ev-[a-f0-9]{20}',v) for v in value) or len(value)!=len(set(value)):fail('核查引用需要 1–12 个真实结论 ID')
+        if 'evidence' in node:evidence_ids(node['evidence'])
         if 'title' in node:string(node['title'])
         if 'visible' in node:expression_parameters(node['visible'])
         if kind in CONTAINERS:
@@ -137,6 +151,7 @@ def validate_ui(document):
             for key in ['column','unit']:
                 if key in node:string(node[key])
         elif kind=='text':allowed.add('text');string(node.get('text'),4000)
+        elif kind=='evidence':allowed.add('claims');evidence_ids(node.get('claims'))
         elif kind=='image':
             allowed|={'file','alt','caption'};image_path=Path(string(node.get('file'),500));string(node.get('alt'),500)
             if image_path.is_absolute() or '..' in image_path.parts or image_path.suffix.lower() not in {'.png','.jpg','.jpeg','.webp'}:fail('图片需要工作区内的 PNG/JPEG/WebP 文件')
@@ -262,7 +277,11 @@ def validate_ui_delivery(document,views,preferred,controls,workspace=None,study=
     missing=ui_parameters(document)-params
     if missing:fail('引用未定义参数：'+', '.join(sorted(missing)))
     datasets=document.get('datasets',{})
-    tables={ident:load_dataset(workspace,spec) for ident,spec in datasets.items()} if workspace is not None else {}
+    tables={}
+    if workspace is not None:
+        for ident,spec in datasets.items():
+            try:tables[ident]=load_dataset(workspace,spec)
+            except ValueError as error:raise ValueError('数据表 '+ident+'（'+spec['file']+'）：'+str(error)) from error
     def columns(source):
         if source['kind']=='study':
             return {'record','runId','label','status','statusCode','iteration','caseRoot'}|{'parameter.'+d['id'] for d in study['parameters']}|{'response.'+d['id'] for d in study['responses']}|({'best.'+source['best']} if source.get('best') else set())
@@ -271,11 +290,18 @@ def validate_ui_delivery(document,views,preferred,controls,workspace=None,study=
             spec=datasets.get(source['dataset'],{})
             actual={c['id'] for c in table['columns']} if table else {c['id'] for c in spec['columns']} if 'columns' in spec else None
             return actual|{'runId'} if actual is not None and source.get('runId') else actual
-        return {'x','value'}|({'cell','distance'} if source['kind']=='probeHistory' else set())
+        return {'x','value'}|({'cell','distance'} if source['kind']=='probeHistory' else {'time','positionX','positionY','positionZ'} if source['kind']=='profile' and source.get('selection') else set())
     def check_columns(source,refs):
         actual=columns(source)
         if actual is not None and set(refs)-actual:fail('引用不存在的数据列：'+', '.join(sorted(set(refs)-actual))+'；实际列：'+', '.join(sorted(actual)))
     for source in ui_sources(document):
+        binding=source.get('selection',{})
+        if binding:check_columns(source,[binding[k] for k in ['viewColumn','timeColumn'] if k in binding]+binding.get('positionColumns',[]))
+        targets=[binding['view']] if 'view' in binding else [r.get(binding['viewColumn']) for r in tables.get(source.get('dataset'),{}).get('rows',[]) if r.get(binding['viewColumn']) is not None] if 'viewColumn' in binding else [source.get('view',preferred)]
+        if binding and any(not isinstance(target,str) for target in targets):fail('联动目标列必须保存真实视图 ID')
+        for target in set(targets) if binding else []:
+            if target not in views:fail('联动选择引用尚未交付的模型视图')
+            if 'timeColumn' in binding and views[target]['task'].get('timeUnit')!=binding['timeUnit']:fail('联动时间单位与目标物理场不一致')
         if source['kind']=='study':
             if not study:fail('研究数据源尚无真实研究记录')
             if source.get('best') and not any(d['id']==source['best'] and d.get('goal') in {'min','max'} for d in study['responses']):fail('最好值需要有实际目标方向的响应')

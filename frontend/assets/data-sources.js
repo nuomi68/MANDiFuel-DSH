@@ -6,7 +6,7 @@ export function nearestCell(mesh,point){
  const axis=mesh.reconstruction?.type==='axisymmetric-revolve'?'xyz'.indexOf(mesh.reconstruction.axis):-1,radial=[0,1,2].filter(i=>i!==axis);
  let distance=Infinity,index=-1;
  for(let i=0;i<centres.length;i++){
-  const c=centres[i],d=axis>=0?(Math.hypot(...radial.map(j=>c[j]))-Math.hypot(...radial.map(j=>point[j])))**2+(c[axis]-point[axis])**2:c.reduce((n,v,j)=>n+(v-point[j])**2,0);
+  const c=centres[i],d=mesh.samplingGeometry==='spherical'?(Math.hypot(...c)-Math.hypot(...point))**2:axis>=0?(Math.hypot(...radial.map(j=>c[j]))-Math.hypot(...radial.map(j=>point[j])))**2+(c[axis]-point[axis])**2:c.reduce((n,v,j)=>n+(v-point[j])**2,0);
   if(d<distance){distance=d;index=i;}
  }
  return{index,distance:Math.sqrt(distance),samplePoint:centres[index]};
@@ -27,9 +27,11 @@ async function rawSource(source,context){
  if(data.kind==='mesh')throw new Error('网格预览没有结果场');
  const frames=data.frames?.length?data.frames:[{time:0,fields:data}],meshAt=frame=>data.meshes?.[frame.mesh],valuesAt=frame=>finiteValues(frame.fields?.[field]||data[field]);
  const columns=[{id:'x',label:source.kind==='profile'?'坐标':'时间',unit:source.kind==='profile'?'':meta.timeUnit||'s'},{id:'value',label:variable.label,unit:variable.unit||''}];
- if(source.kind==='history')return{columns,rows:frames.map(frame=>({x:frame.time,value:reduce(valuesAt(frame),source.statistic||'max')}))};
+ const view=source.view||context.state?.view;
+ const frameSelection=time=>view&&meta.timeUnit?{selection:{view,time,timeUnit:meta.timeUnit}}:{};
+ if(source.kind==='history')return{columns,rows:frames.map(frame=>({x:frame.time,value:reduce(valuesAt(frame),source.statistic||'max'),...frameSelection(frame.time)}))};
  if(source.kind==='probeHistory'){
-  const rows=frames.map(frame=>{const mesh=meshAt(frame);if(!mesh)throw new Error('测点历史需要原始网格和真实单元中心');const point=evaluatePosition(source.position,mesh,context.parameters),sample=nearestCell(mesh,point),values=valuesAt(frame);return{x:frame.time,value:values[sample.index],cell:sample.index,distance:sample.distance};});
+  const rows=frames.map(frame=>{const mesh=meshAt(frame);if(!mesh)throw new Error('测点历史需要原始网格和真实单元中心');const point=evaluatePosition(source.position,mesh,context.parameters),sample=nearestCell(mesh,point),values=valuesAt(frame);return{x:frame.time,value:values[sample.index],cell:sample.index,distance:sample.distance,...frameSelection(frame.time)};});
   return{columns:[...columns,{id:'cell',label:'最近单元'},{id:'distance',label:'采样距离'}],rows,note:'最近存储单元；不作精确插值'};
  }
  if(source.kind!=='profile')throw new Error('未注册的数据源');
@@ -43,6 +45,11 @@ async function rawSource(source,context){
   else if(axis!=='cell'){if(!mesh?.cellCenters)throw new Error('当前结果没有真实单元坐标');x=mesh.cellCenters[i]['xyz'.indexOf(axis)];}
   if(!Number.isFinite(x))throw new Error('图表坐标缺失');return{x,value};
  });
+ if(source.selection?.timeColumn){columns.push({id:'time',label:'保存时刻',unit:meta.timeUnit});for(const row of rows)row.time=frame.time;}
+ if(source.selection?.positionColumns){
+  columns.push({id:'positionX',unit:'m'},{id:'positionY',unit:'m'},{id:'positionZ',unit:'m'});
+  for(const [i,row] of rows.entries()){const p=mesh?.cellCenters?.[i];if(!p)throw new Error('位置联动需要原始单元中心');Object.assign(row,{positionX:p[0],positionY:p[1],positionZ:p[2]});}
+ }
  if(axis!=='cell')rows.sort((a,b)=>a.x-b.x);
  columns[0]={id:'x',label:axis==='cell'?'原始单元':axis.toUpperCase(),unit:axis==='cell'?'':meta.coordinateBounds?.unit||(axis==='r'?meta.radialUnit||'':'')};
  return{columns,rows,time:frame.time};
@@ -55,7 +62,16 @@ export async function resolveSource(source,context){
   table={...table,columns:table.columns.some(c=>c.id==='runId')?table.columns:[...table.columns,{id:'runId',label:'参数组 ID'}],rows:table.rows.map(row=>({...row,runId:row[source.runId]}))};
  }
  if(filters.some(rule=>!table.columns.some(c=>c.id===rule.column)))throw new Error('筛选引用不存在的数据列');
- return !filters.length?table:{...table,rows:table.rows.filter(row=>filters.every(rule=>{const a=row[rule.column],b=rule.value;if(a==null)return false;if(rule.op==='eq')return a===b;if(rule.op==='ne')return a!==b;if(!Number.isFinite(a)||!Number.isFinite(b))throw new Error('范围筛选需要数值列');return({lt:()=>a<b,lte:()=>a<=b,gt:()=>a>b,gte:()=>a>=b})[rule.op]();}))};
+ if(source.selection){
+  const b=source.selection,refs=[b.viewColumn,b.timeColumn,...b.positionColumns||[]].filter(Boolean);
+  if(refs.some(k=>!table.columns.some(c=>c.id===k)))throw new Error('联动引用不存在的数据列');
+  table={...table,rows:table.rows.map(row=>{
+   const view=b.viewColumn?row[b.viewColumn]:b.view||source.view||context.state?.view,time=b.timeColumn?row[b.timeColumn]:undefined,position=b.positionColumns?.map(k=>row[k]);
+   if(typeof view!=='string'||b.timeColumn&&!Number.isFinite(time)||position&&!position.every(Number.isFinite))return row;
+   return{...row,selection:{view,...time!==undefined?{time,timeUnit:b.timeUnit}:{},...position?{position}:{}}};
+  })};
+ }
+ return !filters.length?table:{...table,rows:table.rows.filter(row=>filters.every(rule=>{const a=row[rule.column],b=rule.context==='time'?context.time:rule.context?context.state[rule.context]:rule.value;if(a==null||b==null)return false;if(rule.op==='eq')return a===b;if(rule.op==='ne')return a!==b;if(!Number.isFinite(a)||!Number.isFinite(b))throw new Error('范围筛选需要数值列');return({lt:()=>a<b,lte:()=>a<=b,gt:()=>a>b,gte:()=>a>=b})[rule.op]();}))};
 }
 
 export function studyTable(study,source={}){

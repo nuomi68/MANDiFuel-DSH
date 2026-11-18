@@ -3,7 +3,7 @@ import { createRequire } from 'node:module';
 import { pathToFileURL } from 'node:url';
 import { readFileSync } from 'node:fs';
 import { spawn } from 'node:child_process';
-import { projectRoot, contains } from './project-boundary.mjs';
+import { projectRoot, writablePath, launcherRootArgs } from './project-boundary.mjs';
 const require=createRequire(process.env.MANDIFUEL_DSH_EXECUTABLE);
 const native=async name=>import(pathToFileURL(require.resolve('@deepseek-ai/'+name)));
 const {LocalFileSystem}=await native('dsh-fs-local');
@@ -22,11 +22,11 @@ export default class ProjectFileSystem extends LocalFileSystem {
       throw new FsError('MANDiFuel: file writes are disabled in read-only mode','FS_SANDBOX_DENIED');
     // Resolve the stable absolute target again; never change its base directory.
     const fresh=await this.resolve(this.processPath(target));
-    if (!contains(projectRoot,this.processPath(fresh)))
+    if (!writablePath(this.processPath(fresh)))
       throw new FsError('MANDiFuel: file write is outside the project boundary','FS_SANDBOX_DENIED');
     return this.withLock(fresh.targetKey,()=>new Promise((resolve,reject)=>{
       signal?.throwIfAborted();
-      const child=spawn(python,['-I','-B','-c',launcher,'--project-root',projectRoot,'--',node,'--input-type=module','-e',worker],{
+      const child=spawn(python,['-I','-B','-c',launcher,...launcherRootArgs,'--',node,'--input-type=module','-e',worker],{
         cwd:projectRoot,env:{...process.env,MANDIFUEL_DSH_EXECUTABLE:executable,MANDIFUEL_PROJECT_ROOT:projectRoot},
         stdio:['pipe','pipe','pipe'],signal});
       let output='',diagnostic='';

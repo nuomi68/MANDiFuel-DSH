@@ -11,6 +11,18 @@ async function until(check){for(let i=0;i<100;i++){if(check())return;await delay
 function setup(start,call,options){const disposers=[];const ctx={agentDefaultModel:{currentSelection:()=>({provider:'test-provider',model:'test-model'})},agents:{create:async request=>{assert.equal(request.agentOptions.provider,'test-provider');assert.equal(request.agentOptions.model,'test-model');return{agent:{id:'presentation-owner',session:{header:{origin:'subagent'}}},dispose:async()=>{}};}},subagents:{start},on(){},effect(factory){disposers.push(factory());}};const agent={id:'parent',status:'running',session:{header:{origin:'interactive'}}};const presenter=mountPresenter(ctx,call,async()=> 'task',options);return{agent,presenter,close:async()=>{for(const d of disposers)await d();}};}
 function facts(revision='one',status='running'){return{revision,stage:'prepare',cases:[],views:[],task:{status},summary:'正在准备'};}
 
+test('an explicit request arriving during observation discards the old snapshot before spawning',async()=>{
+ let release,starts=0,disposed=0,observations=0;
+ const h=setup(async()=>{starts++;return{id:'latest',result:Promise.resolve({stopReason:'completed',structured:{update:{}}}),dispose:async()=>disposed++};},async path=>path.endsWith('/observe')?++observations===1?new Promise(resolve=>release=resolve):facts('new'):{});
+ try{h.presenter.request('task');await until(()=>!!release);h.presenter.request('task');release(facts('old'));await delay(20);assert.equal(starts,0);h.presenter.notify(h.agent);await until(()=>disposed===1);assert.equal(starts,1);}finally{await h.close();}
+});
+
+test('a newer display request cancels the old child without publishing a retry error',async()=>{
+ let starts=0,disposed=0,signal;const states=[],commits=[];
+ const h=setup(async(_provider,request)=>{starts++;if(starts===1){signal=request.signal;return{id:'old',result:new Promise(resolve=>signal.addEventListener('abort',()=>resolve({stopReason:'completed',structured:{update:{rendering:{palette:'gray'}}}}),{once:true})),dispose:async()=>disposed++};}return{id:'new',result:Promise.resolve({stopReason:'completed',structured:{update:{}}}),dispose:async()=>disposed++};},async(path,body)=>{if(path.endsWith('/observe'))return facts();if(path.endsWith('/presenter'))states.push(body);if(path.endsWith('/present'))commits.push(body);return{};});
+ try{h.presenter.request('task');await until(()=>!!signal);h.presenter.request('task');await until(()=>disposed===1);assert(signal.aborted);assert(!states.some(s=>s.retryAt||s.state==='error'));assert.equal(commits.length,0);h.presenter.notify(h.agent);await until(()=>disposed===2);assert.equal(starts,2);}finally{await h.close();}
+});
+
 test('coalesces observations and does not mutate immutable late child output',async()=>{
  let release,starts=0,disposed=0,current=facts(),published;
  const original=Object.freeze({progress:Object.freeze({summary:'旧进度'}),exports:Object.freeze([]),controls:Object.freeze([])});

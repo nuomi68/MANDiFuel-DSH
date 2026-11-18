@@ -1,0 +1,27 @@
+{
+  "schema": "mandifuel.token-comparison/v1",
+  "purpose": "Three fresh paired headless tasks; scientific Skills versus bare DSH; no frontend agent.",
+  "tasks": [
+    {
+      "id": "T01",
+      "title": "燃料棒关联尺寸准备",
+      "source": "/home/lwz/offbeat/Cases/testCases/generic_pwr_1D",
+      "solver_start_cap": 0,
+      "prompt": "请根据只读 source-case/ 准备一套独立 target-case/ 输入：燃料外半径改为 4.15 mm，所有包壳块的内半径改为 4.28 mm、外半径改为 4.88 mm。材料中与这些几何量有关的冷态直径和冷态间隙也按各自物理定义同步；轴向结构、离散设置、其余材料与载荷保持。只准备输入，不生成网格，不启动 OFFBEAT。交付完整输入、prepare.json 和简短中文说明，列出修改位置、参数值及单位。源输入只读。"
+    },
+    {
+      "id": "T02",
+      "title": "稳态热学单工况与多响应提取",
+      "source": "runs/rag-modeling-pairs-20261114-03/G01/skill/workspace/cases/mesh40-12",
+      "solver_start_cap": null,
+      "prompt": "使用只读 source-case/ 的热传导模型准备独立算例，将燃料线功率设为恒定 18000 W/m，包壳外表面温度设为固定 620 K；几何、材料、热间隙及其余物理设置保留。采用原稳态离散，模型时间从 0 计算到 1 s，步长 1 s，真实运行 OFFBEAT。提取终态 fuel 和 cladding 两个材料区域各自的最高、最低及体积加权平均温度，并给出 fuel 最高温度对应单元中心坐标；温度统一为 K，坐标用 m。交付 result.json、响应 CSV 和简短中文说明，保留输入、结果场、日志、实际状态、结果根及必要脚本。"
+    },
+    {
+      "id": "T03",
+      "title": "三点线功率扫描与集中提取",
+      "source": "runs/rag-modeling-pairs-20261114-03/G01/skill/workspace/cases/mesh40-12",
+      "solver_start_cap": null,
+      "prompt": "以只读 source-case/ 为共同参考，分别计算燃料线功率 12000、18000、24000 W/m 三个独立稳态工况。包壳外表面固定 620 K，几何、材料、热间隙和其余物理设置相同；每组模型时间 0 到 1 s、步长 1 s，保留原稳态离散。逐组真实运行 OFFBEAT，默认串行。按相同口径提取各组终态 fuel 最高温度与体积加权平均温度、cladding 最高温度与体积加权平均温度，统一为 K。交付参数—状态—响应 CSV、result.json 和简短中文比较，保留每组输入、结果场、日志、结果根和必要脚本。"
+    }
+  ]
+}

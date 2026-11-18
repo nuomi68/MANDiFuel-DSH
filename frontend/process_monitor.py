@@ -62,6 +62,8 @@ def process_progress(meta):
         if status=='completed' and any(c.get('execution',{}).get('status')=='failed' for c in cases):summary='任务处理已结束，存在失败算例'
     index=next((i for i,(key,_) in enumerate(STEPS) if key==phase),0)
     stages=[{'id':key,'label':label,'status':'done' if status=='completed' or i<index else 'error' if status in {'failed','stopped','interrupted'} and i==index else 'active' if i==index and status not in TERMINAL else 'pending'} for i,(key,label) in enumerate(STEPS)]
+    if status=='completed' and not (cases or meta.get('study') or meta.get('modelVersion') or any(e.get('kind')=='case' for e in meta.get('workspaceWatch',{}).get('events',[]))):
+        summary='任务已结束';stages=[]
     return {'summary':summary[:180],'stages':stages,'source':'process-observer','subprocesses':copy.deepcopy(list(state.get('children',{}).values()))}
 
 

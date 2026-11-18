@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
 
+mandifuel_writable_directory() {
+    [[ "$1/" == "$MANDIFUEL_PROJECT_ROOT/"* ||
+       ( -n "${MANDIFUEL_RUNS_ROOT:-}" && "$1/" == "$MANDIFUEL_RUNS_ROOT/"* ) ]]
+}
+
 mandifuel_prepare_agent_environment() {
     # Readiness belongs to this launcher, never to a stale inherited marker.
     unset MANDIFUEL_ENVIRONMENT_READY MANDIFUEL_TASK_PYTHON MANDIFUEL_OFFBEAT_EXECUTABLE
@@ -33,7 +38,7 @@ mandifuel_prepare_agent_environment() {
     local -a override_names=(
         MANDIFUEL_OPENFOAM_BASHRC MANDIFUEL_OFFBEAT_BIN MANDIFUEL_BASE_PYTHON
         MANDIFUEL_DSH MANDIFUEL_NODE MANDIFUEL_CASE_LIBRARY_ROOT
-        MANDIFUEL_PROJECT_ROOT MANDIFUEL_DEFAULT_WORKDIR
+        MANDIFUEL_PROJECT_ROOT MANDIFUEL_DEFAULT_WORKDIR MANDIFUEL_RUNS_ROOT
         MANDIFUEL_RAG_MAPPING_BASE_URL MANDIFUEL_RAG_MAPPING_MODEL
         MANDIFUEL_RAG_MAPPING_API_KEY_ENV MANDIFUEL_RAG_EMBEDDING_BASE_URL
         MANDIFUEL_RAG_EMBEDDING_MODEL MANDIFUEL_RAG_EMBEDDING_DIMENSION
@@ -58,13 +63,19 @@ mandifuel_prepare_agent_environment() {
     fi
     MANDIFUEL_PROJECT_ROOT="$(cd -- "$MANDIFUEL_PROJECT_ROOT" && pwd -P)"
     MANDIFUEL_DEFAULT_WORKDIR="$(cd -- "$MANDIFUEL_DEFAULT_WORKDIR" && pwd -P)"
-    if [[ "$MANDIFUEL_PROJECT_ROOT" == / ||
-          ( "$MANDIFUEL_DEFAULT_WORKDIR" != "$MANDIFUEL_PROJECT_ROOT" &&
-            "$MANDIFUEL_DEFAULT_WORKDIR" != "$MANDIFUEL_PROJECT_ROOT/"* ) ]]; then
-        printf '%s\n' 'MANDiFuel startup: default workdir must be inside a project root other than /.' >&2
+    MANDIFUEL_RUNS_ROOT="${MANDIFUEL_RUNS_ROOT:-}"
+    if [[ -n "$MANDIFUEL_RUNS_ROOT" ]]; then
+        if [[ ! -d "$MANDIFUEL_RUNS_ROOT" || "$MANDIFUEL_RUNS_ROOT" != "$(realpath -e -- "$MANDIFUEL_PROJECT_ROOT/runs")" ||
+              "$MANDIFUEL_RUNS_ROOT" == / || "$MANDIFUEL_PROJECT_ROOT/" == "$MANDIFUEL_RUNS_ROOT/"* ]]; then
+            printf '%s\n' 'MANDiFuel startup: MANDIFUEL_RUNS_ROOT must match the physical project/runs directory.' >&2
+            return 78
+        fi
+    fi
+    if [[ "$MANDIFUEL_PROJECT_ROOT" == / ]] || ! mandifuel_writable_directory "$MANDIFUEL_DEFAULT_WORKDIR"; then
+        printf '%s\n' 'MANDiFuel startup: default workdir must be inside the project or configured runs directory.' >&2
         return 78
     fi
-    export MANDIFUEL_PROJECT_ROOT MANDIFUEL_DEFAULT_WORKDIR
+    export MANDIFUEL_PROJECT_ROOT MANDIFUEL_DEFAULT_WORKDIR MANDIFUEL_RUNS_ROOT
     openfoam_bashrc="${MANDIFUEL_OPENFOAM_BASHRC:-}"
     base_python="${MANDIFUEL_BASE_PYTHON:-}"
     MANDIFUEL_RAG_MAPPING_BASE_URL="${MANDIFUEL_RAG_MAPPING_BASE_URL:-https://api.deepseek.com}"
@@ -166,7 +177,7 @@ mandifuel_prepare_agent_environment() {
         "MANDiFuel plugin root: $plugin_root" \
         "RAG index: 137 case cards, dual index verified" \
         "Task network: offline (native web tools disabled; subprocess seccomp)" \
-        "Task write boundary: $MANDIFUEL_PROJECT_ROOT (Landlock; external file contents protected)" \
+        "Task write boundary: $MANDIFUEL_PROJECT_ROOT${MANDIFUEL_RUNS_ROOT:+ + $MANDIFUEL_RUNS_ROOT} (Landlock)" \
         "RAG retrieval: local lexical/taxonomy ranking; no external provider calls" \
         "OFFBEAT: $(command -v offbeat)" \
         "Task python3: $(command -v python3)" \

@@ -15,7 +15,11 @@
 1. `ui_read_skill` 读取技能和本轮需要的参考。
 2. `ui_inspect` 读取页面、指定节点、显示设置、模型、数据或能力目录。
 3. `ui_apply` 用已观察的版本修改插槽，或操作已有页签、表格和图表。
-4. `ui_wait_for_render` 读取实际回执及错误，确认成功或进行有限修正。
+4. `ui_wait_for_render` 读取实际反馈。含联动的页面通过 `verifySelection` 让当前浏览器操作一项可见的非默认选择，核对模型切换并还原；检查结果随本轮操作回执返回。
+
+关键结论先 `ui_inspect(target="evidence")`，按 claim ID 查询定义和来源。
+组件的 evidence 引用及 evidence 结果表由宿主校验任务归属，数值/状态不可由 agent
+写入。原始文件变化使记录过期；核查进程、缓存和技能均独立于计算助手。
 
 main 是左侧组件区，aside 是聊天窗下方组件区，settings 是动态参数定义；model 保留底层渲染设施，通过显示状态、数学表达式和已有场导出操作。支持组件增删、替换、移动、属性修改及受限交互，不接收任意 HTML、JavaScript 或 DOM 选择器。
 

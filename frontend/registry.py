@@ -100,7 +100,7 @@ class TaskRegistry:
                 for view in views.values():
                     if 'bundle' in view:validate_bundle(view['bundle'])
                     else:inside(p.parent/'workspace',view['source'])
-                self.jobs[meta['id']]={'meta':meta,'workspace':p.parent/'workspace','bundle':bundle,'views':views,'journal':deque(maxlen=1000),'seq':0}
+                self.jobs[meta['id']]={'meta':meta,'workspace':p.parent.resolve()/'workspace','bundle':bundle,'views':views,'journal':deque(maxlen=1000),'seq':0}
                 if 'progressHistory' not in meta:
                     meta['progressHistory']=[];meta['progressHistoryComplete']=False
                     record_progress(meta,timestamp=meta.get('updatedAt',meta.get('createdAt')),restored=True);self._save(self.jobs[meta['id']])
@@ -128,6 +128,8 @@ class TaskRegistry:
         self.dashboard=Dashboard(self)
         from process_monitor import ProcessMonitor
         self.process_monitor=ProcessMonitor(self)
+        from evidence import EvidenceService
+        self.evidence=EvidenceService(self)
     def _job(self,ident):
         if ident not in self.jobs:raise KeyError('任务不存在')
         return self.jobs[ident]
@@ -176,6 +178,9 @@ class TaskRegistry:
         else:result['study']=None
         result.update(workspaceRevision=m.get('workspaceWatch',{}).get('revision',0),progress=current_progress(m),progressCount=sum(row.get('source')=='process-observer' for row in m.get('progressHistory',[])),progressVersion=sum(row.get('source')=='process-observer' for row in m.get('progressHistory',[])),deliveryVersion=m.get('deliveryVersion',0),artifactCount=len({f['path'] for f in m.get('inputs',[])+m.get('files',[])}))
         result['stateVersion']=m.get('stateVersion',0)
+        case_events=[e for e in m.get('workspaceWatch',{}).get('events',[]) if e.get('kind')=='case']
+        result['modelExpected']=bool(primary_task or result['study'] or case_events or m.get('processState',{}).get('cases') or m['status']!='completed')
+        result['evidence']=copy.deepcopy(m.get('evidence',{}))
         result.pop('code',None);return result
     def list(self):
         with self.lock:return [self.public(j) for j in sorted(self.jobs.values(),key=lambda j:j['meta']['createdAt'],reverse=True)]
@@ -217,8 +222,9 @@ class TaskRegistry:
     def draft(self):
         with self.lock:
             for job in self.jobs.values():
-                if job['meta'].get('draft') and job['meta']['status']=='draft':return dict(self.snapshot(job['meta']['id']),workspace=str(job['workspace']),prompt='')
-        return self.prepare('',title='新任务',draft=True)
+                if job['meta'].get('draft') and job['meta']['status']=='draft' and job['workspace'].resolve().is_relative_to(self.root):
+                    return dict(self.snapshot(job['meta']['id']),workspace=str(job['workspace']),prompt='')
+            return self.prepare('',title='新任务',draft=True)
     def adopt(self,cwd,session_id):
         with self.lock:
             for ident,job in self.jobs.items():
@@ -282,6 +288,12 @@ class TaskRegistry:
                 except (ValueError,KeyError,TypeError) as error:presentation_error='显示配置未应用：'+str(error)
             refs=list(manifest.get('views',[]))
             if not refs and manifest.get('viewer'):refs=[{'id':'main','label':'计算结果','viewer':manifest['viewer']}]
+            recovered=[]
+            if not manifest.get('study'):
+                for binding in watch.get('caseViews',[]):
+                    if binding['id'] not in {ref['id'] for ref in refs}:
+                        recovered.append({k:binding[k] for k in ('id','label','viewer','caseRoot')})
+                refs.extend(recovered)
             signature=[path.stat().st_mtime_ns,path.stat().st_size] if path.is_file() else []
             if watch:signature.extend(['workspaceWatch',watch_path.stat().st_mtime_ns,watch_path.stat().st_size])
             study=None;study_path=None
@@ -321,13 +333,17 @@ class TaskRegistry:
                     if file.is_file():
                         stamp=file.stat();relative=str(file.relative_to(work));rows.append({'path':relative,'name':file.name,'bytes':stamp.st_size,'modifiedNs':str(stamp.st_mtime_ns)});signature.extend([category,relative,stamp.st_mtime_ns,stamp.st_size])
                 deliveries[category]=rows
-            if signature==meta.get('handoffSignature'):return
+            if signature==meta.get('handoffSignature'):
+                meta.pop('importError',None)
+                return
             if study_path is not None:study=validate_study(raw_study,[ref['id'] for ref in refs])
             views={}
             for key,ref,viewer in resolved:
                 previous=job.get('views',{}).get(key,{})
                 if bool(study)==('source' in previous) and (previous.get('source') or previous.get('viewer'))==str(viewer.relative_to(work)) and previous.get('stamp')==[viewer.stat().st_mtime_ns,viewer.stat().st_size]:views[key]={**previous,'label':str(ref.get('label','计算结果'))[:60]};continue
                 bundle=validate_bundle(read_json(viewer));inside(work,bundle['caseRoot'])
+                if ref in recovered and inside(work,bundle['caseRoot'])!=inside(work,ref['caseRoot']):
+                    raise ValueError('保存场与恢复视图的计算目录不一致')
                 if study:views[key]={'label':str(ref.get('label','计算结果'))[:60],'source':str(viewer.relative_to(work)),'schema':bundle['schema'],'task':bundle['task'],'caseRoot':bundle['caseRoot'],'stamp':[viewer.stat().st_mtime_ns,viewer.stat().st_size]}
                 else:views[key]={'label':str(ref.get('label','计算结果'))[:60],'bundle':bundle,'viewer':str(viewer.relative_to(work)),'stamp':[viewer.stat().st_mtime_ns,viewer.stat().st_size]}
             if study:
@@ -337,8 +353,10 @@ class TaskRegistry:
                         if root is not None and inside(work,views[ref]['caseRoot'])!=root:raise ValueError('参数组与模型的计算目录不一致')
                         if run['status']=='queued' and views[ref]['schema']!='mandifuel.mesh/v1':raise ValueError('未执行组只能发布网格预览')
             preferred=manifest.get('defaultView',next(iter(views),'main'))
+            if recovered and (preferred not in views or views[preferred].get('bundle',{}).get('schema')=='mandifuel.mesh/v1'):
+                preferred=recovered[0]['id']
             if views and preferred not in views:raise ValueError('默认视图不存在')
-            if not views and not any(deliveries.values()) and study is None:
+            if not views and not any(deliveries.values()) and study is None and not any(k.startswith('saved-case-') for k in job.get('views',{})):
                 # An empty observer index is normal while a new task prepares
                 # inputs. Only an explicit empty handoff is an import error.
                 if not path.is_file():
@@ -350,8 +368,9 @@ class TaskRegistry:
                 if job['bundle']:atomic(work.parent/'bundle.json',job['bundle'])
                 meta['modelVersion']=meta.get('modelVersion',0)+1;meta['defaultView']=preferred
                 if any((v['bundle']['schema'] if 'bundle' in v else v['schema'])=='mandifuel.viewer/v1' for v in views.values()):meta['resultVersion']+=1
-            elif not views and study is not None and (job.get('views') or job.get('bundle')):
+            elif not views and (study is not None or any(k.startswith('saved-case-') for k in job.get('views',{}))) and (job.get('views') or job.get('bundle')):
                 job['views']={};job['bundle']=None;atomic(work.parent/'views.json',{});meta['modelVersion']=meta.get('modelVersion',0)+1
+                (work.parent/'bundle.json').unlink(missing_ok=True)
             if study!=meta.get('study'):
                 meta['study']=study;meta['studyVersion']=meta.get('studyVersion',0)+1
             if config is not None:
@@ -430,6 +449,7 @@ class TaskRegistry:
             if after>=job['seq']:self.condition.wait(timeout=12)
             return [copy.deepcopy(e) for e in job['journal'] if e['id']>after]
     def close(self):
+        self.evidence.close()
         self.process_monitor.close()
         self.dashboard.close()
         with self.condition:self.shutting_down=True;self.condition.notify_all()

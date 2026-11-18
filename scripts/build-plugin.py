@@ -40,6 +40,7 @@ RELEASE_FILES = frozenset(
         "scripts/prepare-agent.sh",
         "scripts/resolve-node.sh",
         "scripts/start-dsh.sh",
+        "scripts/verify-results.py",
     }
 )
 # Release modes are product metadata, not worktree metadata. DrvFS commonly reports every
@@ -56,6 +57,7 @@ RELEASE_PREFIXES = (
     "dsh/",
     "lib/mandifuel_prepare/",
     "lib/mandifuel_run/",
+    "lib/mandifuel_verify/",
     "rag/",
     "skills/",
 )

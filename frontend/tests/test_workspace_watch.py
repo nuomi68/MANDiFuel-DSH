@@ -56,6 +56,18 @@ class WorkspaceWatchTests(unittest.TestCase):
     def test_partial_json_coalesces_and_valid_report_wakes_once(self):
         self.observe();revision=self.job['meta']['workspaceWatch']['revision'];path=self.work/'measurements.json';path.write_text('{"columns":');self.observe();self.assertEqual(self.job['meta']['workspaceWatch']['revision'],revision)
         atomic(path,{'columns':[{'id':'x'}],'rows':[[1]]});self.observe();facts=self.d.inspect(self.id);self.assertGreater(facts['workspaceChanges']['revision'],revision);self.assertIn('measurements.json',[f['path'] for f in self.r.snapshot(self.id)['files']]);before=facts['dataRevision'];self.d.watch_files(self.id);self.assertEqual(self.d.inspect(self.id)['dataRevision'],before)
+    def test_renderer_exports_do_not_wake_their_own_operator_but_new_results_do(self):
+        watcher=WorkspaceWatcher(settle_seconds=0)
+        watcher.scan('task',self.work);self.assertIsNotNone(watcher.scan('task',self.work))
+        views=self.work/'delivery/views';views.mkdir()
+        atomic(views/'field.json',{'schema':'mandifuel.viewer/v1','task':{'fields':['T']}})
+        atomic(self.work/'delivery/viewer.json',{'schema':'mandifuel.mesh/v1','task':{'fields':[]}})
+        self.assertIsNone(watcher.scan('task',self.work));self.assertIsNone(watcher.scan('task',self.work))
+        atomic(views/'field.json',{'schema':'mandifuel.viewer/v1','task':{'fields':['Cs']}})
+        self.assertIsNone(watcher.scan('task',self.work))
+        results=self.work/'results';results.mkdir();atomic(results/'inventory.json',{'inventory_mol':1e-11})
+        self.assertIsNone(watcher.scan('task',self.work));event=watcher.scan('task',self.work)
+        self.assertIn('results/inventory.json',[r['path'] for r in event['files']])
     def test_reference_cases_symlinks_and_unbound_directories_are_not_shared_models(self):
         self.case('a');shutil.copytree(self.work/'cases/a',self.work/'source-case');(self.work/'outside').symlink_to(SOURCE,target_is_directory=True)
         self.assertEqual([c['caseRoot'] for c in discover_cases(self.work)],['cases/a']);self.study['runs'][0].pop('caseRoot');atomic(self.work/'delivery/study.json',self.study);self.assertFalse(self.observe()['modelReady'])
@@ -75,12 +87,47 @@ class WorkspaceWatchTests(unittest.TestCase):
         run=self.r.study(self.id)['runs'][0];self.assertEqual(run['defaultView'],'chosen-a');self.assertEqual(run['preview']['fields'],['T']);self.assertEqual(self.r.study(self.id)['runs'][1]['viewIds'],[])
         with self.assertRaisesRegex(ValueError,'runId'):self.d.publish(self.id,{'exports':[{'id':'wrong','runId':'b','caseRoot':'cases/a','kind':'results','fields':['T']}]})
 
+    def test_loose_completed_cases_recover_once_and_reject_mismatched_endpoints(self):
+        (self.work/'delivery/study.json').unlink();(self.work/'delivery/workbench.json').unlink()
+        for name,end in [('a',1.0),('b',2),('c','1')]:
+            self.case(name);case=self.work/'cases'/name;shutil.copytree(SOURCE/'1',case/'1')
+            atomic(case/'.mandifuel-execution.json',{'status':'completed','exit_code':0,'terminal_marker':True,'final_time':end})
+        task=self.observe();self.assertIsNone(task['study'])
+        self.assertEqual({v['caseRoot'] for v in task['views']},{'cases/a','cases/c'})
+        self.assertTrue(task['resultReady']);self.assertEqual(self.r.fields(self.id,task['defaultView'])['frames'][-1]['time'],1)
+        self.d.watcher.accepted.clear()
+        with patch('export_case.export_case',side_effect=AssertionError('unchanged result should be reused')):
+            self.observe()
+        self.assertEqual(self.r.snapshot(self.id)['task']['modelVersion'],task['modelVersion'])
+
+    def test_archived_task_alias_uses_the_same_root_for_models_and_evidence(self):
+        self.case('a');self.observe()
+        archive=Path(self.temp.name)/'archive-index';archive.mkdir()
+        (archive/self.id).symlink_to(self.work.parent,target_is_directory=True)
+        restored=TaskRegistry(archive)
+        try:
+            owned=restored._job(self.id)['workspace'];self.assertEqual(owned,self.work.resolve())
+            self.assertEqual(owned/'cases/a',(archive/self.id/'workspace/cases/a').resolve())
+            self.assertTrue(restored.snapshot(self.id)['task']['modelReady'])
+        finally:restored.close()
+
     def test_nested_reports_are_indexed_and_exposed_before_any_model_export(self):
         self.case('a');report=self.work/'results/result.json';report.parent.mkdir();atomic(report,{'totals':[{'name':'source','power':4.0},{'name':'boundary','power':3.99}]});original=report.read_bytes()
         self.d.watch_files(self.id,render=False)
         with patch('export_case.export_mesh',side_effect=AssertionError('inventory must not render')):
             self.d.watch_files(self.id,render=False)
         self.assertIn('results/result.json',[f['path'] for f in self.r.snapshot(self.id)['files']]);facts=self.d.inspect(self.id);records=next(row for row in facts['availableRecords'] if row['file']=='results/result.json');self.assertEqual(records['rowsPath'],'totals');self.assertEqual(records['count'],2);self.assertFalse(self.r.snapshot(self.id)['task']['modelReady']);self.assertEqual(report.read_bytes(),original)
+
+    def test_large_embedded_profiles_do_not_hide_ordinary_scalar_result_records(self):
+        path=self.work/'results/summary.json';path.parent.mkdir()
+        atomic(path,[{'id':name,'temperature_K':temperature,'profile':[[i,i*.25] for i in range(1500)]} for name,temperature in [('a',1000),('b',1200)]])
+        original=path.read_bytes();self.d.watch_files(self.id,render=False);self.d.watch_files(self.id,render=False)
+        records=next(row for row in self.d.inspect(self.id)['availableRecords'] if row['file']=='results/summary.json')
+        self.assertEqual(records['rowsPath'],'');self.assertEqual(records['count'],2)
+        self.assertEqual(records['sample'][1]['temperature_K'],1200);self.assertIn('profile',records['omittedFields']);self.assertLess(len(json.dumps(records['sample'])),6000)
+        from adaptive_ui import load_dataset
+        table=load_dataset(self.work,{'file':'results/summary.json','rows':'','columns':[{'id':'id'},{'id':'temperature_K'}]})
+        self.assertEqual(table['rows'][1]['temperature_K'],1200);self.assertEqual(path.read_bytes(),original)
 
     def test_a_fresh_terminal_task_needs_no_delivery_directory_or_ui_contract(self):
         task=self.r.prepare('普通终端任务');ident=task['task']['id'];work=Path(task['workspace']);self.assertFalse((work/'delivery').exists());(work/'results').mkdir();atomic(work/'results/result.json',{'quantities':[{'value':4.0}]})

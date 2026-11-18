@@ -22,6 +22,8 @@ slot 使用 main 或 aside：
 
 slot 为 settings：replace 的 value 是整套控件数组；upsert 的 value 为带 id 的控件定义，已有 ID 局部合并，新增 ID 追加；remove 按 id 删除。参数必须通过显示程序或组件表达式实际使用。新增能力只增加当前需要的操作，不移除仍在使用的其他控件。
 
+修改已有参数的当前数值直接用 `update:{parameterValues:{实际ID:数值}}`，保留定义与其他参数。不要改 default 来代替当前值。settings upsert 的外层仅有 op/slot/value，ID 放在 value 内；replace 的外层仅有 op/slot/value，value 是数组。
+
 ## 模型、数据和完整更新
 
 `update` 使用既有展示协议的 controls、parameterValues、rendering、viewState、ui、exports、defaultView、parameters、progress、studyMapping 等属性；完整 ui 可声明 version/mode/scope/root/aside/datasets。不要同时用 operations 和 update.ui 修改组件树，或同时用 settings 操作与 update.controls 修改控件。

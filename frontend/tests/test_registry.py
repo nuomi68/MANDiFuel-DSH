@@ -77,6 +77,19 @@ class RegistryTests(unittest.TestCase):
         d=self.registry.draft();ident=d['task']['id'];self.assertTrue(d['task']['draft']);self.assertTrue((Path(d['workspace'])/'AGENTS.md').is_file())
         self.registry.native_event(ident,{'kind':'prompt','text':'计算燃料棒温度'})
         current=self.registry.snapshot(ident)['task'];self.assertFalse(current['draft']);self.assertEqual(current['title'],'计算燃料棒温度');self.assertNotIn('code',current)
+    def test_new_draft_after_storage_move_uses_current_disk(self):
+        old=self.registry.draft()['task']['id']
+        root=self.registry.root
+        self.registry.close()
+        archive=Path(self.temp.name)/'archive'
+        (root/old).rename(archive)
+        (root/old).symlink_to(archive,target_is_directory=True)
+        self.registry=TaskRegistry(root)
+        self.assertTrue(self.registry.snapshot(old)['task']['draft'])
+        current=self.registry.draft()
+        self.assertNotEqual(current['task']['id'],old)
+        self.assertTrue(Path(current['workspace']).resolve().is_relative_to(root))
+        self.assertEqual(self.registry.draft()['task']['id'],current['task']['id'])
     def test_native_session_adopts_only_managed_workspace(self):
         self.assertEqual(self.registry.adopt(str(self.work),'another-native')['taskId'],self.ident)
         self.assertEqual(self.registry.adopt('/tmp','outside-native')['taskId'],None)

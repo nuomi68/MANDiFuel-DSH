@@ -4,6 +4,7 @@ The solver owns its plans and handoff. This observer writes a separate index so
 file discovery cannot race with or overwrite those files. Study ownership is
 accepted only from explicit caseRoot bindings.
 """
+from decimal import Decimal, InvalidOperation
 from pathlib import Path
 import copy
 import hashlib
@@ -17,6 +18,14 @@ import threading
 INDEX='delivery/workspace-observation.json'
 SCHEMA='mandifuel.workspace-observation/v1'
 IGNORE={'delivery','.git','sources','source-case','reference-case','source-candidates','node_modules','__pycache__'}
+
+
+def completed_frame(case):
+    receipt=case['execution']
+    if not (case['meshReady'] and case['fields'] and case['latestTime'] and receipt.get('status')=='completed'
+            and receipt.get('terminal_marker') is True and receipt.get('exit_code')==0):return False
+    try:return Decimal(case['latestTime'])==Decimal(str(receipt.get('final_time')))
+    except (InvalidOperation,ValueError):return False
 
 
 def local_file(work,path):
@@ -78,6 +87,9 @@ def structured_files(work,cache):
     for base,dirs,names in os.walk(work,followlinks=False):
         rel=Path(base).relative_to(work)
         dirs[:]=[d for d in dirs if d not in IGNORE and d not in {'case','cases','attempts','constant','system','0','scripts'} and not (Path(base)/d).is_symlink()] if len(rel.parts)<3 else []
+        # Host-generated models and observation overlays are already consumed
+        # by _import. They are not new engineering evidence for a UI worker.
+        if rel==Path('delivery'):dirs[:]=[d for d in dirs if d not in {'views','observed'}]
         for name in names:
             p=Path(base)/name
             if p.suffix.lower()=='.json':candidates.append(p)
@@ -92,13 +104,15 @@ def structured_files(work,cache):
             try:
                 value=json.loads(p.read_text());kind=None
                 if isinstance(value,dict):
-                    if value.get('schema')=='mandifuel.study/v1':kind='study'
+                    if value.get('schema') in {'mandifuel.viewer/v1','mandifuel.mesh/v1'}:pass
+                    elif value.get('schema')=='mandifuel.study/v1':kind='study'
                     elif isinstance(value.get('study'),dict) and value['study'].get('schema')=='mandifuel.study/v1':kind='study-definition'
                     elif isinstance(value.get('columns'),list) and isinstance(value.get('rows'),list):kind='table'
                     elif isinstance(value.get('evaluations'),list):kind='evaluations'
                     elif isinstance(value.get('rows'),list):kind='records'
                     else:kind='report'
                 elif isinstance(value,list) and value and all(isinstance(r,dict) and 'point' in r and 'status' in r for r in value):kind='history'
+                elif isinstance(value,list) and value and all(isinstance(r,dict) for r in value):kind='records'
                 cache[key]={'stamp':signature,'kind':kind}
             except (ValueError,OSError):continue # Incomplete JSON must not become a wakeup.
         if kind:files.append({'path':key,'kind':kind,'stamp':signature})
@@ -169,7 +183,7 @@ class WorkspaceWatcher:
             # An explicit delivered result wins. An initial mesh can be upgraded.
             if any(v['kind']=='results' for v in explicit):continue
             selectors=run.get('preview',{}).get('fields') or (study or {}).get('preview',{}).get('fields')
-            kind='results' if run['status'] in {'running','completed'} and selectors and case['latestTime'] and case['execution'].get('status') not in {'failed','interrupted'} else 'mesh'
+            kind='results' if run['status'] in {'running','completed'} and (selectors or completed_frame(case)) and case['latestTime'] and case['execution'].get('status') not in {'failed','interrupted'} else 'mesh'
             if kind=='mesh' and explicit:continue
             key='observed-'+hashlib.sha256((run['id']+'\0'+root).encode()).hexdigest()[:20]
             target=work/'delivery/observed'/f'{key}.json';target.parent.mkdir(parents=True,exist_ok=True)
@@ -190,6 +204,30 @@ class WorkspaceWatcher:
                     # Retry a transient partial field without repeatedly waking an agent.
                     continue
             bindings.append({'runId':run['id'],'caseRoot':root,'id':key,'label':(run.get('label') or run['id'])+(' · 已保存场' if kind=='results' else ' · 网格预览'),'viewer':str(target.relative_to(work)),'sourceSignature':source_signature})
+        # A loose collection of completed cases can have real fields without a
+        # study plan. Expose the physical case roots without assigning run IDs.
+        recovered=[]
+        owned={v['id'] for v in prior.get('caseViews',[])}
+        needs_recovery=len(cases)>1 or any(v['id'] not in {'mesh-preview','live-results'} for v in views)
+        if not study and needs_recovery and not any(v['kind']=='results' and v['id'] not in owned for v in views):
+            previous_views={v['caseRoot']:v for v in prior.get('caseViews',[])}
+            for root,case in cases.items():
+                if not completed_frame(case):continue
+                key='saved-case-'+hashlib.sha256(root.encode()).hexdigest()[:20]
+                relative=f'delivery/observed/{key}.json'
+                signature=hashlib.sha256(json.dumps([case['latestTime'],case['meshSignature'],case['signature']]).encode()).hexdigest()
+                ref={'id':key,'caseRoot':root,'label':root[-60:],'viewer':relative,'sourceSignature':signature}
+                if previous_views.get(root)==ref and local_file(work,work/relative):
+                    recovered.append(ref)
+                elif render_models:
+                    target=work/relative;target.parent.mkdir(parents=True,exist_ok=True)
+                    temp=target.with_suffix('.next.json')
+                    try:
+                        export_case(work/root,temp,title=title,time=case['latestTime'],write_handoff=False)
+                        validate_bundle(read_json(temp));temp.replace(target);recovered.append(ref)
+                    except (ValueError,OSError,KeyError) as error:
+                        errors.append({'caseRoot':root,'message':str(error)[:300]})
+                    finally:temp.unlink(missing_ok=True)
         inputs=sorted({entry[0] for case in observation['cases'] for entry in case['inputs']})
         files={row['path'] for row in observation['files']}
         for case in observation['cases']:
@@ -197,6 +235,7 @@ class WorkspaceWatcher:
                 p=work/case['caseRoot']/name
                 if local_file(work,p) and (name!='log.offbeat' or case['execution'].get('status') in {'completed','failed','interrupted'}):files.add(str(p.relative_to(work)))
         next_index={'schema':SCHEMA,'revision':prior.get('revision',0)+1,'signature':observation['signature'],'inputs':inputs,'files':sorted(files),'models':bindings,'caseBindings':case_bindings,'events':[{'kind':'case','caseRoot':c['caseRoot'],'meshReady':c['meshReady'],'latestTime':c['latestTime'],'fields':c['fields'],'execution':c['execution']} for c in observation['cases']][-20:]+[{'kind':row['kind'],'path':row['path']} for row in observation['files']][-12:],'errors':errors}
+        if recovered:next_index['caseViews']=recovered
         if mapped:next_index['study']='delivery/observed/study.json'
         elif any(row['path']=='delivery/study.json' and row['kind']=='study' for row in observation['files']):next_index['study']='delivery/study.json'
         with self.commit_lock:
@@ -207,6 +246,8 @@ class WorkspaceWatcher:
                 # A renderer may have completed since the inventory read its index.
                 allowed={r['id']:r.get('caseRoot') for r in study.get('runs',[])}
                 next_index['models']=[b for b in current.get('models',bindings) if allowed.get(b['runId'])==b['caseRoot']]
+                if current.get('signature')==observation['signature'] and current.get('caseViews') and not study:
+                    next_index['caseViews']=current['caseViews']
             same=lambda value:{k:v for k,v in value.items() if k!='revision'}
             if same(next_index)==same(current):return current
             next_index['revision']=current.get('revision',0)+1;atomic(path,next_index)

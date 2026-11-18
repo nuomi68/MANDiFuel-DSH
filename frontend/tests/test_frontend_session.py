@@ -3,6 +3,7 @@ import copy
 import sys
 import tempfile
 import unittest
+from concurrent.futures import ThreadPoolExecutor
 
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from registry import TaskRegistry
@@ -35,6 +36,23 @@ class FrontendSessionTests(unittest.TestCase):
         self.r.native_event(self.ident,{'kind':'display-prompt','text':'新的显示要求'})
         with self.assertRaisesRegex(FrontendConflict,'新的用户请求'):apply(self.d,self.ident,{'expectedRevision':snapshot(self.d,self.ident)['revision'],'expectedRequest':'仅调整显示','update':{'panelTitle':'过时'}})
         self.assertEqual(snapshot(self.d,self.ident,'settings')['values']['width'],4)
+    def test_live_selection_receipt_is_scoped_and_not_replayed(self):
+        from frontend_session import selection_check,selection_check_result
+        rev=snapshot(self.d,self.ident)['revision']
+        self.assertEqual(selection_check(self.r,self.ident,{'revision':rev}),{'status':'offline'})
+        self.d.ui_state(self.ident,{'browserId':'browser-a','revision':snapshot(self.d,self.ident)['uiRevision']})
+        job=self.r._job(self.ident);expected={'status':'verified','before':{'view':'a','time':2},'observed':{'view':'b','time':2},'restored':True}
+        with ThreadPoolExecutor(1) as pool:
+            future=pool.submit(selection_check,self.r,self.ident,{'revision':snapshot(self.d,self.ident)['revision']})
+            with self.r.condition:
+                self.assertTrue(self.r.condition.wait_for(lambda:'selectionCheck' in job,timeout=2))
+                command=job['selectionCheck']['command']
+                self.assertEqual(selection_check_result(self.r,self.ident,{**command,'browserId':'elsewhere','result':expected}),{'accepted':False})
+                with self.assertRaises(ValueError):selection_check_result(self.r,self.ident,{**command,'result':{'status':'verified'}})
+                self.assertTrue(selection_check_result(self.r,self.ident,{**command,'result':expected})['accepted'])
+            self.assertEqual(future.result(timeout=2),expected)
+        self.assertFalse(selection_check_result(self.r,self.ident,{**command,'result':expected})['accepted'])
+
     def test_interaction_commands_are_scoped_and_do_not_replace_the_ui_tree(self):
         before=snapshot(self.d,self.ident,'main')['tree'];version=snapshot(self.d,self.ident)['uiRevision']
         value=self.transact([{'op':'interact','slot':'main','id':'tabs','state':{'activeTab':'b'}}])
