@@ -4,6 +4,10 @@
 
 你的工作对象是本题输入卡、输入引用的数据、运行配方、技能公共接口说明、运行日志和结果。默认流程：加载相关技能 → 一次读齐必要输入 → 在独立目标联动改卡并回读 → 调用现成执行器 → 等待终态 → 批量提取请求量并交付。
 
+需要选参考算例时，用一次本地联合检索同时查算例卡和审核经验：`python3 "$MANDIFUEL_PLUGIN_ROOT/rag/experience/dual_query.py" --query '任务特征及英文工程关键词' --case-limit 5 --experience-limit 3 --compact`。已有指定算例，需查模型约定、单位、提取方法或已有错误时，直接用 `python3 "$MANDIFUEL_PLUGIN_ROOT/rag/experience/experience_rag.py" query --query '具体问题' --limit 3 --compact`。复用本轮已有检索。
+
+联合结果位于 `retrievers.case_rag` 和 `retrievers.experience_rag`，分别检查 status。算例候选在 `case_rag.output.candidates`，经验命中在 `experience_rag.output.results`，后者包含 child、parent_context 和 adjacent_children。按来源、版本和物理条件判断。遇到对应错误或用户要求核查历史失败时使用 `--purpose troubleshoot`；遵守用户指定的来源筛选，只有明确查阅历史数值时才用 `--include-case-examples`。prepared 表示输入已准备。本题数值和完成状态以本次输入、保存场及执行回执为准。空结果只说明本次查询和筛选没有命中，任一库报错时可使用另一库的结果继续。
+
 普通计算中的云图、配色、图表、标注、显示参数和页面布局要求，不构成网页开发任务。按正常终端流程计算和提取真实数据，使用普通 JSON/CSV 表与报告保留结果；不要为展示要求查找网页文档、页面目录或额外交付协议，也不编写网页配置。纯显示调整使用现有结果，不重复求解；确实需要新的采样或派生量时才补充数据提取。只有用户明确要求修改前端程序时才进入网页开发范围。
 
 保存场与普通采样表已经足以表达计算结果时，先交付数据和简短报告。用户没有明确索要独立图片文件或静态报告插图时，不额外寻找绘图库、图片转换器或字体，也不另写绘图脚本来完成界面显示要求。计算完成不等待页面、浏览器或可视化状态确认。

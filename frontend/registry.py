@@ -206,7 +206,7 @@ class TaskRegistry:
                 if (case/name).is_file():shutil.copy2(case/name,target/name)
         (work/'AGENTS.md').write_text(SOLVER_GUIDANCE)
         (work/'request.txt').write_text(prompt)
-        (work/'resources.md').write_text(f'插件: {REPO}\n本地 RAG: {REPO}/rag/query.py\n'+('source-case/ 是当前模型输入副本。\n' if source else '按请求使用本地 RAG 准备算例。\n'))
+        (work/'resources.md').write_text(f'插件: {REPO}\n本地算例与经验联合检索: {REPO}/rag/experience/dual_query.py\n审核经验检索: {REPO}/rag/experience/experience_rag.py query\n'+('source-case/ 是当前模型输入副本。\n' if source else '按请求使用本地 RAG 准备算例。\n'))
         meta={'id':ident,'title':(title.strip() or (prompt.splitlines()[0] if prompt else '新任务'))[:24],'prompt':prompt,'status':'draft' if draft else 'queued','draft':draft,'createdAt':now(),'updatedAt':now(),'nativeSessionId':None,'events':[],'progressHistory':[],'progressHistoryComplete':True,'inputs':[],'files':[],'resultVersion':0}
         job={'meta':meta,'workspace':work,'bundle':None,'views':{},'journal':deque(maxlen=1000),'seq':0}
         with self.lock:self.jobs[ident]=job;self._save(job)

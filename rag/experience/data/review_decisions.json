@@ -1,0 +1,150 @@
+{
+  "reviewer": "assistant",
+  "reviewed_at": "2026-11-16",
+  "review_standard": "根据现有题面、可观察执行轨迹、独立核对的覆盖范围和物理前提逐项判断。通过是限定条件下可作为参考，不表示新增实验验证或无限制适用；仅用于排错的内容不能进入正常求解建议。",
+  "cards": [
+    {
+      "id": "K01_P02",
+      "runtime_scope": "燃料棒几何修改与冷态参数同步；源模型为 generic_pwr_1D，冷态间隙按该 FRAPCON 定义。",
+      "decisions": [
+        {"verdict":"pass","reason":"两组均在独立目录准备并完成几何与参数检查，限定保持未授权修改项。","runtime_text":"先只读源输入，在独立 target-case 中按题目指定的尺寸修改相应几何及所有关联网格块，并核对冷态参数的一致性；未获授权改变的半径、轴向结构、材料和载荷应保留。"},
+        {"verdict":"pass","reason":"两组输入回读和几何核对一致，但间隙定义只对该模型成立。","runtime_text":"在 P02 所用 FRAPCON 参数定义下，DiamCold 是燃料冷态直径；GapCold 是包壳内径减燃料外径，两个量都是直径。若 r_clad_in 是包壳内半径、r_fuel 是燃料外半径，则径向间隙 = r_clad_in - r_fuel；GapCold = 2*(r_clad_in - r_fuel)，不是半径之差。使用其他材料模型或版本前必须先核对定义。"},
+        {"verdict":"pass","reason":"两组均为只准备输入，求解启动为零；网格与尺寸经过核对。","runtime_text":"修改几何后重生成网格字典并回读尺寸、材料参数和单位；只准备任务可以生成或检查网格，但不应启动 OFFBEAT。"},
+        {"verdict":"pass","reason":"保留网格检查失败项并针对用途判断是审慎的限制，未把已有失败当成通过。","runtime_text":"如果 checkMesh 保留源模型原有问题项，与源一致不等于网格对所有用途都合格；应记录具体失败项并按目标用途评估。"}
+      ]
+    },
+    {
+      "id":"K02_C04",
+      "runtime_scope":"包壳外表面腐蚀、时间单位与边界场提取；基于 C04 源模型。",
+      "decisions":[
+        {"verdict":"pass","reason":"days、物理秒和终点目录已在两组证据中交叉核对。","runtime_text":"以实际 controlDict 的 userTime 和求解日志确认时间目录、历史表及终点使用的单位；天与秒换算为 1 d=86400 s。不要仅凭注释或目录字符串判断单位。"},
+        {"verdict":"pass","reason":"独立核对覆盖 C04 的实际边界氧化物厚度，数值仅为本题实例。","runtime_text":"在 C04 源模型中，氧化层厚度取 cladOuter 上 oxideThickness 的边界数据；先核对字段类型、边界名称和单位，不把历史工况数值复制到新算例。"},
+        {"verdict":"pass","reason":"正常退出、终点与实际场比目录名称更能说明执行状态，但仍须选取合理时间容差。"},
+        {"verdict":"pass","reason":"本题 oxideThickness 为 surfaceScalarField，体场读取器能力不能外推到所有边界字段。"}
+      ]
+    },
+    {
+      "id":"K03_KTH01",
+      "runtime_scope":"同轴燃料棒、恒物性稳态导热与圆柱气隙热阻；不含额外接触或辐射热阻。",
+      "decisions":[
+        {"verdict":"pass","reason":"圆柱径向导热热阻及燃料侧面积基准公式与本题假设一致，不能延伸至温变或非同轴情形。","arms":["bare"]},
+        {"verdict":"pass","reason":"题面允许两种气隙表示，分别记录了真实求解及独立细网格核对。","runtime_text":"当题面允许时，气隙可表示为显式导热区或等效界面条件；选择前应核对参数及边界。不同网格和提取方法可能导致小差异，不能将不同实现当作完全相同的离散模型。"},
+        {"verdict":"pass","reason":"两组均区分最大存储单元值与拟合外推中心值；拟合只适用于所述模型。"},
+        {"verdict":"pass","reason":"仅在恒物性、固定边界和温升线性前提下，可利用既有热阻进行限值换算。"}
+      ]
+    },
+    {
+      "id":"K04_C01",
+      "runtime_scope":"轴对称燃料—包壳稳态热流、界面通量方向与扇区积分。",
+      "decisions":[
+        {"verdict":"pass","reason":"四项积分对象与独立热量守恒核对一致。"},
+        {"verdict":"pass","reason":"耦合界面两侧外法向相反，必须统一物理流向与符号。"},
+        {"verdict":"pass","reason":"本题扇区和热源积分核对通过；整棒换算以周向对称为前提。","runtime_text":"先对同一实际计算域分别核对热源、界面热流与外壁散热的守恒；仅在周向对称且扇区具有代表性时，才按 360°/扇区角换算整棒总量。"},
+        {"verdict":"pass","reason":"一次守恒残差不能单独证明其具体来源，保留这一解释边界。"}
+      ]
+    },
+    {
+      "id":"K05_W01",
+      "runtime_scope":"同一物理输入的连续运行与分段续算交接；源配置中气体/FGR 未启用。",
+      "decisions":[
+        {"verdict":"pass","reason":"交接源文件、续算起点和相同对象的连续/续算比较均有实际记录。"},
+        {"verdict":"pass","reason":"实际四次启动中包含一次失败，独立检查区分了退出与留场。","runtime_text":"将连续段、分段、初始化失败与重试都计入用户规定的真实求解启动预算；保存结果场不能替代正常退出、终点和所需输出核对。"},
+        {"verdict":"troubleshooting_only","reason":"回读失败和文件改写有证据，但改写后边界的物理等价性尚未独立确认，不能作为通用修复。","runtime_text":"本机 W01 出现 D 场 coolantPressureList 回读失败；交接副本的边界字典修整后曾成功续算。修改后压力边界的物理等价性尚未独立确认，不能把该修整直接写成通用修复。"},
+        {"verdict":"pass","reason":"源算例确实未启用 gapGas/FGR，且温度和位移主要保持，不能扩称完整物理续算验证。"},
+        {"verdict":"troubleshooting_only","reason":"重复提取和前台超时是实际异常轨迹；批量缓存优化仍是待验证建议。","arms":["skill"]}
+      ]
+    },
+    {
+      "id":"K06_C02",
+      "runtime_scope":"球壳小应变弹性问题、内外压力和球坐标结果提取。",
+      "decisions":[
+        {"verdict":"pass","reason":"题面和两组真实结果均要求球坐标基底、方向、单位及采样位置。"},
+        {"verdict":"pass","reason":"独立复核证实原生边界值与重构口径不同；数值不可照搬。","runtime_text":"分别标注原始 calculated 边界值、相邻单元中心值和基于边界条件重构或外推的值；不能把不同口径的差别直接归因于求解器结果。"},
+        {"verdict":"troubleshooting_only","reason":"零功率时间表在特定版本与输入中末点越界，延长表尾是该条件下的恢复案例，不能无条件改动载荷。","runtime_text":"本机 C02 曾在零功率时间表最后点恰好等于 10 s 时异常终止；延长表尾且保持题目区间内功率不变后曾正常完成。任何类似修改须检查当前版本、原始曲线和物理区间。"}
+      ]
+    },
+    {
+      "id":"K07_C08_LIMITED",
+      "runtime_scope":"双区域绝热热学瞬态；该历史轮次设两次启动上限，Skill 组未完成。",
+      "decisions":[
+        {"verdict":"troubleshooting_only","reason":"非法 mechanicsSolver none 是本版本一次可复现的失败，不可作为跨版本通用结论。","arms":["skill"],"task_statuses":["incomplete"]},
+        {"verdict":"troubleshooting_only","reason":"fuelRodGap 与 gapGas none 的依赖失败有日志依据，只能在确认同类边界和版本后参考。","arms":["skill"],"task_statuses":["incomplete"]},
+        {"verdict":"troubleshooting_only","reason":"这是未完成会话的停止与交付记录；不能将其作为成功求解步骤。","arms":["skill"],"task_statuses":["incomplete"]},
+        {"verdict":"troubleshooting_only","reason":"原版在预算内修复后完成属于单次对照，只用于了解错误恢复过程。","arms":["bare"],"task_statuses":["completed"]}
+      ]
+    },
+    {
+      "id":"K08_C08_RECOVERY",
+      "runtime_scope":"双区域绝热瞬态的输入依赖、受约束恢复及能量核查；不同轮次的产品配置需分别确认。",
+      "decisions":[
+        {"verdict":"troubleshooting_only","reason":"前三次失败与第四次完成的序列用于具体报错诊断，不能作为正常任务预设路径。","arms":["skill"],"runs":["recovery-c08-pairs-20261114-01"]},
+        {"verdict":"pass","reason":"该配置在实际第四次运行完成，机械选择器与气隙依赖受版本、输入和边界限制。","arms":["skill"],"runs":["recovery-c08-pairs-20261114-01"],"runtime_text":"对于采用 fuelRodGap 的热学算例，先分别核对已安装版本支持的力学选择器，以及边界实际需要的间隙气体导热模型。本地 C08 成功案例中，mechanicsSolver 的值为 constant，gapGas 模型为 FRAPCON；constant 是此处的力学选项，不是此案例的气体模型。其他算例必须核实适用性后才能参考。"},
+        {"verdict":"pass","reason":"恢复轮次有独立积分核对；去除历史固定结果以避免污染新算例。","runs":["recovery-c08-pairs-20261114-01"],"runtime_text":"恒定密度与比热时，可按各区单元求和 ΔE=ΣρCp(T−T0)V，并与同一计算域的热源时间积分比较；记录初态、物理区域、扇区角和数值残差。"},
+        {"verdict":"pass","reason":"按当前题面和用户明确预算处理失败与成功结果的原则有两轮实证支持。","runtime_text":"真实求解启动（含初始化失败、诊断与重试）应完整记账；用户明确设置上限或只允许准备/提取时遵守其约束。失败保留证据，成功结果在满足条件时复用。"},
+        {"verdict":"troubleshooting_only","reason":"不同轮次产品配置及环境可能变化，仅供分析结果，不宜作为求解步骤。","arms":["skill"],"runtime_text":"历史 C08 调用次数和耗时可能受产品配置及环境影响；比较不同运行时应核对配置与实际工作，不能只凭次数或耗时归因单一机制。"}
+      ]
+    },
+    {
+      "id":"K09_F01",
+      "runtime_scope":"环形燃料孔径固定点扫描，线功率、外部几何和其余边界按请求保持。",
+      "decisions":[
+        {"verdict":"pass","reason":"三个独立点的输入、网格、启动和目标输出均有核对。","runtime_text":"为每个请求的孔径独立准备和运行算例；明确哪些外半径、材料、气隙边界和线功率保持不变，并把失败、诊断和重试计入用户预算。"},
+        {"verdict":"pass","reason":"实际网格体积与 Q 场均经过核对，扇区与名义圆环有不同近似口径。"},
+        {"verdict":"pass","reason":"三点温度经过独立复核，但仅是该历史题条件下的数值。","role":"case_example"},
+        {"verdict":"troubleshooting_only","reason":"旧采样语法在本机版本造成初始化失败；须根据实际版本和日志处理，不能盲目替换所有配置。"}
+      ]
+    },
+    {
+      "id":"K10_C05",
+      "runtime_scope":"SiC 辐照蠕变的张量分量、应变分解和历史提取。",
+      "decisions":[
+        {"verdict":"pass","reason":"本题载荷方向与 symmTensor 组件顺序在两组字段和独立检查中一致。"},
+        {"verdict":"pass","reason":"应变分解仅限本题热膨胀与塑性应变为零；独立检查覆盖该分解。"},
+        {"verdict":"pass","reason":"本题终态字段经过核对，但检查范围不包括解析本构精度，数值不能泛化。","role":"case_example"},
+        {"verdict":"troubleshooting_only","reason":"温度钳制仅有原版会话主张，独立验收未核对本构解析；不得当作已证实事实。","arms":["bare"],"runtime_text":"原版历史回答声称模型对温度系数存在 640–900 °C 的限制，但现有独立核对未验证该解析本构结论；不能把这条限制或相应系数当作已审核事实。"},
+        {"verdict":"troubleshooting_only","reason":"超时与重复读取是历史提取异常；优化可行性仍需单独验证。","arms":["skill"]}
+      ]
+    },
+    {
+      "id":"K11_F02",
+      "runtime_scope":"双材料圆筒压力固定点研究与界面两侧响应；轴向约束按源输入。",
+      "decisions":[
+        {"verdict":"pass","reason":"本题两个预定压力点完成输入、求解和独立覆盖检查。","runtime_text":"为每个已知压力工况分别准备输入并保存结果、日志；保持题目要求的源几何、材料、接合方式和轴向约束。"},
+        {"verdict":"pass","reason":"两侧单元中心位置不同，必须区别邻近单元、界面和外推值。"},
+        {"verdict":"pass","reason":"线性比例仅为本题设定下的一致性检查；独立验收未进行解析精度评分。"}
+      ]
+    },
+    {
+      "id":"K12_G01",
+      "runtime_scope":"未提供目标输入时，从热学参考建立燃料—包壳稳态模型并生成多档网格。",
+      "decisions":[
+        {"verdict":"pass","reason":"两组均保存检索选型和按目标重建输入的证据；参考不是目标答案。"},
+        {"verdict":"pass","reason":"两档实际网格有验证，但两点比较不足以证明普遍网格无关。","runtime_text":"按请求为每一档生成和运行实际网格，保留网格检查与输入回读；只有两档时报告观察差异，不直接宣称普遍网格无关。"},
+        {"verdict":"pass","reason":"本题接口系数以燃料侧面积为基准，热源积分按扇区核查；历史数值不外推。","runtime_text":"明确界面换热系数的面积基准；对轴对称扇区，用实际 Q 场和体积积分核对域内功率，并在对称假设成立时与线功率、有效长度和扇区角相互核验。"},
+        {"verdict":"troubleshooting_only","reason":"owner_zone、耦合元数据和时间目录问题是特定提取错误，应仅在相应症状下参考。","arms":["skill"]},
+        {"verdict":"pass","reason":"网格检查失败项必须保留并按用途评估，不能由本题响应通过推断普遍无影响。"}
+      ]
+    },
+    {
+      "id":"K13_G02",
+      "runtime_scope":"球壳小应变压力模型的参考选型、球坐标应力投影和结果口径。",
+      "decisions":[
+        {"verdict":"pass","reason":"参考模型选择应核对球壳几何、压力边界和物理模型，而非依赖名称。"},
+        {"verdict":"pass","reason":"独立验证使用笛卡尔张量的球坐标投影；迹给出切向正应力平均值，代表每个切向分量时需满足相等条件。","runtime_text":"以球心为原点，对非零位置向量 x 和三维应力张量 σ，令 e_r=x/|x|、σ_rr=e_r·σ·e_r。在正交球坐标基下，两个切向正应力的平均值恒为 (tr σ−σ_rr)/2，这个平均公式本身不要求剪切为零；只有确认两切向正应力相等时，才能用该均值代表每一个切向分量。球对称建模还需检查几何、载荷和剪切分量。不要把一般柱坐标 sigmaCyl 直接当球坐标张量。"},
+        {"verdict":"pass","reason":"符号和单元/边界对象均需按当前输入与输出定义确认。"},
+        {"verdict":"pass","reason":"固定点可集中组织；额外正常试验和敏感性计算不能误标为失败。","runtime_text":"可将预先已知的独立压力工况集中规划、分别运行和收集；成功结果可复用，额外正常的敏感性与精度检查不应自动标记为失败。"}
+      ]
+    },
+    {
+      "id":"K14_M01",
+      "runtime_scope":"单区域 UO2 球核的 Cs 扩散，零生成源、吸收边界及球对称库存积分。",
+      "decisions":[
+        {"verdict":"pass","reason":"单核参考的几何和物理选择经两组检索及输入、结果核对。"},
+        {"verdict":"pass","reason":"本题参数计划后实际 diffCs、T 和 sourceCs 与要求一致，路径与写法受版本及模型约束。","arms":["skill"],"runtime_text":"对本地单 UO2 区、单 FpDiffusion Cs 恒扩散契约，先确认真实材料参数绑定及其适用版本；字典回读后，运行并核对 diffCs、T 与 sourceCs 实际字段，不能把写入键名当作参数已生效。"},
+        {"verdict":"pass","reason":"题目零生成源且库存变化由该边界释放，体积分与整球换算经过核对；其他源汇或非对称场需重新建立质量平衡。","runtime_text":"在零生成源且库存变化由所考虑边界释放的条件下，按同一域和体积权重计算 M(t)=Σ(Cs_i V_i)、F=1−M(t)/M(0)；球对称扇区换算整球库存需核实对称性和实际网格体积。"},
+        {"verdict":"pass","reason":"不同网格历史释放分数经独立汇总，仅适合保留为该题参考数值。","role":"case_example"},
+        {"verdict":"pass","reason":"球心塌缩与 checkMesh 失败项虽保留对照，不能据一题结果推广成无害。"}
+      ]
+    }
+  ]
+}

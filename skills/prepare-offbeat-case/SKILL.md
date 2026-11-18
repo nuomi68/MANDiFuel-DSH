@@ -34,10 +34,10 @@ description: 用户要求建立或修改 OFFBEAT 算例、设置载荷历史、�
 用户指定 `source-case/` 时只将它作为源，不同时展开 `sources/`、源库或示例再比对一遍；只有必要引用缺失或请求明确指定其他模型时读取对应资产。无源时才用本地检索：
 
 ```bash
-python3 "$MANDIFUEL_PLUGIN_ROOT/rag/query.py" --query-file request.txt --limit 5 --compact
+python3 "$MANDIFUEL_PLUGIN_ROOT/rag/experience/dual_query.py" --query-file request.txt --case-limit 5 --experience-limit 3 --compact
 ```
 
-查询在同一次规划中包含英文工程关键词，供主要为英文的卡片匹配；不用另起翻译调用。可用 `--labels-json '{"geometry":"1D_spherical"}'` 提供词表中已有标签，标签必须符合本地词表（示例标签也先以实际词表为准）。默认 BM25 词项加显式标签排序，不使用在线映射或查询向量，结果给出 `mode=local` 与 `network_requests=0`。不把此分数当作旧版向量融合分数比较。
+查询在同一次规划中包含英文工程关键词，供主要为英文的卡片匹配。两个检索器独立返回 `status` 和 `output`。在 `retrievers.case_rag.output.candidates` 查看源算例候选，可用 `--labels-json` 提供本地词表标签。在 `retrievers.experience_rag.output.results` 查看短经验、适用背景及相邻条目。两库分别排序。任一侧失败时可继续使用成功的一侧；原算例接口 `rag/query.py` 仍可单独调用。
 
 保存一次查询结果，检查候选的几何、材料、物理能力与排除条件，再解析配置的只读源库。没有匹配时仅补充本地关键词或标签；本地资料不足就记录缺口，不联网，也不用旧任务答案替代选源证据。
 

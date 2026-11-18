@@ -1,0 +1,2287 @@
+{
+    "schema_version":  "mandifuel-experience-corpus.v1",
+    "review":  {
+                   "reviewer":  "assistant",
+                   "reviewed_at":  "2026-11-16",
+                   "standard":  "根据现有题面、可观察执行轨迹、独立核对的覆盖范围和物理前提逐项判断。通过是限定条件下可作为参考，不表示新增实验验证或无限制适用；仅用于排错的内容不能进入正常求解建议。",
+                   "parent_count":  14,
+                   "child_count":  59,
+                   "pass_count":  46,
+                   "troubleshooting_only_count":  13,
+                   "case_example_count":  3
+               },
+    "parents":  [
+                    {
+                        "id":  "knowledge:K01_P02",
+                        "record_type":  "parent",
+                        "question_parent_id":  "question:P02",
+                        "title":  "燃料棒改尺寸时同步冷态参数",
+                        "context":  "燃料棒几何修改与冷态参数同步；源模型为 generic_pwr_1D，冷态间隙按该 FRAPCON 定义。",
+                        "source_question_local":  "会话资料/questions/P02.md",
+                        "source_question_server":  "runs/qa-ab-20261113-01/questions/P02.md",
+                        "review_status":  "reviewed_context_only",
+                        "approved_for_rag":  false
+                    },
+                    {
+                        "id":  "knowledge:K02_C04",
+                        "record_type":  "parent",
+                        "question_parent_id":  "question:C04",
+                        "title":  "包壳腐蚀：时间单位、氧化物边界和终点判断",
+                        "context":  "包壳外表面腐蚀、时间单位与边界场提取；基于 C04 源模型。",
+                        "source_question_local":  "会话资料/questions/C04.md",
+                        "source_question_server":  "runs/qa-ab-20261113-01/questions/C04.md",
+                        "review_status":  "reviewed_context_only",
+                        "approved_for_rag":  false
+                    },
+                    {
+                        "id":  "knowledge:K03_KTH01",
+                        "record_type":  "parent",
+                        "question_parent_id":  "question:KTH01",
+                        "title":  "稳态燃料棒：显式气隙与等效界面热阻",
+                        "context":  "同轴燃料棒、恒物性稳态导热与圆柱气隙热阻；不含额外接触或辐射热阻。",
+                        "source_question_local":  "会话资料/questions/KTH01.md",
+                        "source_question_server":  "runs/qa-ab-20261113-01/questions/KTH01.md",
+                        "review_status":  "reviewed_context_only",
+                        "approved_for_rag":  false
+                    },
+                    {
+                        "id":  "knowledge:K04_C01",
+                        "record_type":  "parent",
+                        "question_parent_id":  "question:C01",
+                        "title":  "燃料—包壳稳态热流的方向与扇区换算",
+                        "context":  "轴对称燃料—包壳稳态热流、界面通量方向与扇区积分。",
+                        "source_question_local":  "会话资料/questions/C01.md",
+                        "source_question_server":  "runs/qa-ab-20261113-01/questions/C01.md",
+                        "review_status":  "reviewed_context_only",
+                        "approved_for_rag":  false
+                    },
+                    {
+                        "id":  "knowledge:K05_W01",
+                        "record_type":  "parent",
+                        "question_parent_id":  "question:W01",
+                        "title":  "燃料棒续算：状态交接与失败恢复",
+                        "context":  "同一物理输入的连续运行与分段续算交接；源配置中气体/FGR 未启用。",
+                        "source_question_local":  "会话资料/questions/W01.md",
+                        "source_question_server":  "runs/qa-ab-20261113-01/questions/W01.md",
+                        "review_status":  "reviewed_context_only",
+                        "approved_for_rag":  false
+                    },
+                    {
+                        "id":  "knowledge:K06_C02",
+                        "record_type":  "parent",
+                        "question_parent_id":  "question:C02:b1e123b449f5af77",
+                        "title":  "球壳内外压力：结果基底与表面口径",
+                        "context":  "球壳小应变弹性问题、内外压力和球坐标结果提取。",
+                        "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/C02-b1e123b449f5af77.md",
+                        "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/C02-b1e123b449f5af77.md",
+                        "review_status":  "reviewed_context_only",
+                        "approved_for_rag":  false
+                    },
+                    {
+                        "id":  "knowledge:K07_C08_LIMITED",
+                        "record_type":  "parent",
+                        "question_parent_id":  "question:C08:5abd5a09344ca7c1",
+                        "title":  "双区域瞬态：两次启动限制下的失败诊断",
+                        "context":  "双区域绝热热学瞬态；该历史轮次设两次启动上限，Skill 组未完成。",
+                        "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/C08-5abd5a09344ca7c1.md",
+                        "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/C08-5abd5a09344ca7c1.md",
+                        "review_status":  "reviewed_context_only",
+                        "approved_for_rag":  false
+                    },
+                    {
+                        "id":  "knowledge:K08_C08_RECOVERY",
+                        "record_type":  "parent",
+                        "question_parent_id":  "question:C08:2b02b846b68cd5f8",
+                        "title":  "双区域瞬态：保留记录并逐项修复",
+                        "context":  "双区域绝热瞬态的输入依赖、受约束恢复及能量核查；不同轮次的产品配置需分别确认。",
+                        "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/C08-2b02b846b68cd5f8.md",
+                        "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/C08-2b02b846b68cd5f8.md",
+                        "review_status":  "reviewed_context_only",
+                        "approved_for_rag":  false
+                    },
+                    {
+                        "id":  "knowledge:K09_F01",
+                        "record_type":  "parent",
+                        "question_parent_id":  "question:F01:aca10118513e3da5",
+                        "title":  "环形燃料固定孔径扫描",
+                        "context":  "环形燃料孔径固定点扫描，线功率、外部几何和其余边界按请求保持。",
+                        "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/F01-aca10118513e3da5.md",
+                        "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/F01-aca10118513e3da5.md",
+                        "review_status":  "reviewed_context_only",
+                        "approved_for_rag":  false
+                    },
+                    {
+                        "id":  "knowledge:K10_C05",
+                        "record_type":  "parent",
+                        "question_parent_id":  "question:C05:f80db5f4eae95be2",
+                        "title":  "SiC 辐照蠕变：应变分量与历史",
+                        "context":  "SiC 辐照蠕变的张量分量、应变分解和历史提取。",
+                        "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/C05-f80db5f4eae95be2.md",
+                        "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/C05-f80db5f4eae95be2.md",
+                        "review_status":  "reviewed_context_only",
+                        "approved_for_rag":  false
+                    },
+                    {
+                        "id":  "knowledge:K11_F02",
+                        "record_type":  "parent",
+                        "question_parent_id":  "question:F02:df40729c9e13d917",
+                        "title":  "双材料圆筒：压力扫描与界面两侧响应",
+                        "context":  "双材料圆筒压力固定点研究与界面两侧响应；轴向约束按源输入。",
+                        "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/F02-df40729c9e13d917.md",
+                        "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/F02-df40729c9e13d917.md",
+                        "review_status":  "reviewed_context_only",
+                        "approved_for_rag":  false
+                    },
+                    {
+                        "id":  "knowledge:K12_G01",
+                        "record_type":  "parent",
+                        "question_parent_id":  "question:G01:6781859b9ffe1148",
+                        "title":  "无目标输入时重建燃料—包壳稳态模型",
+                        "context":  "未提供目标输入时，从热学参考建立燃料—包壳稳态模型并生成多档网格。",
+                        "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/G01-6781859b9ffe1148.md",
+                        "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/G01-6781859b9ffe1148.md",
+                        "review_status":  "reviewed_context_only",
+                        "approved_for_rag":  false
+                    },
+                    {
+                        "id":  "knowledge:K13_G02",
+                        "record_type":  "parent",
+                        "question_parent_id":  "question:G02:59a40e5def1f9aea",
+                        "title":  "从物理描述建立球壳压力模型",
+                        "context":  "球壳小应变压力模型的参考选型、球坐标应力投影和结果口径。",
+                        "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/G02-59a40e5def1f9aea.md",
+                        "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/G02-59a40e5def1f9aea.md",
+                        "review_status":  "reviewed_context_only",
+                        "approved_for_rag":  false
+                    },
+                    {
+                        "id":  "knowledge:K14_M01",
+                        "record_type":  "parent",
+                        "question_parent_id":  "question:M01:467ac434c4827f9b",
+                        "title":  "UO2 单球核 Cs 扩散与整球库存",
+                        "context":  "单区域 UO2 球核的 Cs 扩散，零生成源、吸收边界及球对称库存积分。",
+                        "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/M01-467ac434c4827f9b.md",
+                        "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/M01-467ac434c4827f9b.md",
+                        "review_status":  "reviewed_context_only",
+                        "approved_for_rag":  false
+                    }
+                ],
+    "children":  [
+                     {
+                         "id":  "knowledge:K01_P02:01",
+                         "parent_id":  "knowledge:K01_P02",
+                         "record_type":  "child",
+                         "position":  1,
+                         "kind":  "输入准备",
+                         "text":  "先只读源输入，在独立 target-case 中按题目指定的尺寸修改相应几何及所有关联网格块，并核对冷态参数的一致性；未获授权改变的半径、轴向结构、材料和载荷应保留。",
+                         "original_reviewed_text":  "先只读源输入，在独立 target-case 中同步修改燃料外半径以及所有对应包壳块的内、外半径；保留题目未授权改变的轴向结构、材料和载荷。",
+                         "evidence_basis":  "两组题面与最终输入说明；独立检查覆盖对应几何与冷态参数。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "两组均在独立目录准备并完成几何与参数检查，限定保持未授权修改项。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "history:bare",
+                                                   "run":  "history",
+                                                   "arm":  "bare",
+                                                   "task_status":  "prepared",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/raw_history/P02/bare/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "history:skill",
+                                                   "run":  "history",
+                                                   "arm":  "skill",
+                                                   "task_status":  "prepared",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/raw_history/P02/skill/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/questions/P02.md",
+                         "source_question_local":  "会话资料/questions/P02.md"
+                     },
+                     {
+                         "id":  "knowledge:K01_P02:02",
+                         "parent_id":  "knowledge:K01_P02",
+                         "record_type":  "child",
+                         "position":  2,
+                         "kind":  "参数定义",
+                         "text":  "在 P02 所用 FRAPCON 参数定义下，DiamCold 是燃料冷态直径；GapCold 是包壳内径减燃料外径，两个量都是直径。若 r_clad_in 是包壳内半径、r_fuel 是燃料外半径，则径向间隙 = r_clad_in - r_fuel；GapCold = 2*(r_clad_in - r_fuel)，不是半径之差。使用其他材料模型或版本前必须先核对定义。",
+                         "original_reviewed_text":  "在本题模型中 DiamCold 是冷态燃料直径，GapCold 是冷态直径间隙。燃料半径 4.20 mm、包壳内半径 4.30 mm 时，径向间隙为 0.10 mm；DiamCold 为 8.40 mm，GapCold 为 0.20 mm，即 2.0e-4 m。",
+                         "evidence_basis":  "两组参数回读一致；仅适用于该源算例所用的参数定义。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "两组输入回读和几何核对一致，但间隙定义只对该模型成立。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "history:bare",
+                                                   "run":  "history",
+                                                   "arm":  "bare",
+                                                   "task_status":  "prepared",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/raw_history/P02/bare/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "history:skill",
+                                                   "run":  "history",
+                                                   "arm":  "skill",
+                                                   "task_status":  "prepared",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/raw_history/P02/skill/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/questions/P02.md",
+                         "source_question_local":  "会话资料/questions/P02.md"
+                     },
+                     {
+                         "id":  "knowledge:K01_P02:03",
+                         "parent_id":  "knowledge:K01_P02",
+                         "record_type":  "child",
+                         "position":  3,
+                         "kind":  "验证",
+                         "text":  "修改几何后重生成网格字典并回读尺寸、材料参数和单位；只准备任务可以生成或检查网格，但不应启动 OFFBEAT。",
+                         "original_reviewed_text":  "修改几何后重生成网格字典并回读尺寸、材料参数和单位；只准备任务可以生成或检查网格，但不应启动 OFFBEAT。P02 两组均为 0 次求解启动。",
+                         "evidence_basis":  "P02 准备记录、两组问答和独立检查。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "两组均为只准备输入，求解启动为零；网格与尺寸经过核对。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "history:bare",
+                                                   "run":  "history",
+                                                   "arm":  "bare",
+                                                   "task_status":  "prepared",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/raw_history/P02/bare/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "history:skill",
+                                                   "run":  "history",
+                                                   "arm":  "skill",
+                                                   "task_status":  "prepared",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/raw_history/P02/skill/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/questions/P02.md",
+                         "source_question_local":  "会话资料/questions/P02.md"
+                     },
+                     {
+                         "id":  "knowledge:K01_P02:04",
+                         "parent_id":  "knowledge:K01_P02",
+                         "record_type":  "child",
+                         "position":  4,
+                         "kind":  "边界",
+                         "text":  "如果 checkMesh 保留源模型原有问题项，与源一致不等于网格对所有用途都合格；应记录具体失败项并按目标用途评估。",
+                         "original_reviewed_text":  "两组的 checkMesh 保留源模型原有问题项；与源一致不等于网格对所有用途都合格，应记录具体失败项并按目标用途评估。",
+                         "evidence_basis":  "P02 Skill 回答中的网格检查说明。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "保留网格检查失败项并针对用途判断是审慎的限制，未把已有失败当成通过。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "history:bare",
+                                                   "run":  "history",
+                                                   "arm":  "bare",
+                                                   "task_status":  "prepared",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/raw_history/P02/bare/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "history:skill",
+                                                   "run":  "history",
+                                                   "arm":  "skill",
+                                                   "task_status":  "prepared",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/raw_history/P02/skill/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/questions/P02.md",
+                         "source_question_local":  "会话资料/questions/P02.md"
+                     },
+                     {
+                         "id":  "knowledge:K02_C04:01",
+                         "parent_id":  "knowledge:K02_C04",
+                         "record_type":  "child",
+                         "position":  1,
+                         "kind":  "时间和单位",
+                         "text":  "以实际 controlDict 的 userTime 和求解日志确认时间目录、历史表及终点使用的单位；天与秒换算为 1 d=86400 s。不要仅凭注释或目录字符串判断单位。",
+                         "original_reviewed_text":  "依据 controlDict 的 userTime 确认时间目录和历史表的单位；本题为 days，17735.41 d 对应 1,532,339,424 s。不要仅凭旧注释或目录字符串推断单位。",
+                         "evidence_basis":  "两组回答及独立终点检查。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "days、物理秒和终点目录已在两组证据中交叉核对。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "history:bare",
+                                                   "run":  "history",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/raw_history/C04/bare/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "history:skill",
+                                                   "run":  "history",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/raw_history/C04/skill/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/questions/C04.md",
+                         "source_question_local":  "会话资料/questions/C04.md"
+                     },
+                     {
+                         "id":  "knowledge:K02_C04:02",
+                         "parent_id":  "knowledge:K02_C04",
+                         "record_type":  "child",
+                         "position":  2,
+                         "kind":  "结果对象",
+                         "text":  "在 C04 源模型中，氧化层厚度取 cladOuter 上 oxideThickness 的边界数据；先核对字段类型、边界名称和单位，不把历史工况数值复制到新算例。",
+                         "original_reviewed_text":  "本题氧化层厚度位于 cladOuter 的 oxideThickness 边界数据，最终结果约 2.74293e-5 m，即 27.4293 μm；该值只是本题配置的实例。",
+                         "evidence_basis":  "两组最终回答及独立结果核对。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "独立核对覆盖 C04 的实际边界氧化物厚度，数值仅为本题实例。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "history:bare",
+                                                   "run":  "history",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/raw_history/C04/bare/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "history:skill",
+                                                   "run":  "history",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/raw_history/C04/skill/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/questions/C04.md",
+                         "source_question_local":  "会话资料/questions/C04.md"
+                     },
+                     {
+                         "id":  "knowledge:K02_C04:03",
+                         "parent_id":  "knowledge:K02_C04",
+                         "record_type":  "child",
+                         "position":  3,
+                         "kind":  "结束判定",
+                         "text":  "判断终点时结合物理时间、退出码、正常终止标记及结果场；目录名多出浮点尾数不应单凭字符串不同就被当作未到终点。先验证已有场，符合要求则复用。",
+                         "original_reviewed_text":  "判断终点时结合物理时间、退出码、正常终止标记及结果场；目录名多出浮点尾数不应单凭字符串不同就被当作未到终点。先验证已有场，符合要求则复用。",
+                         "evidence_basis":  "Skill 组第一次实际到终点但因目录名称格式额外重算；裸组保留了带浮点尾数的终点目录。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "正常退出、终点与实际场比目录名称更能说明执行状态，但仍须选取合理时间容差。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "history:bare",
+                                                   "run":  "history",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/raw_history/C04/bare/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "history:skill",
+                                                   "run":  "history",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/raw_history/C04/skill/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/questions/C04.md",
+                         "source_question_local":  "会话资料/questions/C04.md"
+                     },
+                     {
+                         "id":  "knowledge:K02_C04:04",
+                         "parent_id":  "knowledge:K02_C04",
+                         "record_type":  "child",
+                         "position":  4,
+                         "kind":  "字段类型",
+                         "text":  "先识别 oxideThickness 是 surfaceScalarField 的边界值，再选择支持该字段和 patch 的提取方式；不要把体场提取接口能读取的范围泛化到所有边界字段。",
+                         "original_reviewed_text":  "先识别 oxideThickness 是 surfaceScalarField 的边界值，再选择支持该字段和 patch 的提取方式；不要把体场提取接口能读取的范围泛化到所有边界字段。",
+                         "evidence_basis":  "Skill 最终回答说明公共接口仅支持相应体场，本题另读边界值。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "本题 oxideThickness 为 surfaceScalarField，体场读取器能力不能外推到所有边界字段。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "history:bare",
+                                                   "run":  "history",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/raw_history/C04/bare/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "history:skill",
+                                                   "run":  "history",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/raw_history/C04/skill/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/questions/C04.md",
+                         "source_question_local":  "会话资料/questions/C04.md"
+                     },
+                     {
+                         "id":  "knowledge:K03_KTH01:01",
+                         "parent_id":  "knowledge:K03_KTH01",
+                         "record_type":  "child",
+                         "position":  1,
+                         "kind":  "物理等效",
+                         "text":  "在同轴圆柱气隙、气隙热导率恒定的条件下，单位长度气隙热阻 R′=ln(r_ci/r_f)/(2πk_g)。若界面系数以燃料外表面积为基准，alpha=k_g/[r_f ln(r_ci/r_f)]；应确认采用的面积基准。",
+                         "original_reviewed_text":  "在同轴圆柱气隙、气隙热导率恒定的条件下，单位长度气隙热阻 R′=ln(r_ci/r_f)/(2πk_g)。若界面系数以燃料外表面积为基准，alpha=k_g/[r_f ln(r_ci/r_f)]；应确认采用的面积基准。",
+                         "evidence_basis":  "原版回答采用的圆柱气隙热阻和燃料侧等效界面系数。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "圆柱径向导热热阻及燃料侧面积基准公式与本题假设一致，不能延伸至温变或非同轴情形。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "new:bare",
+                                                   "run":  "new",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/experiments/new-pairs/KTH01/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-qa-ab-20261113-01-experiments-new-pairs-KTH01-bare-workspace--/session-0c789347-e4ba-4acd-865b-8e42f9a76f24/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/questions/KTH01.md",
+                         "source_question_local":  "会话资料/questions/KTH01.md"
+                     },
+                     {
+                         "id":  "knowledge:K03_KTH01:02",
+                         "parent_id":  "knowledge:K03_KTH01",
+                         "record_type":  "child",
+                         "position":  2,
+                         "kind":  "两种实现",
+                         "text":  "当题面允许时，气隙可表示为显式导热区或等效界面条件；选择前应核对参数及边界。不同网格和提取方法可能导致小差异，不能将不同实现当作完全相同的离散模型。",
+                         "original_reviewed_text":  "题目允许显式气隙导热区或等效界面条件；两组分别采用两种方式并各完成三档求解。不同网格和提取方法可能导致小差异，不能将它们当作完全相同的离散模型。",
+                         "evidence_basis":  "两组可见回答与细网格参考检查。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "题面允许两种气隙表示，分别记录了真实求解及独立细网格核对。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "new:bare",
+                                                   "run":  "new",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/experiments/new-pairs/KTH01/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-qa-ab-20261113-01-experiments-new-pairs-KTH01-bare-workspace--/session-0c789347-e4ba-4acd-865b-8e42f9a76f24/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "new:skill",
+                                                   "run":  "new",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/experiments/new-pairs/KTH01/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-qa-ab-20261113-01-experiments-new-pairs-KTH01-skill-workspace--/session-f48b27ed-96fc-49c1-9350-80e3ef268c06/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/questions/KTH01.md",
+                         "source_question_local":  "会话资料/questions/KTH01.md"
+                     },
+                     {
+                         "id":  "knowledge:K03_KTH01:03",
+                         "parent_id":  "knowledge:K03_KTH01",
+                         "record_type":  "child",
+                         "position":  3,
+                         "kind":  "结果对象",
+                         "text":  "最大存储单元温度与中心线温度不是同一概念。本题中心线由燃料区单元的 T(r)=a+b r² 拟合外推至 r=0；应同时报告单元值、外推方法和位置。",
+                         "original_reviewed_text":  "最大存储单元温度与中心线温度不是同一概念。本题中心线由燃料区单元的 T(r)=a+b r² 拟合外推至 r=0；应同时报告单元值、外推方法和位置。",
+                         "evidence_basis":  "两组回答及参考核对。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "两组均区分最大存储单元值与拟合外推中心值；拟合只适用于所述模型。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "new:bare",
+                                                   "run":  "new",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/experiments/new-pairs/KTH01/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-qa-ab-20261113-01-experiments-new-pairs-KTH01-bare-workspace--/session-0c789347-e4ba-4acd-865b-8e42f9a76f24/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "new:skill",
+                                                   "run":  "new",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/experiments/new-pairs/KTH01/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-qa-ab-20261113-01-experiments-new-pairs-KTH01-skill-workspace--/session-f48b27ed-96fc-49c1-9350-80e3ef268c06/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/questions/KTH01.md",
+                         "source_question_local":  "会话资料/questions/KTH01.md"
+                     },
+                     {
+                         "id":  "knowledge:K03_KTH01:04",
+                         "parent_id":  "knowledge:K03_KTH01",
+                         "record_type":  "child",
+                         "position":  4,
+                         "kind":  "功率限值",
+                         "text":  "仅在恒物性、固定边界且温升对线功率线性的本题条件下，可用本次得到的总热阻由温度上限计算线功率，无需为这个后处理再启动 OFFBEAT。",
+                         "original_reviewed_text":  "仅在恒物性、固定边界且温升对线功率线性的本题条件下，可用本次得到的总热阻由温度上限计算线功率，无需为这个后处理再启动 OFFBEAT。",
+                         "evidence_basis":  "题面要求和两组结果。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "仅在恒物性、固定边界和温升线性前提下，可利用既有热阻进行限值换算。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "new:bare",
+                                                   "run":  "new",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/experiments/new-pairs/KTH01/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-qa-ab-20261113-01-experiments-new-pairs-KTH01-bare-workspace--/session-0c789347-e4ba-4acd-865b-8e42f9a76f24/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "new:skill",
+                                                   "run":  "new",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/experiments/new-pairs/KTH01/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-qa-ab-20261113-01-experiments-new-pairs-KTH01-skill-workspace--/session-f48b27ed-96fc-49c1-9350-80e3ef268c06/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/questions/KTH01.md",
+                         "source_question_local":  "会话资料/questions/KTH01.md"
+                     },
+                     {
+                         "id":  "knowledge:K04_C01:01",
+                         "parent_id":  "knowledge:K04_C01",
+                         "record_type":  "child",
+                         "position":  1,
+                         "kind":  "提取对象",
+                         "text":  "分别积分燃料体积热源、燃料外表面流出热量、包壳内表面接收热量和包壳外表面散热；每个值都写明积分区域、方向与单位。",
+                         "original_reviewed_text":  "分别积分燃料体积热源、燃料外表面流出热量、包壳内表面接收热量和包壳外表面散热；每个值都写明积分区域、方向与单位。",
+                         "evidence_basis":  "C01 题面和两组输出。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "四项积分对象与独立热量守恒核对一致。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "new:bare",
+                                                   "run":  "new",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/experiments/new-pairs/C01/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-qa-ab-20261113-01-experiments-new-pairs-C01-bare-workspace--/session-3d40e028-f06e-4828-b787-00296674c132/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "new:skill",
+                                                   "run":  "new",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/experiments/new-pairs/C01/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-qa-ab-20261113-01-experiments-new-pairs-C01-skill-workspace--/session-331ba51a-f6ed-4982-94d1-b634b9e6ca7a/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/questions/C01.md",
+                         "source_question_local":  "会话资料/questions/C01.md"
+                     },
+                     {
+                         "id":  "knowledge:K04_C01:02",
+                         "parent_id":  "knowledge:K04_C01",
+                         "record_type":  "child",
+                         "position":  2,
+                         "kind":  "方向",
+                         "text":  "界面两侧的外法向相反。比较 fuelOuter 与 cladInner 时应转换成共同的物理方向，不能直接将两个外法向符号相同地解释为同向热流。",
+                         "original_reviewed_text":  "界面两侧的外法向相反。比较 fuelOuter 与 cladInner 时应转换成共同的物理方向，不能直接将两个外法向符号相同地解释为同向热流。",
+                         "evidence_basis":  "两组结果中的燃料向外及包壳接收方向说明。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "耦合界面两侧外法向相反，必须统一物理流向与符号。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "new:bare",
+                                                   "run":  "new",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/experiments/new-pairs/C01/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-qa-ab-20261113-01-experiments-new-pairs-C01-bare-workspace--/session-3d40e028-f06e-4828-b787-00296674c132/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "new:skill",
+                                                   "run":  "new",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/experiments/new-pairs/C01/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-qa-ab-20261113-01-experiments-new-pairs-C01-skill-workspace--/session-331ba51a-f6ed-4982-94d1-b634b9e6ca7a/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/questions/C01.md",
+                         "source_question_local":  "会话资料/questions/C01.md"
+                     },
+                     {
+                         "id":  "knowledge:K04_C01:03",
+                         "parent_id":  "knowledge:K04_C01",
+                         "record_type":  "child",
+                         "position":  3,
+                         "kind":  "域与守恒",
+                         "text":  "先对同一实际计算域分别核对热源、界面热流与外壁散热的守恒；仅在周向对称且扇区具有代表性时，才按 360°/扇区角换算整棒总量。",
+                         "original_reviewed_text":  "本题为 2° 扇区，四项值均约 300 W；在周向对称假设下按 360/2=180 倍换算后，整棒功率约 54 kW。应同时用同一计算域检查热源、界面和外边界的守恒差。",
+                         "evidence_basis":  "两组结果表及独立热量守恒筛查；非直接三维全棒计算。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "本题扇区和热源积分核对通过；整棒换算以周向对称为前提。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "new:bare",
+                                                   "run":  "new",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/experiments/new-pairs/C01/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-qa-ab-20261113-01-experiments-new-pairs-C01-bare-workspace--/session-3d40e028-f06e-4828-b787-00296674c132/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "new:skill",
+                                                   "run":  "new",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/experiments/new-pairs/C01/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-qa-ab-20261113-01-experiments-new-pairs-C01-skill-workspace--/session-331ba51a-f6ed-4982-94d1-b634b9e6ca7a/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/questions/C01.md",
+                         "source_question_local":  "会话资料/questions/C01.md"
+                     },
+                     {
+                         "id":  "knowledge:K04_C01:04",
+                         "parent_id":  "knowledge:K04_C01",
+                         "record_type":  "child",
+                         "position":  4,
+                         "kind":  "解释限制",
+                         "text":  "本题观察到的小守恒残差可以报告；若要把残差定量归因于 AMI 插值或其他机制，应另有针对性证据，不能只凭一次输出断言。",
+                         "original_reviewed_text":  "本题观察到的小守恒残差可以报告；若要把残差定量归因于 AMI 插值或其他机制，应另有针对性证据，不能只凭一次输出断言。",
+                         "evidence_basis":  "两组结果与独立检查覆盖范围。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "一次守恒残差不能单独证明其具体来源，保留这一解释边界。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "new:bare",
+                                                   "run":  "new",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/experiments/new-pairs/C01/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-qa-ab-20261113-01-experiments-new-pairs-C01-bare-workspace--/session-3d40e028-f06e-4828-b787-00296674c132/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "new:skill",
+                                                   "run":  "new",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/experiments/new-pairs/C01/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-qa-ab-20261113-01-experiments-new-pairs-C01-skill-workspace--/session-331ba51a-f6ed-4982-94d1-b634b9e6ca7a/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/questions/C01.md",
+                         "source_question_local":  "会话资料/questions/C01.md"
+                     },
+                     {
+                         "id":  "knowledge:K05_W01:01",
+                         "parent_id":  "knowledge:K05_W01",
+                         "record_type":  "child",
+                         "position":  1,
+                         "kind":  "交接",
+                         "text":  "保留交接时刻完整原始状态文件及清单，再建立续算输入副本；核查实际续算起点、时间索引、相关历史场和终态，并与连续路径在同一对象、位置和单位下比较。",
+                         "original_reviewed_text":  "保留交接时刻完整原始状态文件及清单，再建立续算输入副本；核查实际续算起点、时间索引、相关历史场和终态，并与连续路径在同一对象、位置和单位下比较。",
+                         "evidence_basis":  "两轮 W01 题面、轨迹和验收摘要。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "交接源文件、续算起点和相同对象的连续/续算比较均有实际记录。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "history:bare",
+                                                   "run":  "history",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/raw_history/W01/bare/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "history:skill",
+                                                   "run":  "history",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/raw_history/W01/skill/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "new:bare",
+                                                   "run":  "new",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/experiments/new-pairs/W01/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-qa-ab-20261113-01-experiments-new-pairs-W01-bare-workspace--/session-7350ffda-d484-498d-aae4-b9be7019fa2b/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "new:skill",
+                                                   "run":  "new",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/experiments/new-pairs/W01/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-qa-ab-20261113-01-experiments-new-pairs-W01-skill-workspace--/session-3b826974-4ae2-4fa8-8d2d-168cecd34642/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/questions/W01.md",
+                         "source_question_local":  "会话资料/questions/W01.md"
+                     },
+                     {
+                         "id":  "knowledge:K05_W01:02",
+                         "parent_id":  "knowledge:K05_W01",
+                         "record_type":  "child",
+                         "position":  2,
+                         "kind":  "失败与预算",
+                         "text":  "将连续段、分段、初始化失败与重试都计入用户规定的真实求解启动预算；保存结果场不能替代正常退出、终点和所需输出核对。",
+                         "original_reviewed_text":  "本题四次启动包括连续段、分段首段、一次失败续算和修复后续算。初始化失败与重试都计入题目上限；不得以保留场文件代替正常结束证据。",
+                         "evidence_basis":  "两组启动记录及最终回答。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "实际四次启动中包含一次失败，独立检查区分了退出与留场。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "history:bare",
+                                                   "run":  "history",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/raw_history/W01/bare/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "history:skill",
+                                                   "run":  "history",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/raw_history/W01/skill/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "new:bare",
+                                                   "run":  "new",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/experiments/new-pairs/W01/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-qa-ab-20261113-01-experiments-new-pairs-W01-bare-workspace--/session-7350ffda-d484-498d-aae4-b9be7019fa2b/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "new:skill",
+                                                   "run":  "new",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/experiments/new-pairs/W01/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-qa-ab-20261113-01-experiments-new-pairs-W01-skill-workspace--/session-3b826974-4ae2-4fa8-8d2d-168cecd34642/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/questions/W01.md",
+                         "source_question_local":  "会话资料/questions/W01.md"
+                     },
+                     {
+                         "id":  "knowledge:K05_W01:03",
+                         "parent_id":  "knowledge:K05_W01",
+                         "record_type":  "child",
+                         "position":  3,
+                         "kind":  "待审核恢复",
+                         "text":  "本机 W01 出现 D 场 coolantPressureList 回读失败；交接副本的边界字典修整后曾成功续算。修改后压力边界的物理等价性尚未独立确认，不能把该修整直接写成通用修复。",
+                         "original_reviewed_text":  "本机出现 D 场 coolantPressureList 回读失败，两组对交接副本的边界字典进行了修整并成功续算。原始交接与续算输入为 43/44 个文件字节一致，D 内部值相同；修改后的压力边界物理等价性尚未独立确认，不能把该修整直接写成通用修复。",
+                         "evidence_basis":  "新 W01 独立 checkpoint 检查。",
+                         "review_status":  "troubleshooting_only",
+                         "reviewer":  "assistant",
+                         "review_reason":  "回读失败和文件改写有证据，但改写后边界的物理等价性尚未独立确认，不能作为通用修复。",
+                         "approved_for_rag":  false,
+                         "diagnostic_eligible":  true,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "history:bare",
+                                                   "run":  "history",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/raw_history/W01/bare/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "history:skill",
+                                                   "run":  "history",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/raw_history/W01/skill/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "new:bare",
+                                                   "run":  "new",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/experiments/new-pairs/W01/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-qa-ab-20261113-01-experiments-new-pairs-W01-bare-workspace--/session-7350ffda-d484-498d-aae4-b9be7019fa2b/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "new:skill",
+                                                   "run":  "new",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/experiments/new-pairs/W01/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-qa-ab-20261113-01-experiments-new-pairs-W01-skill-workspace--/session-3b826974-4ae2-4fa8-8d2d-168cecd34642/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/questions/W01.md",
+                         "source_question_local":  "会话资料/questions/W01.md"
+                     },
+                     {
+                         "id":  "knowledge:K05_W01:04",
+                         "parent_id":  "knowledge:K05_W01",
+                         "record_type":  "child",
+                         "position":  4,
+                         "kind":  "适用限制",
+                         "text":  "此源算例 gapGas 和 fgr 未启用，温度、位移主要为状态保持；它支持评估该配置下的交接流程，不证明活跃裂变气体释放或完整热力瞬态的续算正确。",
+                         "original_reviewed_text":  "此源算例 gapGas 和 fgr 未启用，温度、位移主要为状态保持；它支持评估该配置下的交接流程，不证明活跃裂变气体释放或完整热力瞬态的续算正确。",
+                         "evidence_basis":  "W01 实际源配置与独立核对限制。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "源算例确实未启用 gapGas/FGR，且温度和位移主要保持，不能扩称完整物理续算验证。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "history:bare",
+                                                   "run":  "history",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/raw_history/W01/bare/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "history:skill",
+                                                   "run":  "history",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/raw_history/W01/skill/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "new:bare",
+                                                   "run":  "new",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/experiments/new-pairs/W01/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-qa-ab-20261113-01-experiments-new-pairs-W01-bare-workspace--/session-7350ffda-d484-498d-aae4-b9be7019fa2b/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "new:skill",
+                                                   "run":  "new",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/experiments/new-pairs/W01/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-qa-ab-20261113-01-experiments-new-pairs-W01-skill-workspace--/session-3b826974-4ae2-4fa8-8d2d-168cecd34642/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/questions/W01.md",
+                         "source_question_local":  "会话资料/questions/W01.md"
+                     },
+                     {
+                         "id":  "knowledge:K05_W01:05",
+                         "parent_id":  "knowledge:K05_W01",
+                         "record_type":  "child",
+                         "position":  5,
+                         "kind":  "提取效率",
+                         "text":  "大量字段提取应先确认字段类型、边界和所需范围，并保留已完成中间结果；历史 Skill 提取遇错后重跑整段，新增轮次也发生前台超时后从头转后台。",
+                         "original_reviewed_text":  "大量字段提取应先确认字段类型、边界和所需范围，并保留已完成中间结果；历史 Skill 提取遇错后重跑整段，新增轮次也发生前台超时后从头转后台。",
+                         "evidence_basis":  "历史执行观察和新轮次会话工具轨迹；这是改进候选，需另行验证。",
+                         "review_status":  "troubleshooting_only",
+                         "reviewer":  "assistant",
+                         "review_reason":  "重复提取和前台超时是实际异常轨迹；批量缓存优化仍是待验证建议。",
+                         "approved_for_rag":  false,
+                         "diagnostic_eligible":  true,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "history:skill",
+                                                   "run":  "history",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/raw_history/W01/skill/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "new:skill",
+                                                   "run":  "new",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/qa-ab-20261113-01/experiments/new-pairs/W01/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-qa-ab-20261113-01-experiments-new-pairs-W01-skill-workspace--/session-3b826974-4ae2-4fa8-8d2d-168cecd34642/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/questions/W01.md",
+                         "source_question_local":  "会话资料/questions/W01.md"
+                     },
+                     {
+                         "id":  "knowledge:K06_C02:01",
+                         "parent_id":  "knowledge:K06_C02",
+                         "record_type":  "child",
+                         "position":  1,
+                         "kind":  "边界和坐标",
+                         "text":  "先确认球壳几何与材料，按题目关闭热膨胀，并分别给出位移、径向应力和切向应力的坐标基底、取样位置及拉压符号。",
+                         "original_reviewed_text":  "先确认球壳几何与材料，按题目关闭热膨胀，并分别给出位移、径向应力和切向应力的坐标基底、取样位置及拉压符号。",
+                         "evidence_basis":  "C02 题面与两组最终回答。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "题面和两组真实结果均要求球坐标基底、方向、单位及采样位置。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "generalization-pairs-20261114-01:bare",
+                                                   "run":  "generalization-pairs-20261114-01",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/generalization-pairs-20261114-01/C02/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-generalization-pairs-20261114-01-C02-bare-workspace--/session-c4085bac-8967-402b-af75-2d51e689030d/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "generalization-pairs-20261114-01:skill",
+                                                   "run":  "generalization-pairs-20261114-01",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/generalization-pairs-20261114-01/C02/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-generalization-pairs-20261114-01-C02-skill-workspace--/session-c7d7cfcd-4f41-4e65-97c8-dadb5c049ba1/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/C02-b1e123b449f5af77.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/C02-b1e123b449f5af77.md"
+                     },
+                     {
+                         "id":  "knowledge:K06_C02:02",
+                         "parent_id":  "knowledge:K06_C02",
+                         "record_type":  "child",
+                         "position":  2,
+                         "kind":  "结果口径",
+                         "text":  "分别标注原始 calculated 边界值、相邻单元中心值和基于边界条件重构或外推的值；不能把不同口径的差别直接归因于求解器结果。",
+                         "original_reviewed_text":  "明确区分原始 calculated 边界值、相邻单元中心值和依据边界条件重构或外推的值。两组原始内表面环向应力均约 -185.016 MPa；原版还给出约 -187.9 MPa 的重构值，不能把不同口径混作求解差异。",
+                         "evidence_basis":  "迁移效果分析和两组回答；该数值仅对本题。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "独立复核证实原生边界值与重构口径不同；数值不可照搬。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "generalization-pairs-20261114-01:bare",
+                                                   "run":  "generalization-pairs-20261114-01",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/generalization-pairs-20261114-01/C02/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-generalization-pairs-20261114-01-C02-bare-workspace--/session-c4085bac-8967-402b-af75-2d51e689030d/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "generalization-pairs-20261114-01:skill",
+                                                   "run":  "generalization-pairs-20261114-01",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/generalization-pairs-20261114-01/C02/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-generalization-pairs-20261114-01-C02-skill-workspace--/session-c7d7cfcd-4f41-4e65-97c8-dadb5c049ba1/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/C02-b1e123b449f5af77.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/C02-b1e123b449f5af77.md"
+                     },
+                     {
+                         "id":  "knowledge:K06_C02:03",
+                         "parent_id":  "knowledge:K06_C02",
+                         "record_type":  "child",
+                         "position":  3,
+                         "kind":  "端点错误",
+                         "text":  "本机 C02 曾在零功率时间表最后点恰好等于 10 s 时异常终止；延长表尾且保持题目区间内功率不变后曾正常完成。任何类似修改须检查当前版本、原始曲线和物理区间。",
+                         "original_reviewed_text":  "两组都曾在热源时间表最后点恰好等于 10 s 时异常终止；后续将零功率表延到区间之外，保持题目区间内功率不变后正常完成。任何类似修改须检查原始曲线和物理区间。",
+                         "evidence_basis":  "两组失败和恢复记录；仅为该版本与输入的已观察行为。",
+                         "review_status":  "troubleshooting_only",
+                         "reviewer":  "assistant",
+                         "review_reason":  "零功率时间表在特定版本与输入中末点越界，延长表尾是该条件下的恢复案例，不能无条件改动载荷。",
+                         "approved_for_rag":  false,
+                         "diagnostic_eligible":  true,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "generalization-pairs-20261114-01:bare",
+                                                   "run":  "generalization-pairs-20261114-01",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/generalization-pairs-20261114-01/C02/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-generalization-pairs-20261114-01-C02-bare-workspace--/session-c4085bac-8967-402b-af75-2d51e689030d/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "generalization-pairs-20261114-01:skill",
+                                                   "run":  "generalization-pairs-20261114-01",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/generalization-pairs-20261114-01/C02/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-generalization-pairs-20261114-01-C02-skill-workspace--/session-c7d7cfcd-4f41-4e65-97c8-dadb5c049ba1/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/C02-b1e123b449f5af77.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/C02-b1e123b449f5af77.md"
+                     },
+                     {
+                         "id":  "knowledge:K07_C08_LIMITED:01",
+                         "parent_id":  "knowledge:K07_C08_LIMITED",
+                         "record_type":  "child",
+                         "position":  1,
+                         "kind":  "失败案例",
+                         "text":  "本机该版本中，Skill 第一次把 mechanicsSolver 设为 none，初始化时未找到对应类型；这次真实启动消耗预算。不要将此观察泛化为所有 OFFBEAT 版本都不支持该值。",
+                         "original_reviewed_text":  "本机该版本中，Skill 第一次把 mechanicsSolver 设为 none，初始化时未找到对应类型；这次真实启动消耗预算。不要将此观察泛化为所有 OFFBEAT 版本都不支持该值。",
+                         "evidence_basis":  "generalization C08 的 Skill 轨迹与分析。",
+                         "review_status":  "troubleshooting_only",
+                         "reviewer":  "assistant",
+                         "review_reason":  "非法 mechanicsSolver none 是本版本一次可复现的失败，不可作为跨版本通用结论。",
+                         "approved_for_rag":  false,
+                         "diagnostic_eligible":  true,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "generalization-pairs-20261114-01:skill",
+                                                   "run":  "generalization-pairs-20261114-01",
+                                                   "arm":  "skill",
+                                                   "task_status":  "incomplete",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/generalization-pairs-20261114-01/C08/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-generalization-pairs-20261114-01-C08-skill-workspace--/session-274bc93d-49a0-480c-a7fc-6135e620a9c9/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/C08-5abd5a09344ca7c1.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/C08-5abd5a09344ca7c1.md"
+                     },
+                     {
+                         "id":  "knowledge:K07_C08_LIMITED:02",
+                         "parent_id":  "knowledge:K07_C08_LIMITED",
+                         "record_type":  "child",
+                         "position":  2,
+                         "kind":  "失败案例",
+                         "text":  "第二次使用固定力学状态后仍将 gapGas 设为 none，但所用 fuelRodGap 热边界需要气体导热数据，因依赖缺失再次初始化失败。关闭力学并不自动意味着可以关闭相关间隙传热依赖。",
+                         "original_reviewed_text":  "第二次使用固定力学状态后仍将 gapGas 设为 none，但所用 fuelRodGap 热边界需要气体导热数据，因依赖缺失再次初始化失败。关闭力学并不自动意味着可以关闭相关间隙传热依赖。",
+                         "evidence_basis":  "第二次运行日志摘要与失败分析。",
+                         "review_status":  "troubleshooting_only",
+                         "reviewer":  "assistant",
+                         "review_reason":  "fuelRodGap 与 gapGas none 的依赖失败有日志依据，只能在确认同类边界和版本后参考。",
+                         "approved_for_rag":  false,
+                         "diagnostic_eligible":  true,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "generalization-pairs-20261114-01:skill",
+                                                   "run":  "generalization-pairs-20261114-01",
+                                                   "arm":  "skill",
+                                                   "task_status":  "incomplete",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/generalization-pairs-20261114-01/C08/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-generalization-pairs-20261114-01-C08-skill-workspace--/session-274bc93d-49a0-480c-a7fc-6135e620a9c9/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/C08-5abd5a09344ca7c1.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/C08-5abd5a09344ca7c1.md"
+                     },
+                     {
+                         "id":  "knowledge:K07_C08_LIMITED:03",
+                         "parent_id":  "knowledge:K07_C08_LIMITED",
+                         "record_type":  "child",
+                         "position":  3,
+                         "kind":  "停止条件",
+                         "text":  "两次预算用尽后 Skill 没有正常的 10 s 瞬态结果；应如实标记未完成并交付已有证据，不能用会话正常结束、较短耗时或未运行的修订输入冒充完成。",
+                         "original_reviewed_text":  "两次预算用尽后 Skill 没有正常的 10 s 瞬态结果；应如实标记未完成并交付已有证据，不能用会话正常结束、较短耗时或未运行的修订输入冒充完成。",
+                         "evidence_basis":  "独立核对标记 normal_completion_10s 未通过。",
+                         "review_status":  "troubleshooting_only",
+                         "reviewer":  "assistant",
+                         "review_reason":  "这是未完成会话的停止与交付记录；不能将其作为成功求解步骤。",
+                         "approved_for_rag":  false,
+                         "diagnostic_eligible":  true,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "generalization-pairs-20261114-01:skill",
+                                                   "run":  "generalization-pairs-20261114-01",
+                                                   "arm":  "skill",
+                                                   "task_status":  "incomplete",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/generalization-pairs-20261114-01/C08/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-generalization-pairs-20261114-01-C08-skill-workspace--/session-274bc93d-49a0-480c-a7fc-6135e620a9c9/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/C08-5abd5a09344ca7c1.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/C08-5abd5a09344ca7c1.md"
+                     },
+                     {
+                         "id":  "knowledge:K07_C08_LIMITED:04",
+                         "parent_id":  "knowledge:K07_C08_LIMITED",
+                         "record_type":  "child",
+                         "position":  4,
+                         "kind":  "对照",
+                         "text":  "原版组经历时间表末点错误并在预算内修复后完成；其结果可作为本题完成路径的证据，但不能由一次配对推断一般成功率。",
+                         "original_reviewed_text":  "原版组经历时间表末点错误并在预算内修复后完成；其结果可作为本题完成路径的证据，但不能由一次配对推断一般成功率。",
+                         "evidence_basis":  "原版会话和 generalization 结果汇总。",
+                         "review_status":  "troubleshooting_only",
+                         "reviewer":  "assistant",
+                         "review_reason":  "原版在预算内修复后完成属于单次对照，只用于了解错误恢复过程。",
+                         "approved_for_rag":  false,
+                         "diagnostic_eligible":  true,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "generalization-pairs-20261114-01:bare",
+                                                   "run":  "generalization-pairs-20261114-01",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/generalization-pairs-20261114-01/C08/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-generalization-pairs-20261114-01-C08-bare-workspace--/session-adb5a163-2748-4121-b7ef-fbb2546974f7/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/C08-5abd5a09344ca7c1.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/C08-5abd5a09344ca7c1.md"
+                     },
+                     {
+                         "id":  "knowledge:K08_C08_RECOVERY:01",
+                         "parent_id":  "knowledge:K08_C08_RECOVERY",
+                         "record_type":  "child",
+                         "position":  1,
+                         "kind":  "恢复路径",
+                         "text":  "recovery Skill 依次遇到力学选择器、fuelRodGap 气体依赖、热源表末点三类问题；每次保留输入、日志和退出状态，第四次修正后正常到 10 s。不要把前三次保留的场改记为正常成功。",
+                         "original_reviewed_text":  "recovery Skill 依次遇到力学选择器、fuelRodGap 气体依赖、热源表末点三类问题；每次保留输入、日志和退出状态，第四次修正后正常到 10 s。不要把前三次保留的场改记为正常成功。",
+                         "evidence_basis":  "恢复闭环报告中的四次真实运行。",
+                         "review_status":  "troubleshooting_only",
+                         "reviewer":  "assistant",
+                         "review_reason":  "前三次失败与第四次完成的序列用于具体报错诊断，不能作为正常任务预设路径。",
+                         "approved_for_rag":  false,
+                         "diagnostic_eligible":  true,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "recovery-c08-pairs-20261114-01:skill",
+                                                   "run":  "recovery-c08-pairs-20261114-01",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/recovery-c08-pairs-20261114-01/C08/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-recovery-c08-pairs-20261114-01-C08-skill-workspace--/session-1f314d65-96c7-47b7-921c-fc99d21c824c/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/C08-2b02b846b68cd5f8.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/C08-2b02b846b68cd5f8.md"
+                     },
+                     {
+                         "id":  "knowledge:K08_C08_RECOVERY:02",
+                         "parent_id":  "knowledge:K08_C08_RECOVERY",
+                         "record_type":  "child",
+                         "position":  2,
+                         "kind":  "物理设置",
+                         "text":  "对于采用 fuelRodGap 的热学算例，先分别核对已安装版本支持的力学选择器，以及边界实际需要的间隙气体导热模型。本地 C08 成功案例中，mechanicsSolver 的值为 constant，gapGas 模型为 FRAPCON；constant 是此处的力学选项，不是此案例的气体模型。其他算例必须核实适用性后才能参考。",
+                         "original_reviewed_text":  "该成功路径使用 mechanicsSolver constant、FRAPCON 气体模型，并将恒定线功率表尾延至请求区间之外；需要确认选项与边界依赖、表尾外推及目标物理相容。",
+                         "evidence_basis":  "recovery 的第四次运行记录；不是适用于任何材料和求解器版本的默认参数。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "该配置在实际第四次运行完成，机械选择器与气隙依赖受版本、输入和边界限制。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "recovery-c08-pairs-20261114-01:skill",
+                                                   "run":  "recovery-c08-pairs-20261114-01",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/recovery-c08-pairs-20261114-01/C08/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-recovery-c08-pairs-20261114-01-C08-skill-workspace--/session-1f314d65-96c7-47b7-921c-fc99d21c824c/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/C08-2b02b846b68cd5f8.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/C08-2b02b846b68cd5f8.md"
+                     },
+                     {
+                         "id":  "knowledge:K08_C08_RECOVERY:03",
+                         "parent_id":  "knowledge:K08_C08_RECOVERY",
+                         "record_type":  "child",
+                         "position":  3,
+                         "kind":  "能量核对",
+                         "text":  "恒定密度与比热时，可按各区单元求和 ΔE=ΣρCp(T−T0)V，并与同一计算域的热源时间积分比较；记录初态、物理区域、扇区角和数值残差。",
+                         "original_reviewed_text":  "在该 2° 扇区算例中，10 s 独立积分的燃料和包壳热能增量约 2497.953 J 与 501.907 J，总计约 2999.860 J。解释能量时应标注计算域、初态和数值残差；该值不是整棒结果。",
+                         "evidence_basis":  "恢复轮次独立数值复核；仅针对本题几何和热源。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "恢复轮次有独立积分核对；去除历史固定结果以避免污染新算例。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "recovery-c08-pairs-20261114-01:bare",
+                                                   "run":  "recovery-c08-pairs-20261114-01",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/recovery-c08-pairs-20261114-01/C08/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-recovery-c08-pairs-20261114-01-C08-bare-workspace--/session-ccbfd345-5ccf-4b74-b08e-8d7692784b15/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "recovery-c08-pairs-20261114-01:skill",
+                                                   "run":  "recovery-c08-pairs-20261114-01",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/recovery-c08-pairs-20261114-01/C08/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-recovery-c08-pairs-20261114-01-C08-skill-workspace--/session-1f314d65-96c7-47b7-921c-fc99d21c824c/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/C08-2b02b846b68cd5f8.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/C08-2b02b846b68cd5f8.md"
+                     },
+                     {
+                         "id":  "knowledge:K08_C08_RECOVERY:04",
+                         "parent_id":  "knowledge:K08_C08_RECOVERY",
+                         "record_type":  "child",
+                         "position":  4,
+                         "kind":  "执行约束",
+                         "text":  "真实求解启动（含初始化失败、诊断与重试）应完整记账；用户明确设置上限或只允许准备/提取时遵守其约束。失败保留证据，成功结果在满足条件时复用。",
+                         "original_reviewed_text":  "本题明确不设启动上限才允许继续修复；若用户设置启动上限或只允许准备/提取，仍必须遵守。每次启动均记账，成功结果可复用。",
+                         "evidence_basis":  "本轮有效题面与恢复报告。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "按当前题面和用户明确预算处理失败与成功结果的原则有两轮实证支持。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "recovery-c08-pairs-20261114-01:bare",
+                                                   "run":  "recovery-c08-pairs-20261114-01",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/recovery-c08-pairs-20261114-01/C08/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-recovery-c08-pairs-20261114-01-C08-bare-workspace--/session-ccbfd345-5ccf-4b74-b08e-8d7692784b15/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "recovery-c08-pairs-20261114-01:skill",
+                                                   "run":  "recovery-c08-pairs-20261114-01",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/recovery-c08-pairs-20261114-01/C08/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-recovery-c08-pairs-20261114-01-C08-skill-workspace--/session-1f314d65-96c7-47b7-921c-fc99d21c824c/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "capability-pairs-20261114-01:bare",
+                                                   "run":  "capability-pairs-20261114-01",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/capability-pairs-20261114-01/C08/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-capability-pairs-20261114-01-C08-bare-workspace--/session-4f28f676-ae19-437c-9702-3afcc885dfa8/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "capability-pairs-20261114-01:skill",
+                                                   "run":  "capability-pairs-20261114-01",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/capability-pairs-20261114-01/C08/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-capability-pairs-20261114-01-C08-skill-workspace--/session-72bf3926-8bf4-4f5f-87a0-a5f180ee27b6/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/C08-2b02b846b68cd5f8.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/C08-2b02b846b68cd5f8.md"
+                     },
+                     {
+                         "id":  "knowledge:K08_C08_RECOVERY:05",
+                         "parent_id":  "knowledge:K08_C08_RECOVERY",
+                         "record_type":  "child",
+                         "position":  5,
+                         "kind":  "比较边界",
+                         "text":  "历史 C08 调用次数和耗时可能受产品配置及环境影响；比较不同运行时应核对配置与实际工作，不能只凭次数或耗时归因单一机制。",
+                         "original_reviewed_text":  "capability 轮次 Skill 一次真实启动完成，而 recovery 轮次为四次；两个轮次的产品与环境可能不同，不宜只根据次数或耗时归因单一机制。",
+                         "evidence_basis":  "各轮运行与独立核验。",
+                         "review_status":  "troubleshooting_only",
+                         "reviewer":  "assistant",
+                         "review_reason":  "不同轮次产品配置及环境可能变化，仅供分析结果，不宜作为求解步骤。",
+                         "approved_for_rag":  false,
+                         "diagnostic_eligible":  true,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "recovery-c08-pairs-20261114-01:skill",
+                                                   "run":  "recovery-c08-pairs-20261114-01",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/recovery-c08-pairs-20261114-01/C08/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-recovery-c08-pairs-20261114-01-C08-skill-workspace--/session-1f314d65-96c7-47b7-921c-fc99d21c824c/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "capability-pairs-20261114-01:skill",
+                                                   "run":  "capability-pairs-20261114-01",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/capability-pairs-20261114-01/C08/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-capability-pairs-20261114-01-C08-skill-workspace--/session-72bf3926-8bf4-4f5f-87a0-a5f180ee27b6/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/C08-2b02b846b68cd5f8.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/C08-2b02b846b68cd5f8.md"
+                     },
+                     {
+                         "id":  "knowledge:K09_F01:01",
+                         "parent_id":  "knowledge:K09_F01",
+                         "record_type":  "child",
+                         "position":  1,
+                         "kind":  "固定点研究",
+                         "text":  "为每个请求的孔径独立准备和运行算例；明确哪些外半径、材料、气隙边界和线功率保持不变，并把失败、诊断和重试计入用户预算。",
+                         "original_reviewed_text":  "为 0.50、0.75、1.00 mm 三个孔径分别生成独立输入和网格，同时保持外半径、包壳、气隙边界、线功率与燃料导热率符合题面；记录失败启动，不能只统计最终成功点。",
+                         "evidence_basis":  "题面、两组启动账本及独立核对。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "三个独立点的输入、网格、启动和目标输出均有核对。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "generalization-pairs-20261114-01:bare",
+                                                   "run":  "generalization-pairs-20261114-01",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/generalization-pairs-20261114-01/F01/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-generalization-pairs-20261114-01-F01-bare-workspace--/session-4e3c6cf3-a589-4f56-95c1-595deb687e89/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "generalization-pairs-20261114-01:skill",
+                                                   "run":  "generalization-pairs-20261114-01",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/generalization-pairs-20261114-01/F01/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-generalization-pairs-20261114-01-F01-skill-workspace--/session-5d636901-c786-4ab2-8cd4-9dc19b29d294/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/F01-aca10118513e3da5.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/F01-aca10118513e3da5.md"
+                     },
+                     {
+                         "id":  "knowledge:K09_F01:02",
+                         "parent_id":  "knowledge:K09_F01",
+                         "record_type":  "child",
+                         "position":  2,
+                         "kind":  "体积热源",
+                         "text":  "对每个实际网格分别核实发热体积和 Q 场，并以相同计算域验证热源积分；扇区折算与按名义圆环面积计算可能出现几何近似差异，应标明口径。",
+                         "original_reviewed_text":  "对每个实际网格分别核实发热体积和 Q 场，并以相同计算域验证热源积分；扇区折算与按名义圆环面积计算可能出现几何近似差异，应标明口径。",
+                         "evidence_basis":  "两组实际网格体积与热源报告；独立检查覆盖实际几何与场。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "实际网格体积与 Q 场均经过核对，扇区与名义圆环有不同近似口径。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "generalization-pairs-20261114-01:bare",
+                                                   "run":  "generalization-pairs-20261114-01",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/generalization-pairs-20261114-01/F01/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-generalization-pairs-20261114-01-F01-bare-workspace--/session-4e3c6cf3-a589-4f56-95c1-595deb687e89/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "generalization-pairs-20261114-01:skill",
+                                                   "run":  "generalization-pairs-20261114-01",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/generalization-pairs-20261114-01/F01/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-generalization-pairs-20261114-01-F01-skill-workspace--/session-5d636901-c786-4ab2-8cd4-9dc19b29d294/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/F01-aca10118513e3da5.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/F01-aca10118513e3da5.md"
+                     },
+                     {
+                         "id":  "knowledge:K09_F01:03",
+                         "parent_id":  "knowledge:K09_F01",
+                         "record_type":  "child",
+                         "position":  3,
+                         "kind":  "数值例",
+                         "text":  "在本题固定物理条件下，三孔径的燃料最大存储单元温度依次约 1235.470、1210.360、1181.820 K；这不是对其他功率、尺寸或边界的通用数值。",
+                         "original_reviewed_text":  "在本题固定物理条件下，三孔径的燃料最大存储单元温度依次约 1235.470、1210.360、1181.820 K；这不是对其他功率、尺寸或边界的通用数值。",
+                         "evidence_basis":  "两组原生温度字段和数值复核。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "三点温度经过独立复核，但仅是该历史题条件下的数值。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "case_example",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "generalization-pairs-20261114-01:bare",
+                                                   "run":  "generalization-pairs-20261114-01",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/generalization-pairs-20261114-01/F01/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-generalization-pairs-20261114-01-F01-bare-workspace--/session-4e3c6cf3-a589-4f56-95c1-595deb687e89/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "generalization-pairs-20261114-01:skill",
+                                                   "run":  "generalization-pairs-20261114-01",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/generalization-pairs-20261114-01/F01/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-generalization-pairs-20261114-01-F01-skill-workspace--/session-5d636901-c786-4ab2-8cd4-9dc19b29d294/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/F01-aca10118513e3da5.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/F01-aca10118513e3da5.md"
+                     },
+                     {
+                         "id":  "knowledge:K09_F01:04",
+                         "parent_id":  "knowledge:K09_F01",
+                         "record_type":  "child",
+                         "position":  4,
+                         "kind":  "采样兼容",
+                         "text":  "本机 OpenFOAM v2506 下，旧采样配置曾分别因 lineUniform 或 patchProbes 的旧参数写法导致初始化失败。根据实际版本和日志修正非必需采样配置，并保留失败证据。",
+                         "original_reviewed_text":  "本机 OpenFOAM v2506 下，旧采样配置曾分别因 lineUniform 或 patchProbes 的旧参数写法导致初始化失败。根据实际版本和日志修正非必需采样配置，并保留失败证据。",
+                         "evidence_basis":  "两个组的首次失败和恢复轨迹。",
+                         "review_status":  "troubleshooting_only",
+                         "reviewer":  "assistant",
+                         "review_reason":  "旧采样语法在本机版本造成初始化失败；须根据实际版本和日志处理，不能盲目替换所有配置。",
+                         "approved_for_rag":  false,
+                         "diagnostic_eligible":  true,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "generalization-pairs-20261114-01:bare",
+                                                   "run":  "generalization-pairs-20261114-01",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/generalization-pairs-20261114-01/F01/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-generalization-pairs-20261114-01-F01-bare-workspace--/session-4e3c6cf3-a589-4f56-95c1-595deb687e89/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "generalization-pairs-20261114-01:skill",
+                                                   "run":  "generalization-pairs-20261114-01",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/generalization-pairs-20261114-01/F01/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-generalization-pairs-20261114-01-F01-skill-workspace--/session-5d636901-c786-4ab2-8cd4-9dc19b29d294/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/F01-aca10118513e3da5.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/F01-aca10118513e3da5.md"
+                     },
+                     {
+                         "id":  "knowledge:K10_C05:01",
+                         "parent_id":  "knowledge:K10_C05",
+                         "record_type":  "child",
+                         "position":  1,
+                         "kind":  "张量对象",
+                         "text":  "先确定载荷方向、场与分量：本题沿 x 方向，关心 epsilonCreep 的 XX 分量；symmTensor 的顺序为 XX、XY、XZ、YY、YZ、ZZ，应变无量纲。",
+                         "original_reviewed_text":  "先确定载荷方向、场与分量：本题沿 x 方向，关心 epsilonCreep 的 XX 分量；symmTensor 的顺序为 XX、XY、XZ、YY、YZ、ZZ，应变无量纲。",
+                         "evidence_basis":  "两组回答与独立字段检查。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "本题载荷方向与 symmTensor 组件顺序在两组字段和独立检查中一致。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "capability-pairs-20261114-01:bare",
+                                                   "run":  "capability-pairs-20261114-01",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/capability-pairs-20261114-01/C05/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-capability-pairs-20261114-01-C05-bare-workspace--/session-f6854e08-943c-4e35-a10c-4721d298db4b/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "capability-pairs-20261114-01:skill",
+                                                   "run":  "capability-pairs-20261114-01",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/capability-pairs-20261114-01/C05/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-capability-pairs-20261114-01-C05-skill-workspace--/session-ef99d0c0-ac89-4510-bdda-b982edd4dcff/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/C05-f80db5f4eae95be2.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/C05-f80db5f4eae95be2.md"
+                     },
+                     {
+                         "id":  "knowledge:K10_C05:02",
+                         "parent_id":  "knowledge:K10_C05",
+                         "record_type":  "child",
+                         "position":  2,
+                         "kind":  "应变分解",
+                         "text":  "在本题热膨胀关闭且无塑性应变的设置下，记录总应变、弹性应变和蠕变应变，并检查 epsilon≈epsEl+epsilonCreep。该简式不能直接推广到热应变或塑性非零的情况。",
+                         "original_reviewed_text":  "在本题热膨胀关闭且无塑性应变的设置下，记录总应变、弹性应变和蠕变应变，并检查 epsilon≈epsEl+epsilonCreep。该简式不能直接推广到热应变或塑性非零的情况。",
+                         "evidence_basis":  "题目条件与独立应变分解检查。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "应变分解仅限本题热膨胀与塑性应变为零；独立检查覆盖该分解。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "capability-pairs-20261114-01:bare",
+                                                   "run":  "capability-pairs-20261114-01",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/capability-pairs-20261114-01/C05/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-capability-pairs-20261114-01-C05-bare-workspace--/session-f6854e08-943c-4e35-a10c-4721d298db4b/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "capability-pairs-20261114-01:skill",
+                                                   "run":  "capability-pairs-20261114-01",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/capability-pairs-20261114-01/C05/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-capability-pairs-20261114-01-C05-skill-workspace--/session-ef99d0c0-ac89-4510-bdda-b982edd4dcff/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/C05-f80db5f4eae95be2.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/C05-f80db5f4eae95be2.md"
+                     },
+                     {
+                         "id":  "knowledge:K10_C05:03",
+                         "parent_id":  "knowledge:K10_C05",
+                         "record_type":  "child",
+                         "position":  3,
+                         "kind":  "案例数值",
+                         "text":  "两组报告 2e8 s 时载荷方向蠕变应变约 1.0e-3；该值仅对应本题材料模型、温度、应力、通量和取值方式。",
+                         "original_reviewed_text":  "两组报告 2e8 s 时载荷方向蠕变应变约 1.0e-3；该值仅对应本题材料模型、温度、应力、通量和取值方式。",
+                         "evidence_basis":  "两组终态回答和字段核对。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "本题终态字段经过核对，但检查范围不包括解析本构精度，数值不能泛化。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "case_example",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "capability-pairs-20261114-01:bare",
+                                                   "run":  "capability-pairs-20261114-01",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/capability-pairs-20261114-01/C05/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-capability-pairs-20261114-01-C05-bare-workspace--/session-f6854e08-943c-4e35-a10c-4721d298db4b/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "capability-pairs-20261114-01:skill",
+                                                   "run":  "capability-pairs-20261114-01",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/capability-pairs-20261114-01/C05/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-capability-pairs-20261114-01-C05-skill-workspace--/session-ef99d0c0-ac89-4510-bdda-b982edd4dcff/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/C05-f80db5f4eae95be2.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/C05-f80db5f4eae95be2.md"
+                     },
+                     {
+                         "id":  "knowledge:K10_C05:04",
+                         "parent_id":  "knowledge:K10_C05",
+                         "record_type":  "child",
+                         "position":  4,
+                         "kind":  "待核查主张",
+                         "text":  "原版历史回答声称模型对温度系数存在 640–900 °C 的限制，但现有独立核对未验证该解析本构结论；不能把这条限制或相应系数当作已审核事实。",
+                         "original_reviewed_text":  "原版回答声称模型对温度系数存在 640–900 °C 的限制，Skill 回答未给出同样说明。现有独立核对未对该解析本构结论评分，因此不能把这条温度限制或相应系数作为已审核事实。",
+                         "evidence_basis":  "原版与 Skill 回答的差异；独立检查 scope 明示未作解析参考评分。",
+                         "review_status":  "troubleshooting_only",
+                         "reviewer":  "assistant",
+                         "review_reason":  "温度钳制仅有原版会话主张，独立验收未核对本构解析；不得当作已证实事实。",
+                         "approved_for_rag":  false,
+                         "diagnostic_eligible":  true,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "capability-pairs-20261114-01:bare",
+                                                   "run":  "capability-pairs-20261114-01",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/capability-pairs-20261114-01/C05/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-capability-pairs-20261114-01-C05-bare-workspace--/session-f6854e08-943c-4e35-a10c-4721d298db4b/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/C05-f80db5f4eae95be2.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/C05-f80db5f4eae95be2.md"
+                     },
+                     {
+                         "id":  "knowledge:K10_C05:05",
+                         "parent_id":  "knowledge:K10_C05",
+                         "record_type":  "child",
+                         "position":  5,
+                         "kind":  "提取性能",
+                         "text":  "Skill 提取脚本先发生前台超时、再从头转后台；多个张量分量和历史帧可能反复读取同一网格与场。优化方向是先确认支持批量提取和失败恢复，不应删除必要物理核对。",
+                         "original_reviewed_text":  "Skill 提取脚本先发生前台超时、再从头转后台；多个张量分量和历史帧可能反复读取同一网格与场。优化方向是先确认支持批量提取和失败恢复，不应删除必要物理核对。",
+                         "evidence_basis":  "能力表效果分析和中文轨迹。",
+                         "review_status":  "troubleshooting_only",
+                         "reviewer":  "assistant",
+                         "review_reason":  "超时与重复读取是历史提取异常；优化可行性仍需单独验证。",
+                         "approved_for_rag":  false,
+                         "diagnostic_eligible":  true,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "capability-pairs-20261114-01:skill",
+                                                   "run":  "capability-pairs-20261114-01",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/capability-pairs-20261114-01/C05/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-capability-pairs-20261114-01-C05-skill-workspace--/session-ef99d0c0-ac89-4510-bdda-b982edd4dcff/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/C05-f80db5f4eae95be2.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/C05-f80db5f4eae95be2.md"
+                     },
+                     {
+                         "id":  "knowledge:K11_F02:01",
+                         "parent_id":  "knowledge:K11_F02",
+                         "record_type":  "child",
+                         "position":  1,
+                         "kind":  "工况组织",
+                         "text":  "为每个已知压力工况分别准备输入并保存结果、日志；保持题目要求的源几何、材料、接合方式和轴向约束。",
+                         "original_reviewed_text":  "10 MPa 与 20 MPa 是两个可预先枚举的独立压力点；各自准备输入、运行并保存结果与日志。保持源几何、材料、接合方式与轴向约束，除非题目明确授权修改。",
+                         "evidence_basis":  "题面和 Skill 固定点研究记录。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "本题两个预定压力点完成输入、求解和独立覆盖检查。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "capability-pairs-20261114-01:bare",
+                                                   "run":  "capability-pairs-20261114-01",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/capability-pairs-20261114-01/F02/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-capability-pairs-20261114-01-F02-bare-workspace--/session-6326e00e-afba-405f-88ba-46bb023bbbfe/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "capability-pairs-20261114-01:skill",
+                                                   "run":  "capability-pairs-20261114-01",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/capability-pairs-20261114-01/F02/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-capability-pairs-20261114-01-F02-skill-workspace--/session-96987059-706f-47a5-b09a-d703ec6b0001/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/F02-df40729c9e13d917.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/F02-df40729c9e13d917.md"
+                     },
+                     {
+                         "id":  "knowledge:K11_F02:02",
+                         "parent_id":  "knowledge:K11_F02",
+                         "record_type":  "child",
+                         "position":  2,
+                         "kind":  "界面取值",
+                         "text":  "分别报告内、外材料区最近界面的单元位置、径向位移与径向应力；不同位置的单元中心值不能直接当作同一界面点的精确跳变。若做外推，必须注明方法与位置。",
+                         "original_reviewed_text":  "分别报告内、外材料区最近界面的单元位置、径向位移与径向应力；不同位置的单元中心值不能直接当作同一界面点的精确跳变。若做外推，必须注明方法与位置。",
+                         "evidence_basis":  "两组结果分别列出近界面单元值及外推值。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "两侧单元中心位置不同，必须区别邻近单元、界面和外推值。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "capability-pairs-20261114-01:bare",
+                                                   "run":  "capability-pairs-20261114-01",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/capability-pairs-20261114-01/F02/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-capability-pairs-20261114-01-F02-bare-workspace--/session-6326e00e-afba-405f-88ba-46bb023bbbfe/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "capability-pairs-20261114-01:skill",
+                                                   "run":  "capability-pairs-20261114-01",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/capability-pairs-20261114-01/F02/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-capability-pairs-20261114-01-F02-skill-workspace--/session-96987059-706f-47a5-b09a-d703ec6b0001/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/F02-df40729c9e13d917.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/F02-df40729c9e13d917.md"
+                     },
+                     {
+                         "id":  "knowledge:K11_F02:03",
+                         "parent_id":  "knowledge:K11_F02",
+                         "record_type":  "child",
+                         "position":  3,
+                         "kind":  "方向和验证",
+                         "text":  "说明柱坐标基底、应力拉压符号和两侧牵引法向约定；本题线性模型中的 20 MPa 结果约为 10 MPa 的两倍，可作一致性检查，但不能代替独立精度验证。",
+                         "original_reviewed_text":  "说明柱坐标基底、应力拉压符号和两侧牵引法向约定；本题线性模型中的 20 MPa 结果约为 10 MPa 的两倍，可作一致性检查，但不能代替独立精度验证。",
+                         "evidence_basis":  "两组结果和任务独立检查范围。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "线性比例仅为本题设定下的一致性检查；独立验收未进行解析精度评分。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "capability-pairs-20261114-01:bare",
+                                                   "run":  "capability-pairs-20261114-01",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/capability-pairs-20261114-01/F02/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-capability-pairs-20261114-01-F02-bare-workspace--/session-6326e00e-afba-405f-88ba-46bb023bbbfe/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "capability-pairs-20261114-01:skill",
+                                                   "run":  "capability-pairs-20261114-01",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/capability-pairs-20261114-01/F02/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-capability-pairs-20261114-01-F02-skill-workspace--/session-96987059-706f-47a5-b09a-d703ec6b0001/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/F02-df40729c9e13d917.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/F02-df40729c9e13d917.md"
+                     },
+                     {
+                         "id":  "knowledge:K12_G01:01",
+                         "parent_id":  "knowledge:K12_G01",
+                         "record_type":  "child",
+                         "position":  1,
+                         "kind":  "检索选型",
+                         "text":  "参考应按几何、物理选择器、边界和可用工具筛选；本题可从 exerciseOFFBEAT/case1 一类热学输入入手，再按目标重建尺寸、材料、功率、壁温、界面系数和网格。参考算例的旧参数不是答案。",
+                         "original_reviewed_text":  "参考应按几何、物理选择器、边界和可用工具筛选；本题可从 exerciseOFFBEAT/case1 一类热学输入入手，再按目标重建尺寸、材料、功率、壁温、界面系数和网格。参考算例的旧参数不是答案。",
+                         "evidence_basis":  "两组选择与排除候选的会话记录。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "两组均保存检索选型和按目标重建输入的证据；参考不是目标答案。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "rag-modeling-pairs-20261114-03:bare",
+                                                   "run":  "rag-modeling-pairs-20261114-03",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/rag-modeling-pairs-20261114-03/G01/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-G01-bare-workspace--/session-d6ab03de-8d0b-48e0-8dce-66bcd03277fc/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "rag-modeling-pairs-20261114-03:skill",
+                                                   "run":  "rag-modeling-pairs-20261114-03",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/rag-modeling-pairs-20261114-03/G01/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-G01-skill-workspace--/session-09e5d326-306c-4bfb-98ce-338f390e0581/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/G01-6781859b9ffe1148.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/G01-6781859b9ffe1148.md"
+                     },
+                     {
+                         "id":  "knowledge:K12_G01:02",
+                         "parent_id":  "knowledge:K12_G01",
+                         "record_type":  "child",
+                         "position":  2,
+                         "kind":  "两网格",
+                         "text":  "按请求为每一档生成和运行实际网格，保留网格检查与输入回读；只有两档时报告观察差异，不直接宣称普遍网格无关。",
+                         "original_reviewed_text":  "两组分别实际运行 20/6 和 40/12 燃料/包壳径向单元，保留网格检查和输入回读；在仅两档比较下应报告观察到的差值，不应仅凭两点宣称普遍网格无关。",
+                         "evidence_basis":  "G01 题面、结果与独立几何/数值核对。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "两档实际网格有验证，但两点比较不足以证明普遍网格无关。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "rag-modeling-pairs-20261114-03:bare",
+                                                   "run":  "rag-modeling-pairs-20261114-03",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/rag-modeling-pairs-20261114-03/G01/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-G01-bare-workspace--/session-d6ab03de-8d0b-48e0-8dce-66bcd03277fc/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "rag-modeling-pairs-20261114-03:skill",
+                                                   "run":  "rag-modeling-pairs-20261114-03",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/rag-modeling-pairs-20261114-03/G01/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-G01-skill-workspace--/session-09e5d326-306c-4bfb-98ce-338f390e0581/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/G01-6781859b9ffe1148.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/G01-6781859b9ffe1148.md"
+                     },
+                     {
+                         "id":  "knowledge:K12_G01:03",
+                         "parent_id":  "knowledge:K12_G01",
+                         "record_type":  "child",
+                         "position":  3,
+                         "kind":  "能量和面积基准",
+                         "text":  "明确界面换热系数的面积基准；对轴对称扇区，用实际 Q 场和体积积分核对域内功率，并在对称假设成立时与线功率、有效长度和扇区角相互核验。",
+                         "original_reviewed_text":  "本题界面 alpha=4500 W/(m²·K)，以燃料外表面积为基准；2° 扇区在 15000 W/m、0.12 m 条件下的目标热源积分约 10 W。改变面积基准或几何时必须重新推导。",
+                         "evidence_basis":  "G01 Skill 结果和两组目标物理输入。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "本题接口系数以燃料侧面积为基准，热源积分按扇区核查；历史数值不外推。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "rag-modeling-pairs-20261114-03:bare",
+                                                   "run":  "rag-modeling-pairs-20261114-03",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/rag-modeling-pairs-20261114-03/G01/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-G01-bare-workspace--/session-d6ab03de-8d0b-48e0-8dce-66bcd03277fc/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "rag-modeling-pairs-20261114-03:skill",
+                                                   "run":  "rag-modeling-pairs-20261114-03",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/rag-modeling-pairs-20261114-03/G01/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-G01-skill-workspace--/session-09e5d326-306c-4bfb-98ce-338f390e0581/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/G01-6781859b9ffe1148.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/G01-6781859b9ffe1148.md"
+                     },
+                     {
+                         "id":  "knowledge:K12_G01:04",
+                         "parent_id":  "knowledge:K12_G01",
+                         "record_type":  "child",
+                         "position":  4,
+                         "kind":  "失败恢复",
+                         "text":  "Skill 在耦合 patch 提取阶段修复 owner_zone、元数据和时间目录匹配问题，并复用已有求解结果；提取错误本身不应直接触发重求解。",
+                         "original_reviewed_text":  "Skill 在耦合 patch 提取阶段修复 owner_zone、元数据和时间目录匹配问题，并复用已有求解结果；提取错误本身不应直接触发重求解。",
+                         "evidence_basis":  "Skill 结果与轨迹；具体接口行为依版本核对。",
+                         "review_status":  "troubleshooting_only",
+                         "reviewer":  "assistant",
+                         "review_reason":  "owner_zone、耦合元数据和时间目录问题是特定提取错误，应仅在相应症状下参考。",
+                         "approved_for_rag":  false,
+                         "diagnostic_eligible":  true,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "rag-modeling-pairs-20261114-03:skill",
+                                                   "run":  "rag-modeling-pairs-20261114-03",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/rag-modeling-pairs-20261114-03/G01/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-G01-skill-workspace--/session-09e5d326-306c-4bfb-98ce-338f390e0581/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/G01-6781859b9ffe1148.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/G01-6781859b9ffe1148.md"
+                     },
+                     {
+                         "id":  "knowledge:K12_G01:05",
+                         "parent_id":  "knowledge:K12_G01",
+                         "record_type":  "child",
+                         "position":  5,
+                         "kind":  "网格限制",
+                         "text":  "部分轴心/薄楔网格的 checkMesh 报告空边界、零面积面或偏斜项。需保留具体日志与适用性分析；本题结果通过不等于这些问题对任何用途都无影响。",
+                         "original_reviewed_text":  "部分轴心/薄楔网格的 checkMesh 报告空边界、零面积面或偏斜项。需保留具体日志与适用性分析；本题结果通过不等于这些问题对任何用途都无影响。",
+                         "evidence_basis":  "独立结果汇总的网格限制。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "网格检查失败项必须保留并按用途评估，不能由本题响应通过推断普遍无影响。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "rag-modeling-pairs-20261114-03:bare",
+                                                   "run":  "rag-modeling-pairs-20261114-03",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/rag-modeling-pairs-20261114-03/G01/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-G01-bare-workspace--/session-d6ab03de-8d0b-48e0-8dce-66bcd03277fc/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "rag-modeling-pairs-20261114-03:skill",
+                                                   "run":  "rag-modeling-pairs-20261114-03",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/rag-modeling-pairs-20261114-03/G01/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-G01-skill-workspace--/session-09e5d326-306c-4bfb-98ce-338f390e0581/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/G01-6781859b9ffe1148.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/G01-6781859b9ffe1148.md"
+                     },
+                     {
+                         "id":  "knowledge:K13_G02:01",
+                         "parent_id":  "knowledge:K13_G02",
+                         "record_type":  "child",
+                         "position":  1,
+                         "kind":  "模型选择",
+                         "text":  "根据球对称几何、压力边界和 smallStrain 选择空心球参考；不能只因名称中有 cylinder 或 sphere 就接受模型。按目标重新生成半径、材料、边界和网格。",
+                         "original_reviewed_text":  "根据球对称几何、压力边界和 smallStrain 选择空心球参考；不能只因名称中有 cylinder 或 sphere 就接受模型。按目标重新生成半径、材料、边界和网格。",
+                         "evidence_basis":  "两组选型轨迹和目标输入核对。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "参考模型选择应核对球壳几何、压力边界和物理模型，而非依赖名称。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "rag-modeling-pairs-20261114-03:bare",
+                                                   "run":  "rag-modeling-pairs-20261114-03",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/rag-modeling-pairs-20261114-03/G02/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-G02-bare-workspace--/session-1abf8481-d474-4137-9eff-e796d97ea082/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "rag-modeling-pairs-20261114-03:skill",
+                                                   "run":  "rag-modeling-pairs-20261114-03",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/rag-modeling-pairs-20261114-03/G02/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-G02-skill-workspace--/session-398490e6-b7ba-402b-8ea5-32b8dbf3f883/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/G02-59a40e5def1f9aea.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/G02-59a40e5def1f9aea.md"
+                     },
+                     {
+                         "id":  "knowledge:K13_G02:02",
+                         "parent_id":  "knowledge:K13_G02",
+                         "record_type":  "child",
+                         "position":  2,
+                         "kind":  "球坐标应力",
+                         "text":  "以球心为原点，对非零位置向量 x 和三维应力张量 σ，令 e_r=x/|x|、σ_rr=e_r·σ·e_r。在正交球坐标基下，两个切向正应力的平均值恒为 (tr σ−σ_rr)/2，这个平均公式本身不要求剪切为零；只有确认两切向正应力相等时，才能用该均值代表每一个切向分量。球对称建模还需检查几何、载荷和剪切分量。不要把一般柱坐标 sigmaCyl 直接当球坐标张量。",
+                         "original_reviewed_text":  "对中心位置向量 x 和应力张量 σ，使用 e_r=x/|x|、σ_rr=e_r·σ·e_r；在球对称切向分量相等的前提下可用 σ_t=(tr σ−σ_rr)/2。不要把一般柱坐标 sigmaCyl 直接当球坐标张量。",
+                         "evidence_basis":  "独立核对对原生笛卡尔场进行球坐标投影。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "独立验证使用笛卡尔张量的球坐标投影；迹给出切向正应力平均值，代表每个切向分量时需满足相等条件。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "rag-modeling-pairs-20261114-03:bare",
+                                                   "run":  "rag-modeling-pairs-20261114-03",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/rag-modeling-pairs-20261114-03/G02/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-G02-bare-workspace--/session-1abf8481-d474-4137-9eff-e796d97ea082/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "rag-modeling-pairs-20261114-03:skill",
+                                                   "run":  "rag-modeling-pairs-20261114-03",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/rag-modeling-pairs-20261114-03/G02/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-G02-skill-workspace--/session-398490e6-b7ba-402b-8ea5-32b8dbf3f883/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/G02-59a40e5def1f9aea.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/G02-59a40e5def1f9aea.md"
+                     },
+                     {
+                         "id":  "knowledge:K13_G02:03",
+                         "parent_id":  "knowledge:K13_G02",
+                         "record_type":  "child",
+                         "position":  3,
+                         "kind":  "符号与对象",
+                         "text":  "本题输入压力以压缩为正、输出应力以拉为正；分别注明表面响应和单元中心分布，必要时说明外推方法和离散误差。",
+                         "original_reviewed_text":  "本题输入压力以压缩为正、输出应力以拉为正；分别注明表面响应和单元中心分布，必要时说明外推方法和离散误差。",
+                         "evidence_basis":  "两组最终回答及结果汇总。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "符号和单元/边界对象均需按当前输入与输出定义确认。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "rag-modeling-pairs-20261114-03:bare",
+                                                   "run":  "rag-modeling-pairs-20261114-03",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/rag-modeling-pairs-20261114-03/G02/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-G02-bare-workspace--/session-1abf8481-d474-4137-9eff-e796d97ea082/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "rag-modeling-pairs-20261114-03:skill",
+                                                   "run":  "rag-modeling-pairs-20261114-03",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/rag-modeling-pairs-20261114-03/G02/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-G02-skill-workspace--/session-398490e6-b7ba-402b-8ea5-32b8dbf3f883/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/G02-59a40e5def1f9aea.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/G02-59a40e5def1f9aea.md"
+                     },
+                     {
+                         "id":  "knowledge:K13_G02:04",
+                         "parent_id":  "knowledge:K13_G02",
+                         "record_type":  "child",
+                         "position":  4,
+                         "kind":  "检索与求解",
+                         "text":  "可将预先已知的独立压力工况集中规划、分别运行和收集；成功结果可复用，额外正常的敏感性与精度检查不应自动标记为失败。",
+                         "original_reviewed_text":  "两个独立压力点可集中规划与收集；本轮原版额外试算和敏感性检查共 16 次正常启动，Skill 两次启动。附加正常计算不应一律称为失败或无用。",
+                         "evidence_basis":  "比较汇总与两组执行记录。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "固定点可集中组织；额外正常试验和敏感性计算不能误标为失败。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "rag-modeling-pairs-20261114-03:bare",
+                                                   "run":  "rag-modeling-pairs-20261114-03",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/rag-modeling-pairs-20261114-03/G02/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-G02-bare-workspace--/session-1abf8481-d474-4137-9eff-e796d97ea082/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "rag-modeling-pairs-20261114-03:skill",
+                                                   "run":  "rag-modeling-pairs-20261114-03",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/rag-modeling-pairs-20261114-03/G02/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-G02-skill-workspace--/session-398490e6-b7ba-402b-8ea5-32b8dbf3f883/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/G02-59a40e5def1f9aea.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/G02-59a40e5def1f9aea.md"
+                     },
+                     {
+                         "id":  "knowledge:K14_M01:01",
+                         "parent_id":  "knowledge:K14_M01",
+                         "record_type":  "child",
+                         "position":  1,
+                         "kind":  "选源",
+                         "text":  "从本地参考中选适合单区域 UO2 核和 Cs 扩散的输入；多层涂层、独立气隙或未启用输运的参考不能直接当作本题目标。目标尺寸、温度、初值、扩散参数与网格仍须重建。",
+                         "original_reviewed_text":  "从本地参考中选适合单区域 UO2 核和 Cs 扩散的输入；多层涂层、独立气隙或未启用输运的参考不能直接当作本题目标。目标尺寸、温度、初值、扩散参数与网格仍须重建。",
+                         "evidence_basis":  "两组检索和目标输入的会话记录。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "单核参考的几何和物理选择经两组检索及输入、结果核对。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "rag-modeling-pairs-20261114-03:bare",
+                                                   "run":  "rag-modeling-pairs-20261114-03",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/rag-modeling-pairs-20261114-03/M01/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-M01-bare-workspace--/session-fe301b10-3c3a-4b91-9e0e-6390237ae841/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "rag-modeling-pairs-20261114-03:skill",
+                                                   "run":  "rag-modeling-pairs-20261114-03",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/rag-modeling-pairs-20261114-03/M01/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-M01-skill-workspace--/session-3b597a44-6d26-4a97-b686-138d175a4cad/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/M01-467ac434c4827f9b.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/M01-467ac434c4827f9b.md"
+                     },
+                     {
+                         "id":  "knowledge:K14_M01:02",
+                         "parent_id":  "knowledge:K14_M01",
+                         "record_type":  "child",
+                         "position":  2,
+                         "kind":  "参数生效",
+                         "text":  "对本地单 UO2 区、单 FpDiffusion Cs 恒扩散契约，先确认真实材料参数绑定及其适用版本；字典回读后，运行并核对 diffCs、T 与 sourceCs 实际字段，不能把写入键名当作参数已生效。",
+                         "original_reviewed_text":  "本题 Skill 使用 materials/Kernel/fissionProductsTransport/Cs 下的 d1=2.5e-14、q1=0、d2=0、q2=0。字典回读只能证明写入；运行后还要检查实际 diffCs、T、sourceCs 等字段。",
+                         "evidence_basis":  "Skill 输入记录及两组运行场核对；参数路径须按版本和模型确认。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "本题参数计划后实际 diffCs、T 和 sourceCs 与要求一致，路径与写法受版本及模型约束。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "rag-modeling-pairs-20261114-03:skill",
+                                                   "run":  "rag-modeling-pairs-20261114-03",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/rag-modeling-pairs-20261114-03/M01/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-M01-skill-workspace--/session-3b597a44-6d26-4a97-b686-138d175a4cad/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/M01-467ac434c4827f9b.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/M01-467ac434c4827f9b.md"
+                     },
+                     {
+                         "id":  "knowledge:K14_M01:03",
+                         "parent_id":  "knowledge:K14_M01",
+                         "record_type":  "child",
+                         "position":  3,
+                         "kind":  "库存与释放",
+                         "text":  "在零生成源且库存变化由所考虑边界释放的条件下，按同一域和体积权重计算 M(t)=Σ(Cs_i V_i)、F=1−M(t)/M(0)；球对称扇区换算整球库存需核实对称性和实际网格体积。",
+                         "original_reviewed_text":  "在本题零生成源、同一计算域和体积权重条件下，先由 Σ(Cs_i V_i) 得计算域库存，再计算 F=1−M(t)/M(0)；边界浓度为零不等于释放分数。整球库存换算需要球对称及扇区代表性，并按实际网格体积核对。",
+                         "evidence_basis":  "两组库存计算说明与独立数据一致性检查。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "题目零生成源且库存变化由该边界释放，体积分与整球换算经过核对；其他源汇或非对称场需重新建立质量平衡。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "rag-modeling-pairs-20261114-03:bare",
+                                                   "run":  "rag-modeling-pairs-20261114-03",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/rag-modeling-pairs-20261114-03/M01/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-M01-bare-workspace--/session-fe301b10-3c3a-4b91-9e0e-6390237ae841/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "rag-modeling-pairs-20261114-03:skill",
+                                                   "run":  "rag-modeling-pairs-20261114-03",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/rag-modeling-pairs-20261114-03/M01/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-M01-skill-workspace--/session-3b597a44-6d26-4a97-b686-138d175a4cad/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/M01-467ac434c4827f9b.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/M01-467ac434c4827f9b.md"
+                     },
+                     {
+                         "id":  "knowledge:K14_M01:04",
+                         "parent_id":  "knowledge:K14_M01",
+                         "record_type":  "child",
+                         "position":  4,
+                         "kind":  "结果范围",
+                         "text":  "本题 30000 s 终态释放分数：原版 60 单元约 0.2459467，Skill 70 单元约 0.2460665，原版附加 120 单元约 0.2462843；应同时注明网格及模型条件。",
+                         "original_reviewed_text":  "本题 30000 s 终态释放分数：原版 60 单元约 0.2459467，Skill 70 单元约 0.2460665，原版附加 120 单元约 0.2462843；应同时注明网格及模型条件。",
+                         "evidence_basis":  "独立汇总；这些值不应作为其他核尺寸、扩散系数或边界的答案。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "不同网格历史释放分数经独立汇总，仅适合保留为该题参考数值。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "case_example",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "rag-modeling-pairs-20261114-03:bare",
+                                                   "run":  "rag-modeling-pairs-20261114-03",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/rag-modeling-pairs-20261114-03/M01/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-M01-bare-workspace--/session-fe301b10-3c3a-4b91-9e0e-6390237ae841/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "rag-modeling-pairs-20261114-03:skill",
+                                                   "run":  "rag-modeling-pairs-20261114-03",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/rag-modeling-pairs-20261114-03/M01/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-M01-skill-workspace--/session-3b597a44-6d26-4a97-b686-138d175a4cad/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/M01-467ac434c4827f9b.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/M01-467ac434c4827f9b.md"
+                     },
+                     {
+                         "id":  "knowledge:K14_M01:05",
+                         "parent_id":  "knowledge:K14_M01",
+                         "record_type":  "child",
+                         "position":  5,
+                         "kind":  "网格限制",
+                         "text":  "球心塌缩一维楔网格存在 checkMesh 失败项；实际场与参考响应的本题比较通过，不足以证明这些网格缺陷对其他几何和物理过程没有影响。",
+                         "original_reviewed_text":  "球心塌缩一维楔网格存在 checkMesh 失败项；实际场与参考响应的本题比较通过，不足以证明这些网格缺陷对其他几何和物理过程没有影响。",
+                         "evidence_basis":  "独立结果汇总对网格限制的说明。",
+                         "review_status":  "pass",
+                         "reviewer":  "assistant",
+                         "review_reason":  "球心塌缩与 checkMesh 失败项虽保留对照，不能据一题结果推广成无害。",
+                         "approved_for_rag":  true,
+                         "diagnostic_eligible":  false,
+                         "role":  "guidance",
+                         "source_groups":  [
+                                               {
+                                                   "group_id":  "rag-modeling-pairs-20261114-03:bare",
+                                                   "run":  "rag-modeling-pairs-20261114-03",
+                                                   "arm":  "bare",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/rag-modeling-pairs-20261114-03/M01/bare/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-M01-bare-workspace--/session-fe301b10-3c3a-4b91-9e0e-6390237ae841/session.jsonl"
+                                               },
+                                               {
+                                                   "group_id":  "rag-modeling-pairs-20261114-03:skill",
+                                                   "run":  "rag-modeling-pairs-20261114-03",
+                                                   "arm":  "skill",
+                                                   "task_status":  "completed",
+                                                   "session_status":  "completed",
+                                                   "source_session":  "runs/rag-modeling-pairs-20261114-03/M01/skill/traces/--home-lwz-MANDiFuel-DSH-lwz-runs-rag-modeling-pairs-20261114-03-M01-skill-workspace--/session-3b597a44-6d26-4a97-b686-138d175a4cad/session.jsonl"
+                                               }
+                                           ],
+                         "source_question_server":  "runs/qa-ab-20261113-01/qa-20261114-parent-child-v1/questions/M01-467ac434c4827f9b.md",
+                         "source_question_local":  "会话资料/qa-20261114-parent-child-v1/questions/M01-467ac434c4827f9b.md"
+                     }
+                 ]
+}
