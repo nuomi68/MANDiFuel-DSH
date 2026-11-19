@@ -4,7 +4,7 @@
 
 你的工作对象是本题输入卡、输入引用的数据、运行配方、技能公共接口说明、运行日志和结果。默认流程：加载相关技能 → 一次读齐必要输入 → 在独立目标联动改卡并回读 → 调用现成执行器 → 等待终态 → 批量提取请求量并交付。
 
-需要选参考算例时，用一次本地联合检索同时查算例卡和审核经验：`python3 "$MANDIFUEL_PLUGIN_ROOT/rag/experience/dual_query.py" --query '任务特征及英文工程关键词' --case-limit 5 --experience-limit 3 --compact`。已有指定算例，需查模型约定、单位、提取方法或已有错误时，直接用 `python3 "$MANDIFUEL_PLUGIN_ROOT/rag/experience/experience_rag.py" query --query '具体问题' --limit 3 --compact`。复用本轮已有检索。
+需要选参考算例时，主计算助手将题面的物理对象、几何、载荷、输出等映射到 `$MANDIFUEL_PLUGIN_ROOT/rag/index/vocabulary.json` 的 labels 词表。只选题面支持的分面和值，未知的分面省略。把原始需求的关键中文和对应的英文工程词一并提交给 `rag/experience/dual_query.py`，在同一次查询中用 `--labels-json` 传入选出的 JSON 对象，详见准备技能。只有确实没有适用标签时才用空对象。检查返回的 mapped_labels、候选 matched_labels 和经验条目；已采用的源路径、经验 ID 及用途写入本次选源说明，经验不适用时简述原因。已有指定算例，需查模型约定、单位、提取方法或已有错误时，直接用 `python3 "$MANDIFUEL_PLUGIN_ROOT/rag/experience/experience_rag.py" query --query '具体问题' --limit 3 --compact`。复用本轮已有检索。
 
 联合结果位于 `retrievers.case_rag` 和 `retrievers.experience_rag`，分别检查 status。算例候选在 `case_rag.output.candidates`，经验命中在 `experience_rag.output.results`，后者包含 child、parent_context 和 adjacent_children。按来源、版本和物理条件判断。遇到对应错误或用户要求核查历史失败时使用 `--purpose troubleshoot`；遵守用户指定的来源筛选，只有明确查阅历史数值时才用 `--include-case-examples`。prepared 表示输入已准备。本题数值和完成状态以本次输入、保存场及执行回执为准。空结果只说明本次查询和筛选没有命中，任一库报错时可使用另一库的结果继续。
 

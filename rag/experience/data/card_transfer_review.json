@@ -1,0 +1,309 @@
+{
+  "schema_version": "mandifuel-card-transfer-review.v1",
+  "source_run": "three-arm-20-20261119-01",
+  "transfer_run": "card-transfer-20261119-01",
+  "candidate_sha256": "5fffba02d069cb534679c900d974c0a85cb791340770cea13f0a4f0f3bb3258f",
+  "policy": "保留旧卡全部内容与审核边界；新增20张条件化方法卡，不录入历史答案数值。原题复跑单独报告。",
+  "cards": [
+    {
+      "id": "knowledge:K21",
+      "task": "S01",
+      "source_session": "runs/three-arm-20-20261119-01/S01/skill/traces/--data-lwz-MANDiFuel-DSH-lwz-runs-three-arm-20-20261119-01-S01-skill-workspace--/session-9ea1404e-0d1c-4c18-a600-9fefe92309c2/session.jsonl",
+      "answer": "runs/three-arm-20-20261119-01/S01/skill/workspace/answer.json",
+      "answer_sha256": "6b60f416306b532ecde5d1f1bef1614faafb42a5f0b42a239520e8573bc49e0c",
+      "trace_sha256": "14bf47cbc9f25d20b2f4d402530959593e9d416ecc0cc6156afd6dd7482ff548",
+      "reviewed_arms": [
+        "bare",
+        "skill",
+        "skill_rag"
+      ],
+      "evidence_arm": "skill",
+      "exception": "经验组延长了终点，成功的 Skill 组保留原终点"
+    },
+    {
+      "id": "knowledge:K22",
+      "task": "S02",
+      "source_session": "runs/three-arm-20-20261119-01/S02/skill/traces/--data-lwz-MANDiFuel-DSH-lwz-runs-three-arm-20-20261119-01-S02-skill-workspace--/session-5ace58ea-285f-4e21-b55e-7558d5f14e57/session.jsonl",
+      "answer": "runs/three-arm-20-20261119-01/S02/skill/workspace/answer.json",
+      "answer_sha256": "9829e50b553515417bf6894e15d77220e56c68e9f22d1caf6fce0b812aecc510",
+      "trace_sha256": "c4274a7ab2bafc99d141aa98a8607f66b02fed43d9a3056357367b91f2b437ea",
+      "reviewed_arms": [
+        "bare",
+        "skill",
+        "skill_rag"
+      ],
+      "evidence_arm": "skill",
+      "exception": null
+    },
+    {
+      "id": "knowledge:K23",
+      "task": "S03",
+      "source_session": "runs/three-arm-20-20261119-01/S03/skill/traces/--data-lwz-MANDiFuel-DSH-lwz-runs-three-arm-20-20261119-01-S03-skill-workspace--/session-3afe253a-7e6f-4180-92f4-de8d02bf76ff/session.jsonl",
+      "answer": "runs/three-arm-20-20261119-01/S03/skill/workspace/answer.json",
+      "answer_sha256": "f54dfb00aaabcad2ae22ce8fd8b57422cc795fc380764c7b2201ef114e7359c2",
+      "trace_sha256": "57eb899bbe5090217fb9b0247e00f09e559deafe33c325db17bd3fee4ab5618d",
+      "reviewed_arms": [
+        "bare",
+        "skill",
+        "skill_rag"
+      ],
+      "evidence_arm": "skill",
+      "exception": null
+    },
+    {
+      "id": "knowledge:K24",
+      "task": "S04",
+      "source_session": "runs/three-arm-20-20261119-01/S04/skill/traces/--data-lwz-MANDiFuel-DSH-lwz-runs-three-arm-20-20261119-01-S04-skill-workspace--/session-4e9aada7-8e05-48e1-b678-5a4f408dacf2/session.jsonl",
+      "answer": "runs/three-arm-20-20261119-01/S04/skill/workspace/answer.json",
+      "answer_sha256": "738f1404cb6fcaf663c5420cc2dd785981fe8a0a124916c4bf9e9a423aa54e4c",
+      "trace_sha256": "3823ac68181fa3e8d34d4f1ba457762908a37f07ce93367c5c863c3f23936237",
+      "reviewed_arms": [
+        "bare",
+        "skill",
+        "skill_rag"
+      ],
+      "evidence_arm": "skill",
+      "exception": null
+    },
+    {
+      "id": "knowledge:K25",
+      "task": "S05",
+      "source_session": "runs/three-arm-20-20261119-01/S05/skill/traces/--data-lwz-MANDiFuel-DSH-lwz-runs-three-arm-20-20261119-01-S05-skill-workspace--/session-4ce45c6a-5b56-49fa-a924-fa3cbc718b2f/session.jsonl",
+      "answer": "runs/three-arm-20-20261119-01/S05/skill/workspace/answer.json",
+      "answer_sha256": "ba7d929807a129290ef7a8478d13526e7ccf9d238dbb6a624bed3f5bcb45ad20",
+      "trace_sha256": "aa785a62840c8b3cd652c95f1d7b314c09543a947fa70cf8556d416ca6c0925b",
+      "reviewed_arms": [
+        "bare",
+        "skill",
+        "skill_rag"
+      ],
+      "evidence_arm": "skill",
+      "exception": null
+    },
+    {
+      "id": "knowledge:K26",
+      "task": "S06",
+      "source_session": "runs/three-arm-20-20261119-01/S06/skill/traces/--data-lwz-MANDiFuel-DSH-lwz-runs-three-arm-20-20261119-01-S06-skill-workspace--/session-01e412c8-299b-4d4a-a9ac-8785619541e4/session.jsonl",
+      "answer": "runs/three-arm-20-20261119-01/S06/skill/workspace/answer.json",
+      "answer_sha256": "d15a7ff74128da350cd8a4ce9a5ae3c02611852fc5a1a013b38ccbc872941bfb",
+      "trace_sha256": "6dfddd33488335e72d24ca404226d21d1b78c7f0f91826d3bad9467fa45bf0fe",
+      "reviewed_arms": [
+        "bare",
+        "skill",
+        "skill_rag"
+      ],
+      "evidence_arm": "skill",
+      "exception": null
+    },
+    {
+      "id": "knowledge:K27",
+      "task": "S07",
+      "source_session": "runs/three-arm-20-20261119-01/S07/skill/traces/--data-lwz-MANDiFuel-DSH-lwz-runs-three-arm-20-20261119-01-S07-skill-workspace--/session-66c736fb-f490-4e27-80c4-b468a837740b/session.jsonl",
+      "answer": "runs/three-arm-20-20261119-01/S07/skill/workspace/answer.json",
+      "answer_sha256": "88b31fc10525bf17d7d4c1d6c00006cc9c7ad55e701be6a424a3229b47be42f1",
+      "trace_sha256": "0d1665db7e30235cd7088deb6139e980443b25327811fe3560494795370ff72e",
+      "reviewed_arms": [
+        "bare",
+        "skill",
+        "skill_rag"
+      ],
+      "evidence_arm": "skill",
+      "exception": null
+    },
+    {
+      "id": "knowledge:K28",
+      "task": "S08",
+      "source_session": "runs/three-arm-20-20261119-01/S08/skill/traces/--data-lwz-MANDiFuel-DSH-lwz-runs-three-arm-20-20261119-01-S08-skill-workspace--/session-34baf778-3596-4e98-938b-5c198f654751/session.jsonl",
+      "answer": "runs/three-arm-20-20261119-01/S08/skill/workspace/answer.json",
+      "answer_sha256": "544c34c546a25da29aefcc314eb81dab85554ada1594964ed32e06aa15bce2b3",
+      "trace_sha256": "4b55104a431a549f7888237d7312077b656535800df04c065ca76226505bab2c",
+      "reviewed_arms": [
+        "bare",
+        "skill",
+        "skill_rag"
+      ],
+      "evidence_arm": "skill",
+      "exception": null
+    },
+    {
+      "id": "knowledge:K29",
+      "task": "P09",
+      "source_session": "runs/three-arm-20-20261119-01/P09/skill/traces/--data-lwz-MANDiFuel-DSH-lwz-runs-three-arm-20-20261119-01-P09-skill-workspace--/session-348e7eb7-a09f-4501-8762-e06c463ec11c/session.jsonl",
+      "answer": "runs/three-arm-20-20261119-01/P09/skill/workspace/answer.json",
+      "answer_sha256": "ef411c75fbe9f539b62c77bccf141822060accaa8efed610b2125f0139969b4b",
+      "trace_sha256": "7f359c6a0eb350d6475d226aff9c787b3b0851c1f6675defbc04e155a311be10",
+      "reviewed_arms": [
+        "bare",
+        "skill",
+        "skill_rag"
+      ],
+      "evidence_arm": "skill",
+      "exception": null
+    },
+    {
+      "id": "knowledge:K30",
+      "task": "P10",
+      "source_session": "runs/three-arm-20-20261119-01/P10/skill/traces/--data-lwz-MANDiFuel-DSH-lwz-runs-three-arm-20-20261119-01-P10-skill-workspace--/session-b9b0c392-589e-48ec-b5d7-7aee7c3c1810/session.jsonl",
+      "answer": "runs/three-arm-20-20261119-01/P10/skill/workspace/answer.json",
+      "answer_sha256": "c1a6845a88a48e121c9af33b995508b65cf58dfdc3dfc2b0b47badb746705d0f",
+      "trace_sha256": "2e6b6336b6eb35778f3adff26b1dd8a9b42fa03e3b47bb7bbe719de71df27d3f",
+      "reviewed_arms": [
+        "bare",
+        "skill",
+        "skill_rag"
+      ],
+      "evidence_arm": "skill",
+      "exception": null
+    },
+    {
+      "id": "knowledge:K31",
+      "task": "P11",
+      "source_session": "runs/three-arm-20-20261119-01/P11/skill/traces/--data-lwz-MANDiFuel-DSH-lwz-runs-three-arm-20-20261119-01-P11-skill-workspace--/session-a2b73ffc-a545-4383-bd4c-9f6b70a1cf76/session.jsonl",
+      "answer": "runs/three-arm-20-20261119-01/P11/skill/workspace/answer.json",
+      "answer_sha256": "2b22c38742768ddcf3dae7d75cdbf98196cfd127e0390e75a54aec7450aed02c",
+      "trace_sha256": "0e571d30f4051d76ec6a54f0e6752737ecfbbdf8fa161cf0e7dff34205ddc641",
+      "reviewed_arms": [
+        "bare",
+        "skill",
+        "skill_rag"
+      ],
+      "evidence_arm": "skill",
+      "exception": null
+    },
+    {
+      "id": "knowledge:K32",
+      "task": "P12",
+      "source_session": "runs/three-arm-20-20261119-01/P12/skill/traces/--data-lwz-MANDiFuel-DSH-lwz-runs-three-arm-20-20261119-01-P12-skill-workspace--/session-7af29456-8e87-43ae-9579-25ba3a3bd064/session.jsonl",
+      "answer": "runs/three-arm-20-20261119-01/P12/skill/workspace/answer.json",
+      "answer_sha256": "a0bb06ff0be2116b54fc6dba411c1060710119f5fe2d9d3c36152b54ce3d3086",
+      "trace_sha256": "5c629eebcb29c2f18d10f8f805b3717a53872ad4f387d94007e393dc64470c13",
+      "reviewed_arms": [
+        "bare",
+        "skill",
+        "skill_rag"
+      ],
+      "evidence_arm": "skill",
+      "exception": null
+    },
+    {
+      "id": "knowledge:K33",
+      "task": "P13",
+      "source_session": "runs/three-arm-20-20261119-01/P13/skill/traces/--data-lwz-MANDiFuel-DSH-lwz-runs-three-arm-20-20261119-01-P13-skill-workspace--/session-2377e2ee-4a61-4b00-9713-da95ef3a76aa/session.jsonl",
+      "answer": "runs/three-arm-20-20261119-01/P13/skill/workspace/answer.json",
+      "answer_sha256": "55d15580f754e459f5fc54361bf5cb2fc08469629e972aea76cd5aef54180c67",
+      "trace_sha256": "e9af02c21da7f31167918877f83e14074cf0edf6fc05250a69af680f8a8206af",
+      "reviewed_arms": [
+        "bare",
+        "skill",
+        "skill_rag"
+      ],
+      "evidence_arm": "skill",
+      "exception": null
+    },
+    {
+      "id": "knowledge:K34",
+      "task": "P14",
+      "source_session": "runs/three-arm-20-20261119-01/P14/skill/traces/--data-lwz-MANDiFuel-DSH-lwz-runs-three-arm-20-20261119-01-P14-skill-workspace--/session-164c7980-b6a7-4439-bf4a-bd5ef895306e/session.jsonl",
+      "answer": "runs/three-arm-20-20261119-01/P14/skill/workspace/answer.json",
+      "answer_sha256": "9765bff7a36fd8896a8b2dd97e7c52de5861d82a27aefe3719be8e16293af474",
+      "trace_sha256": "2e0641b0c331a8fc27dc135b575c63c9ecd936ba13f274cc9daf8ec98fe3a88c",
+      "reviewed_arms": [
+        "bare",
+        "skill",
+        "skill_rag"
+      ],
+      "evidence_arm": "skill",
+      "exception": null
+    },
+    {
+      "id": "knowledge:K35",
+      "task": "P15",
+      "source_session": "runs/three-arm-20-20261119-01/P15/skill/traces/--data-lwz-MANDiFuel-DSH-lwz-runs-three-arm-20-20261119-01-P15-skill-workspace--/session-55c5c3ee-0e97-4d65-8a7f-117a10a3951d/session.jsonl",
+      "answer": "runs/three-arm-20-20261119-01/P15/skill/workspace/answer.json",
+      "answer_sha256": "8fdc21136b860e53c94fdeaf95dc34e4149de1d81d59ec890596e72bfbed6b5c",
+      "trace_sha256": "980f0d6bf0d967018a2b93d62db53fbf74827155f32c3ce3999d1fefaab93336",
+      "reviewed_arms": [
+        "bare",
+        "skill",
+        "skill_rag"
+      ],
+      "evidence_arm": "skill",
+      "exception": null
+    },
+    {
+      "id": "knowledge:K36",
+      "task": "P16",
+      "source_session": "runs/three-arm-20-20261119-01/P16/skill/traces/--data-lwz-MANDiFuel-DSH-lwz-runs-three-arm-20-20261119-01-P16-skill-workspace--/session-ba0fb1c7-b568-4812-bb58-2398de46de34/session.jsonl",
+      "answer": "runs/three-arm-20-20261119-01/P16/skill/workspace/answer.json",
+      "answer_sha256": "d9ee69d54409af711a861687c97890bc0134f8e9f4b098a257d1f6ec81df837b",
+      "trace_sha256": "c2198a01227627ff15093ceedcc3c2a4840d139e1213068977a506cf0d4ad15b",
+      "reviewed_arms": [
+        "bare",
+        "skill",
+        "skill_rag"
+      ],
+      "evidence_arm": "skill",
+      "exception": null
+    },
+    {
+      "id": "knowledge:K37",
+      "task": "D17",
+      "source_session": "runs/three-arm-20-20261119-01/D17/skill/traces/--data-lwz-MANDiFuel-DSH-lwz-runs-three-arm-20-20261119-01-D17-skill-workspace--/session-579dc7d8-8b0c-4351-9989-bafb7e166cb5/session.jsonl",
+      "answer": "runs/three-arm-20-20261119-01/D17/skill/workspace/answer.json",
+      "answer_sha256": "03f222738b52f637e9cb3a0918e6a3cdd16f4f93f781e3cf6f424fd06b9302ae",
+      "trace_sha256": "1410ae898c8a3eac486915774aa2640e6bb332619c4ea597b24561f64b39cb7f",
+      "reviewed_arms": [
+        "bare",
+        "skill",
+        "skill_rag"
+      ],
+      "evidence_arm": "skill",
+      "exception": null
+    },
+    {
+      "id": "knowledge:K38",
+      "task": "D18",
+      "source_session": "runs/three-arm-20-20261119-01/D18/skill/traces/--data-lwz-MANDiFuel-DSH-lwz-runs-three-arm-20-20261119-01-D18-skill-workspace--/session-d403f88f-7995-4880-8481-ceffaa1d0b30/session.jsonl",
+      "answer": "runs/three-arm-20-20261119-01/D18/skill/workspace/answer.json",
+      "answer_sha256": "095008ff8b7a497970e1c2efa61733577afe4c1b0babd43469accaa01173eb1b",
+      "trace_sha256": "8579e4508216ccc18d08c5956a3f7ad159b5dbd91bf9221e449178251081c16d",
+      "reviewed_arms": [
+        "bare",
+        "skill",
+        "skill_rag"
+      ],
+      "evidence_arm": "skill",
+      "exception": null
+    },
+    {
+      "id": "knowledge:K39",
+      "task": "D19",
+      "source_session": "runs/three-arm-20-20261119-01/D19/skill/traces/--data-lwz-MANDiFuel-DSH-lwz-runs-three-arm-20-20261119-01-D19-skill-workspace--/session-555778f7-f6f9-4762-9857-16ca5fae431d/session.jsonl",
+      "answer": "runs/three-arm-20-20261119-01/D19/skill/workspace/answer.json",
+      "answer_sha256": "616fc060de6480c2e0544d519f90bdeb040fd69a637e475c8ae067e2dc74f652",
+      "trace_sha256": "a92878099495f295799804c4f0d43b1acadc40356bb099229c14bf276443212b",
+      "reviewed_arms": [
+        "bare",
+        "skill",
+        "skill_rag"
+      ],
+      "evidence_arm": "skill",
+      "exception": null
+    },
+    {
+      "id": "knowledge:K40",
+      "task": "D20",
+      "source_session": "runs/three-arm-20-20261119-01/D20/skill/traces/--data-lwz-MANDiFuel-DSH-lwz-runs-three-arm-20-20261119-01-D20-skill-workspace--/session-7270f8c4-fc8f-43ae-bd90-bb964b30fb73/session.jsonl",
+      "answer": "runs/three-arm-20-20261119-01/D20/skill/workspace/answer.json",
+      "answer_sha256": "d893eba1d92f6558c82cb7f904e5374cb30927c17e5feed938514dbd0f14ef31",
+      "trace_sha256": "14b6ad4852d3a2d425bce25fad525c1aa6f8666327dafc5cbdc50da8a48866fa",
+      "reviewed_arms": [
+        "bare",
+        "skill",
+        "skill_rag"
+      ],
+      "evidence_arm": "skill",
+      "exception": null
+    }
+  ]
+}

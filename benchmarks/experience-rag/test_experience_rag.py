@@ -33,13 +33,29 @@ class ExperienceRetrievalTests(unittest.TestCase):
 
     def test_review_completeness_and_no_unreviewed_source(self):
         parents, children = exp.validate_corpus(self.corpus)
-        self.assertEqual((len(parents), len(children)), (14, 59))
-        self.assertEqual(sum(c["review_status"] == "pass" for c in children.values()), 46)
+        self.assertEqual((len(parents), len(children)), (34, 79))
+        self.assertEqual(sum(c["review_status"] == "pass" for c in children.values()), 66)
         self.assertEqual(sum(c["review_status"] == "troubleshooting_only" for c in children.values()), 13)
         self.assertEqual(sum(c.get("role") == "case_example" for c in children.values()), 3)
 
     def test_shipped_index_matches_clean_rebuild(self):
         self.assertEqual(exp.DEFAULT_INDEX.read_bytes(), self.index.read_bytes())
+
+    def test_promoted_method_cards_have_complete_reviewed_provenance(self):
+        review = exp._read(ROOT / "data/card_transfer_review.json")
+        expected = {f"knowledge:K{i}" for i in range(21, 41)}
+        self.assertEqual({c["id"] for c in review["cards"]}, expected)
+        self.assertEqual(len({c["task"] for c in review["cards"]}), 20)
+        children = {c["parent_id"]: c for c in self.corpus["children"] if c["parent_id"] in expected}
+        self.assertEqual(set(children), expected)
+        for evidence in review["cards"]:
+            child = children[evidence["id"]]
+            self.assertEqual(child["role"], "guidance")
+            self.assertEqual(child["review_status"], "pass")
+            self.assertEqual(child["source_groups"][0]["source_session"], evidence["source_session"])
+            self.assertEqual(child["source_groups"][0]["task_status"], "completed")
+            self.assertRegex(evidence["trace_sha256"], r"^[0-9a-f]{64}$")
+            self.assertRegex(evidence["answer_sha256"], r"^[0-9a-f]{64}$")
 
     def test_neighbor_does_not_quote_comparison_with_only_one_source(self):
         primary = "knowledge:K14_M01:02"
@@ -242,8 +258,27 @@ class ExperienceRetrievalTests(unittest.TestCase):
         )
         result = dual_query.query_both(request, case_query=case_query)
         self.assertEqual(result["status"], "ok")
-        self.assertEqual(result["retrievers"]["case_rag"]["output"], json.loads(direct.stdout))
+        case = result["retrievers"]["case_rag"]["output"]
+        self.assertEqual(case, json.loads(direct.stdout))
+        self.assertEqual(case["fusion"]["weights"], {"normalized_bm25": 1.0, "taxonomy": 0.0})
+        self.assertEqual(case["query_mapping"]["mapped_labels"], {})
         self.assertEqual(result["retrievers"]["experience_rag"]["status"], "ok")
+
+    def test_agent_labels_contribute_to_case_scores_in_joint_query(self):
+        query = "空心球壳内外恒压 hollow spherical shell pressure"
+        labels = {"geometry": ["1D_spherical"], "driving_condition": ["constant_pressure"]}
+        result = dual_query.query_both(query, labels_json=json.dumps(labels))
+        self.assertEqual(result["status"], "ok")
+        case = result["retrievers"]["case_rag"]["output"]
+        self.assertEqual(case["query_mapping"]["mapped_labels"], labels)
+        self.assertFalse(case["fusion"]["embedding_used"])
+        self.assertEqual(case["fusion"]["weights"], {"normalized_bm25": 0.6, "taxonomy": 0.4})
+        self.assertTrue(any(c["matched_labels"] for c in case["candidates"]))
+        for candidate in case["candidates"]:
+            scores = candidate["score_components"]
+            expected = sum(scores[k] * v for k, v in case["fusion"]["weights"].items())
+            self.assertAlmostEqual(candidate["score"], expected + scores["exact_path_bonus"], delta=2e-6)
+        self.assertTrue(result["retrievers"]["experience_rag"]["output"]["results"])
 
 
 if __name__ == "__main__":

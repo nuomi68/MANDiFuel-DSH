@@ -21,13 +21,15 @@ const variables = {
 };
 
 export function apply(ctx) {
-  const persona = readFileSync(new URL("./run-assistant-persona.md", import.meta.url), "utf8");
+  const personaFile = new URL("./run-assistant-persona.md", import.meta.url);
   // Presets shadow the global deployment persona. Replace the assembled
   // persona slot too, so Web standard cannot restore its coding-agent identity.
   ctx.on("system-prompt/assemble", async (_assembly, context, next) => {
     const assembly = await next();
     // Preserve the assigned role of private presentation and other subagents.
     if (context?.agent?.session?.header?.origin === 'subagent') return assembly;
+    // A Web host can outlive a plugin update. Read the role for the current turn.
+    const persona = readFileSync(personaFile, "utf8");
     return { ...assembly, sections: assembly.sections.map(section =>
       section.name === "deployment:persona" ? { ...section, text: persona } : section) };
   });

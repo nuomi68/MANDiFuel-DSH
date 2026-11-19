@@ -921,7 +921,7 @@ def query(
         if facet not in vocabulary or any(value not in vocabulary[facet] for value in values):
             raise QueryError(f"unknown taxonomy label or facet: {facet}")
         if values:
-            selected[facet] = values
+            selected[facet] = list(dict.fromkeys(values))
 
     stop = {"the", "a", "an", "of", "for", "and", "or", "to", "in", "with", "case", "offbeat"}
     def tokens(text):
@@ -943,24 +943,27 @@ def query(
                 score += idf * count * 2.2 / (count + 1.2 * (0.25 + 0.75 * length / max(average, 1)))
         lexical[card["card_path"]] = score
     highest = max(lexical.values(), default=0.0) or 1.0
+    lexical_weight, taxonomy_weight = (0.6, 0.4) if selected else (1.0, 0.0)
+    denom = sum(FACET_WEIGHTS[facet] for facet in selected) or 1.0
     candidates = []
     for card in cards:
         path = card["card_path"]
         matched = {facet: sorted(set(values) & set(_label_values(card.get("labels", {}).get(facet))))
                    for facet, values in selected.items()}
         matched = {facet: values for facet, values in matched.items() if values}
-        denom = sum(FACET_WEIGHTS.get(facet, 0.1) for facet in selected) or 1.0
-        taxonomy_score = sum(FACET_WEIGHTS.get(facet, 0.1) * len(values) / len(selected[facet])
+        taxonomy_score = sum(FACET_WEIGHTS[facet] * len(values) / len(selected[facet])
                              for facet, values in matched.items()) / denom
         lexical_score = lexical[path] / highest
         exact = path.lower() in engineering_request.lower()
-        score = (0.6 * lexical_score + 0.4 * taxonomy_score if selected else lexical_score) + float(exact)
+        score = lexical_weight * lexical_score + taxonomy_weight * taxonomy_score + float(exact)
         if score <= 0:
             continue
         description = card.get("description", {})
         candidates.append({
             "score": round(score, 6), "card_name": card.get("card_name"), "card_path": path,
-            "score_components": {"lexical_bm25": round(lexical[path], 6), "taxonomy": round(taxonomy_score, 6)},
+            "score_components": {"lexical_bm25": round(lexical[path], 6),
+                                 "normalized_bm25": round(lexical_score, 6),
+                                 "taxonomy": round(taxonomy_score, 6), "exact_path_bonus": float(exact)},
             "labels": card.get("labels"), "matched_labels": matched,
             "retrieval_summary": description.get("retrieval_summary"),
             "sibling_discriminator": description.get("sibling_discriminator"),
@@ -975,7 +978,8 @@ def query(
         "status": "ok", "interface": "mandifuel-rag-query.v2", "mode": "local",
         "engineering_request": engineering_request, "candidate_count": len(candidates),
         "corpus_card_count": len(cards), "candidates": candidates,
-        "fusion": {"strategy": "local_bm25_and_explicit_taxonomy", "embedding_used": False},
+        "fusion": {"strategy": "local_bm25_and_explicit_taxonomy", "embedding_used": False,
+                   "weights": {"normalized_bm25": lexical_weight, "taxonomy": taxonomy_weight}},
         "query_mapping": {"mapped_labels": selected, "origin": "caller_explicit_labels"},
         "provider_telemetry": {"network_requests": 0, "mapping": {"used": False}, "embedding": {"used": False}},
         "index_evidence": {"manifest_sha256": _sha256_file(index_path / "manifest.json"),

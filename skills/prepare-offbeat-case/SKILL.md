@@ -31,15 +31,17 @@ description: 用户要求建立或修改 OFFBEAT 算例、设置载荷历史、�
 
 ## 选择源并隔离目标
 
-用户指定 `source-case/` 时只将它作为源，不同时展开 `sources/`、源库或示例再比对一遍；只有必要引用缺失或请求明确指定其他模型时读取对应资产。无源时才用本地检索：
+用户指定 `source-case/` 时沿用它。需要选源时，读取 `$MANDIFUEL_PLUGIN_ROOT/rag/index/vocabulary.json` 中的 `labels`，由当前主助手将用户需求映射到词表。九个分面涵盖任务意图、系统或部件、燃料或反应堆背景、几何、物理模块、求解特征、载荷、输出和近似算例间的区别。只提交题面支持的值，未限定项留空。不要为了命中某张卡反推题面没有给出的条件。
+
+例如“球对称、内外恒压”可这样查。按本题实际替换查询和标签。
 
 ```bash
-python3 "$MANDIFUEL_PLUGIN_ROOT/rag/experience/dual_query.py" --query-file request.txt --case-limit 5 --experience-limit 3 --compact
+python3 "$MANDIFUEL_PLUGIN_ROOT/rag/experience/dual_query.py" --query '空心球壳内外恒压 hollow spherical shell internal external pressure' --labels-json '{"geometry":["1D_spherical"],"driving_condition":["constant_pressure"]}' --case-limit 5 --experience-limit 3 --compact
 ```
 
-查询在同一次规划中包含英文工程关键词，供主要为英文的卡片匹配。两个检索器独立返回 `status` 和 `output`。在 `retrievers.case_rag.output.candidates` 查看源算例候选，可用 `--labels-json` 提供本地词表标签。在 `retrievers.experience_rag.output.results` 查看短经验、适用背景及相邻条目。两库分别排序。任一侧失败时可继续使用成功的一侧；原算例接口 `rag/query.py` 仍可单独调用。
+查询包含本题中文和对应英文工程关键词，供两个库分别匹配。算例结果 `retrievers.case_rag.output` 中的 `query_mapping.mapped_labels` 和各候选的 `matched_labels`、`score_components` 可核对实际打分。算例侧报标签错误时按词表纠正。经验结果 `retrievers.experience_rag.output.results` 中有短经验、适用背景和相邻条目。两库分别排序。任一侧不可用时保留其状态，继续使用成功的一侧。
 
-保存一次查询结果，检查候选的几何、材料、物理能力与排除条件，再解析配置的只读源库。没有匹配时仅补充本地关键词或标签；本地资料不足就记录缺口，不联网，也不用旧任务答案替代选源证据。
+保存联合查询结果，检查候选的几何、材料、物理能力与排除条件，再解析配置的只读源库。在交付或选源说明中简述最终源路径及所用经验条目 ID、用途；没有适用经验或没有可映射的标签时如实说明。没有匹配时仅补充本地关键词或标签，本地资料不足就记录缺口，不联网，也不用旧任务答案替代选源证据。
 
 在工作区复制源输入树，默认目标为 `case/`。`0/`、`constant/`、`system/` 与算例根目录模型文件一起保留。复制时处理相对软链；不要修改源库。区分用户要求的变更和沿用的参考假设。确有必要工程信息缺失时再询问。
 
