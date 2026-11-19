@@ -21,6 +21,14 @@ test('configuration saved while the browser is offline remains unconfirmed',asyn
  const h=setup();await h.call('ui_read_skill');await h.call('ui_inspect',{target:'page'});await h.call('ui_apply',{expectedRevision:'r1',update:{rendering:{palette:'viridis'}}});h.page.browser.connected=false;
  assert.equal((await h.call('ui_wait_for_render',{timeoutMs:0})).status,'offline');assert.equal(h.session.confirmed,false);
 });
+test('malformed writes give actionable feedback and only accepted transactions count',async()=>{
+ const h=setup();await h.call('ui_read_skill');await h.call('ui_inspect',{target:'page'});
+ await assert.rejects(h.call('ui_apply',{}),/完整 JSON/);
+ assert.match(h.session.applyError,/括号/);assert.equal(h.commits(),0);
+ const first=await h.call('ui_apply',{expectedRevision:'r1',datasets:{summary:{file:'results.csv'}}});
+ await h.call('ui_apply',{expectedRevision:first.revision,update:{panelTitle:'汇总'}});
+ assert.equal(h.session.mutations,2);assert.equal(h.session.applyError,null);
+});
 test('a newer user instruction cannot be adopted by the older operator session',async()=>{
  const h=setup();let cancelled=false;h.session.cancel=()=>{cancelled=true;h.session.closed=true;};h.page.task.request='新要求';
  await assert.rejects(h.call('ui_inspect',{target:'page'}),/新的用户请求/);assert.equal(cancelled,true);await assert.rejects(h.call('ui_apply',{expectedRevision:'r1',update:{}}),/失效/);

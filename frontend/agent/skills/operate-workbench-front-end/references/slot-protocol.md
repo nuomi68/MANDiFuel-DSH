@@ -2,7 +2,7 @@
 
 `ui_inspect` 的 `target` 可为 page、main、aside、settings、model、data、capabilities；读取 main/aside 时可另给 node，定位唯一组件 ID。每次返回当前不透明 revision。page 的 browser 是实际页面上报状态，包含连接情况、视口、插槽尺寸、节点可见性、当前页签、表格搜索/排序/分页和图表缩放。
 
-`ui_apply` 参数为 `{expectedRevision, operations?, update?}`。至少有一项修改。operations 最多 24 个，最终组件树和数据绑定仍由宿主校验；错误事务不提交。
+`ui_apply` 参数为 `{expectedRevision, datasets?, operations?, update?}`。顶层 datasets 按 ID 合并进现有数据源，可和引用该数据源的节点操作一起提交。完整替换页面时统一使用 update.ui.datasets。至少有一项修改。operations 最多 24 个，最终组件树和数据绑定仍由宿主校验；错误事务不提交。
 
 ## 主区与右侧组件
 

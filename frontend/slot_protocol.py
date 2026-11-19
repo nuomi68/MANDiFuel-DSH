@@ -40,10 +40,13 @@ def _find(node,ident,parent=None):
 
 
 def patch_slots(presentation,request):
-    if not isinstance(request,dict) or set(request)-{'expectedRevision','expectedRequest','operations','update'}:raise ValueError('插槽请求属性无效')
+    if not isinstance(request,dict) or set(request)-{'expectedRevision','expectedRequest','operations','datasets','update'}:raise ValueError('插槽请求属性无效')
     operations=request.get('operations',[]);update=copy.deepcopy(request.get('update',{}))
     if not isinstance(operations,list) or len(operations)>24 or not isinstance(update,dict):raise ValueError('插槽操作数量或更新类型无效')
-    if not operations and not update:raise ValueError('插槽更新为空')
+    datasets=request.get('datasets',{})
+    if not isinstance(datasets,dict):raise ValueError('datasets 需要数据表 ID 到来源的映射')
+    if datasets and 'ui' in update:raise ValueError('完整页面的数据源放在 update.ui.datasets')
+    if not operations and not update and not datasets:raise ValueError('插槽更新为空')
     ui=copy.deepcopy(presentation.get('ui'));tree_changed=False;interactions=[]
     controls=copy.deepcopy(presentation.get('controls',[]));changed=set()
     for operation in operations:
@@ -112,6 +115,10 @@ def patch_slots(presentation,request):
             else:parent['children'].remove(node)
         else:raise ValueError('未知插槽操作：'+str(op))
         changed.add(slot)
+    if datasets:
+        if ui is None:ui={'version':1,'mode':'above','root':{'id':'mainModel','type':'model'}}
+        ui.setdefault('datasets',{}).update(datasets)
+        tree_changed=True
     if tree_changed:update['ui']=ui
     if interactions:
         if 'interactions' in update:raise ValueError('交互操作不能重复定义')

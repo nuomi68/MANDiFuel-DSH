@@ -420,7 +420,7 @@ async function verifySelection(id,request){
 async function loadTasks(){tasks=(await api('/api/tasks')).filter(t=>!t.draft);if(tasks.length)await showTask(tasks.some(t=>t.id===state.task)?state.task:tasks[0].id);else await dsh.newTask();}
 async function init(){try{
  evidenceBrowser=new EvidenceBrowser({button:els['evidence-button'],dialog:els['evidence-dialog'],onData:()=>syncAdaptiveUI()});
- presentationActivity=new PresentationActivity(els['presentation-skeletons']);
+ presentationActivity=new PresentationActivity(els['presentation-skeletons'],els['presentation-issue']);
  frontendObserver=new FrontendStateObserver({context:()=>({task,state,adaptive,modelReady:!!task&&loadedVersion===modelLoadKey(),style:task&&model&&fields?renderStyle():null}),send:(id,observation)=>{if(!checkingSelection&&dsh?.token)return fetch(`${BASE}/api/tasks/${id}/ui-state`,{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-Workbench-Token':dsh.token},body:JSON.stringify({...observation,browserId})}).catch(()=>{});}});
  adaptive=new AdaptiveUI({host:els['adaptive-ui'],aside:els['adaptive-aside'],model:els['model-content'],onAction:applyUIAction,onRun:selectStudyRun,onControlInput:handleControlInput,onControlChange:handleControlChange,onRendered:()=>{syncAdaptiveChrome();presentationActivity.update(task);frontendObserver.schedule();},getModelImage:()=>viewer?.screenshot(),onObserve:()=>frontendObserver.schedule()});
  studyPanel=new StudyPanel({onRun:selectStudyRun,onPanel:selectStudyPanel,onRuns:ids=>{studyPanel.pendingBinIds=ids||null;openDrawer('runs');},onError:showError});

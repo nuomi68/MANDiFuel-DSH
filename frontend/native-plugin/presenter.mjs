@@ -50,9 +50,23 @@ export function mountPresenter(ctx,call,resolveTask,{timeoutMs=300000,maxWorkers
    if(state.lastRequest!==request){state.lastRequest=request;state.uiRepairAttempts=0;state.awaitingUI=null;state.awaitingView=null;state.awaitingFrontend=null;}
    if(state.awaitingFrontend){
     const pending=state.awaitingFrontend,page=await call(`/api/tasks/${id}/frontend?target=page`),status=renderConfirmation(page,pending);
+    if(superseded())return;
     if(status==='confirmed'){
-     state.awaitingFrontend=null;state.settled=facts.dataRevision===pending.dataRevision&&['completed','failed','stopped','interrupted'].includes(facts.task.status);if(state.settled)state.settledDataRevision=facts.dataRevision;
-     if(state.operator)state.operator.confirmed=true;const advanced=facts.dataRevision!==pending.dataRevision;await publishState(id,{state:advanced?'queued':'idle',message:advanced?'等待同步最新结果':'前端操作已由页面确认'});if(state.settled)return;
+     state.awaitingFrontend=null;
+     const advanced=facts.dataRevision!==pending.dataRevision;
+     const proof=advanced?null:await verifyRenderedSelection(pending,page,call,id);
+     if(superseded())return;
+     if(proof?.status==='failed')throw new Error('联动复验失败，请检查工况或保存帧绑定');
+     if(pending.resumeAfterAck){
+      state.revision=null;
+      state.feedback='浏览器已连接。请对照当前请求核对已有组件，补齐仍未提交的内容。';
+      await publishState(id,{state:'queued',message:'正在核对未完成的展示'});return;
+     }
+     const confirmed=!proof||['verified','not-applicable'].includes(proof.status);
+     if(confirmed&&!advanced)state.failures=0;
+     if(state.operator)Object.assign(state.operator,{confirmed,...proof?{selectionCheck:proof}:{}});
+     state.settled=!advanced&&['completed','failed','stopped','interrupted'].includes(facts.task.status);if(state.settled)state.settledDataRevision=facts.dataRevision;
+     await publishState(id,{state:advanced?'queued':confirmed?'idle':'warning',message:advanced?'等待同步最新结果':confirmed?'前端操作已由页面确认':'页面已显示，本次工况或时刻切换尚未得到浏览器确认'});if(!advanced)return;
     }else if(status==='error'){
      state.awaitingFrontend=null;state.feedback=JSON.stringify({errors:page.browser?.errors,model:page.viewer?.rendererError});state.revision=null;state.uiRepairAttempts=(state.uiRepairAttempts||0)+1;
      if(state.uiRepairAttempts>2){state.settled=true;state.settledDataRevision=facts.dataRevision;await publishState(id,{state:'error',message:'前端操作修正仍未通过：'+state.feedback});return;}
@@ -87,7 +101,7 @@ export function mountPresenter(ctx,call,resolveTask,{timeoutMs=300000,maxWorkers
    }
    if(activeWorkers.size>=maxWorkers&&!activeWorkers.has(state)){if(!state.queued){state.queued=true;await publishState(id,{state:'queued',message:'等待更新展示'});}return;}state.queued=false;activeWorkers.add(state);
    state.revision=facts.revision;state.stage=facts.stage;state.lastRun=Date.now();state.configReady=false;
-   const controller=new AbortController();state.controller=controller;
+   const controller=new AbortController();state.controller=controller;state.operator=null;
    await publishState(id,{state:'running',message:'正在整理界面'});
    if(superseded())return;
    const agentOptions=state.agent?.options||ctx.agentDefaultModel?.currentSelection();
@@ -96,7 +110,7 @@ export function mountPresenter(ctx,call,resolveTask,{timeoutMs=300000,maxWorkers
    if(superseded())return;
    const session=toolMode?{closed:false,request,cancel:()=>controller.abort(new Error('新的用户请求已替代当前前端操作'))}:null;state.toolSession=session;
    if(toolMode)owners.set(String(parent.agent.id),state);
-   const prompt=toolMode?{request,trigger:facts.stage,skill:SKILL,currentPage:await call(`/api/tasks/${id}/frontend?target=page`),validationFeedback:state.feedback||null}:{...facts,validationFeedback:state.feedback||null,rejectedUpdate:state.rejectedUpdate||null};
+   const prompt=toolMode?{request,calculationRequest:facts.task.request,trigger:facts.stage,skill:SKILL,currentPage:await call(`/api/tasks/${id}/frontend?target=page`),validationFeedback:state.feedback||null}:{...facts,validationFeedback:state.feedback||null,rejectedUpdate:state.rejectedUpdate||null};
    if(superseded())return;
    const run=await ctx.subagents.start('spawn',{label:'前端操作',parent:parent.agent,signal:controller.signal,persona:ROLE,toolFilter:{allow:[]},outputSchema:toolMode?AGENT_RESULT_SCHEMA:SCHEMA,prompt:[{type:'text',text:'读取前端技能并操作当前任务的授权插槽。\n'+JSON.stringify(prompt)}]});state.run=run;
    await publishState(id,{state:'running',sessionId:String(run.id),message:'正在整理界面'});
@@ -105,24 +119,39 @@ export function mountPresenter(ctx,call,resolveTask,{timeoutMs=300000,maxWorkers
    if(toolMode){
     if(!session.toolsAttached)throw new Error('前端操作工具未绑定到私有会话');
     if(result.stopReason!=='completed'||!result.structured?.status)throw new Error(result.diagnostic||'前端操作会话未正常结束');
-    if(!session.observed||!session.skillLoaded)throw new Error('前端操作会话未读取技能与页面状态');
+    if(!session.pageObserved||!session.skillLoaded)throw new Error('前端操作会话未读取技能与页面状态');
     const latest=await call(`/api/tasks/${id}/observe`),published=session.lastPublished;
     const status=result.structured.status;
-    if(status==='blocked'){state.settled=true;state.settledDataRevision=latest.dataRevision;await publishState(id,{state:'error',message:String(result.structured.summary||'当前前端能力无法完成请求').slice(0,500)});return;}
-    state.feedback=null;state.failedFeedback=null;state.failures=0;state.retryAt=0;
+    const summary=String(result.structured.summary||'').slice(0,500);
+    state.operator={skill:SKILL.name,toolCalls:session.toolCalls||0,mutations:session.mutations||0,confirmed:false};
+    if(session.applyError||status==='partial'||status==='applied'&&!published){
+     throw new Error([summary,session.applyError||'本轮尚未完成提交','保留已生效的内容，先提交一个缺失组件，再继续。'].filter(Boolean).join('。'));
+    }
+    if(status==='blocked'){
+     state.settled=latest.dataRevision===facts.dataRevision;state.settledDataRevision=facts.dataRevision;
+     await publishState(id,{state:state.settled?'error':'queued',message:summary||'当前前端能力无法完成请求'});return;
+    }
     // Verify even a no-op claim: the model may still be loading, or the page
     // may have disconnected since the child's last successful observation.
     const page=await call(`/api/tasks/${id}/frontend?target=page`),expected=published||session.renderExpected||page;
     const confirmed=renderConfirmation(page,expected)==='confirmed',pending=!confirmed;
+    // A pending plan is not a browser receipt for the already visible model.
+    const waitingForReceipt=['pending','offline'].includes(session.renderStatus);
+    if(status==='pending'&&!waitingForReceipt&&(!published||confirmed)){
+     if(['completed','failed','stopped','interrupted'].includes(latest.task.status))throw new Error(summary||'计算已结束，请继续提交尚缺的展示内容');
+     await publishState(id,{state:'waiting',message:summary||'等待计算结果'});return;
+    }
     if(confirmed)await verifyRenderedSelection(session,page,call,id,controller.signal);
     if(session.selectionCheck?.status==='failed')throw new Error('联动复验失败，请检查工况或保存帧绑定');
-    if(pending){state.awaitingFrontend={...expected,dataRevision:latest.dataRevision,deadline:Date.now()+30000};state.ackExpired=false;}
+    state.feedback=null;state.failedFeedback=null;state.retryAt=0;
+    if(confirmed)state.failures=0;
+    if(pending){state.awaitingFrontend={...expected,checkSelection:session.checkSelection,resumeAfterAck:status==='pending'&&!published,dataRevision:facts.dataRevision,deadline:Date.now()+30000};state.ackExpired=false;}
     state.settled=!pending&&latest.revision===facts.revision&&['completed','failed','stopped','interrupted'].includes(latest.task.status);if(state.settled)state.settledDataRevision=latest.dataRevision;
     state.triggeredByFiles=false;state.displayRequest=false;
-    state.operator={skill:SKILL.name,toolCalls:session.toolCalls||0,mutations:session.mutations||0,confirmed,...session.selectionCheck?{selectionCheck:session.selectionCheck}:{}};
+    Object.assign(state.operator,{confirmed,...session.selectionCheck?{selectionCheck:session.selectionCheck}:{}});
     const advanced=latest.revision!==facts.revision;
     if(confirmed&&session.selectionCheck&&!['verified','not-applicable'].includes(session.selectionCheck.status)){
-     state.operator.confirmed=false;state.settled=true;state.settledDataRevision=latest.dataRevision;
+     state.operator.confirmed=false;state.settled=latest.dataRevision===facts.dataRevision;state.settledDataRevision=facts.dataRevision;
      await publishState(id,{state:'warning',message:'页面已显示，本次工况或时刻切换尚未得到浏览器确认'});return;
     }
     await publishState(id,{state:pending?'waiting':advanced?'queued':'idle',sessionId:String(run.id),message:pending?'配置已保存，等待页面确认':advanced?'等待同步最新结果':String(result.structured.summary||'界面已确认').slice(0,160)});
@@ -168,5 +197,5 @@ export function mountPresenter(ctx,call,resolveTask,{timeoutMs=300000,maxWorkers
  const timer=setInterval(()=>{void discover().catch(()=>{});for(const state of states.values())void pump(state);},3000);void discover().catch(()=>{});
  ctx.on('agent/disposed',({agent})=>{for(const state of states.values())if(state.agent===agent)state.agent=null;});
  ctx.effect(()=>async()=>{closed=true;clearInterval(timer);const runs=[];for(const s of states.values()){s.controller?.abort();if(s.run)runs.push(s.run.dispose());if(s.ownerPromise)runs.push(s.ownerPromise.then(h=>h.dispose()));}await Promise.allSettled(runs);states.clear();owners.clear();});
- return {notify,request(id){const state=stateFor(id);state.requestEpoch=(state.requestEpoch||0)+1;state.controller?.abort(new Error('新的显示请求已替代当前前端操作'));state.settled=false;state.displayRequest=true;state.failures=0;state.feedback=null;state.failedFeedback=null;state.retryAt=0;state.revision=null;void pump(state);}};
+ return {notify,request(id){const state=stateFor(id);state.requestEpoch=(state.requestEpoch||0)+1;state.controller?.abort(new Error('新的显示请求已替代当前前端操作'));state.awaitingFrontend=null;state.awaitingUI=null;state.awaitingView=null;state.uiRepairAttempts=0;state.settled=false;state.displayRequest=true;state.failures=0;state.feedback=null;state.failedFeedback=null;state.retryAt=0;state.revision=null;void pump(state);}};
 }

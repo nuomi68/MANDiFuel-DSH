@@ -4,7 +4,7 @@ const object=(properties={},required=[])=>({type:'object',properties,required,ad
 export const TOOL_SCHEMAS={
  ui_read_skill:object({resource:{type:'string'}}),
  ui_inspect:object({target:{type:'string',enum:['page','main','aside','settings','model','data','capabilities','evidence']},node:{type:'string'}},['target']),
- ui_apply:object({expectedRevision:{type:'string'},operations:{type:'array',items:{type:'object'}},update:{type:'object'}},['expectedRevision']),
+ ui_apply:object({expectedRevision:{type:'string'},operations:{type:'array',items:{type:'object'}},datasets:{type:'object'},update:{type:'object'}},['expectedRevision']),
  ui_wait_for_render:object({timeoutMs:{type:'integer'},verifySelection:{type:'boolean'}}),
 };
 const descriptions={ui_read_skill:'Read the registered frontend skill or one of its references. Read SKILL.md before mutations.',ui_inspect:'Inspect the actual current page, one slot, models, data or capabilities. Returns the revision required by ui_apply.',ui_apply:'Apply bounded slot operations and/or a presentation update to this task, using an inspected expectedRevision. Never writes solver inputs or saved fields.',ui_wait_for_render:'Check the browser acknowledgement and actual errors for the last mutation. Saving a configuration alone is not confirmation.'};
@@ -41,7 +41,11 @@ export function attachFrontendTools(agent,{id,call,current,session}){
   output:{schema:{type:'object'},render:(_args,value)=>[{type:'text',text:JSON.stringify(value)}]},
   async execute(args,exec){
    if(exec.agent!==agent||!current()||session.closed||exec.signal.aborted)throw new Error('前端操作会话已失效');
-   if(++calls>24)throw new Error('本轮前端操作超过 24 次，请保留已完成部分并结束');
+   if(++calls>24){
+    const message='本轮前端操作超过 24 次，请以 partial 交接待提交的组件';
+    if(name==='ui_apply')session.applyError=message;
+    throw new Error(message);
+   }
    session.toolCalls=calls;
    if(name==='ui_read_skill'){
     const value=readSkill(args.resource);if(value.resource==='SKILL.md'){skillLoaded=true;session.skillLoaded=true;}return value;
@@ -52,13 +56,18 @@ export function attachFrontendTools(agent,{id,call,current,session}){
     revisions.add(value.revision);session.observed=true;if(args.target==='page')session.pageObserved=true;return value;
    }
    if(name==='ui_apply'){
-    if(!skillLoaded)throw new Error('先 ui_read_skill 读取 '+SKILL.name+' 的 SKILL.md');
-    if(!revisions.has(args.expectedRevision))throw new Error('必须先 ui_inspect 获取本轮实际状态版本；本轮已读取：'+[...revisions].join(', ')+'；收到：'+String(args.expectedRevision));
-    if(!session.pageObserved)throw new Error('先 ui_inspect(target="page") 获取当前实际页面布局、内容与物理场状态');
-    if(++mutations>8)throw new Error('本轮前端修改超过 8 次，请保留已完成部分并结束');
-    const value=await call(`/api/tasks/${id}/frontend`,{...args,...session.request!==undefined?{expectedRequest:session.request}:{}},exec.signal);
+    let value;
+    try{
+     if(!skillLoaded)throw new Error('先 ui_read_skill 读取 '+SKILL.name+' 的 SKILL.md');
+     if(typeof args?.expectedRevision!=='string')throw new Error('ui_apply 需要完整 JSON 对象，顶层包含 expectedRevision。检查括号是否闭合，不要包装在 arguments 字符串中。请缩短调用，一次只提交一个组件及其 datasets。');
+     if(!revisions.has(args.expectedRevision))throw new Error('必须先 ui_inspect 获取本轮实际状态版本；本轮已读取：'+[...revisions].join(', ')+'；收到：'+String(args.expectedRevision));
+     if(!session.pageObserved)throw new Error('先 ui_inspect(target="page") 获取当前实际页面布局、内容与物理场状态');
+     if(++mutations>8)throw new Error('本轮前端修改超过 8 次，请以 partial 交接待提交的组件');
+     value=await call(`/api/tasks/${id}/frontend`,{...args,...session.request!==undefined?{expectedRequest:session.request}:{}},exec.signal);
+    }
+    catch(error){session.applyError=String(error.message||error);throw error;}
     if(args.update?.ui||args.operations?.some(op=>['main','aside'].includes(op.slot)&&op.op!=='interact')){session.checkSelection=true;delete session.selectionCheck;}
-    session.lastPublished=value;session.mutations=mutations;session.confirmed=false;return value;
+    revisions.add(value.revision);session.lastPublished=value;session.mutations=(session.mutations||0)+1;session.applyError=null;session.confirmed=false;return value;
    }
    const timeout=args.timeoutMs??8000;
    if(!Number.isInteger(timeout)||timeout<0||timeout>10000)throw new Error('等待时间必须为 0–10000 毫秒');

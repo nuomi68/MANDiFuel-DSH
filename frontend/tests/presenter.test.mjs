@@ -215,3 +215,64 @@ test('an unchanged claim without mutation or render-wait cannot finish before th
  try{p.request('task');await until(()=>finished);assert.equal(lastState.state,'waiting');page.browser.model={visible:true,ready:true,kind:'fields'};p.notify({status:'idle',session:{header:{origin:'interactive'}}});await until(()=>lastState.state==='idle');assert.equal(starts,1);}
  finally{for(const dispose of disposers)await dispose();}
 });
+
+test('an existing field receipt cannot end unfinished chart work; a fresh child continues with feedback',async t=>{
+ const calls=new Map(),hooks=new Map(),disposers=[],prompts=[],states=[];
+ let now=100000,runs=0;
+ t.mock.method(Date,'now',()=>now);
+ const page={revision:'field',presentationVersion:1,uiRevision:1,task:{request:'补齐结果'},browser:{connected:true,ready:true,presentationVersion:1,revision:1,errors:[]}};
+ const task={status:'completed',request:'比较三组温度曲线',latestRequest:'补齐结果'};
+ const ctx={tools:{},agentDefaultModel:{currentSelection:()=>({provider:'local',model:'test'})},agents:{create:async()=>({agent:{id:'owner'},dispose:async()=>{}})},on:(name,fn)=>hooks.set(name,fn),effect:fn=>disposers.push(fn()),subagents:{start:async(_provider,request)=>{
+  const child={ctx:{tools:{register:d=>calls.set(d.name,d)}},session:{header:{parentSession:'owner'}}};hooks.get('agent/created')({agent:child});
+  const invoke=(name,args)=>calls.get(name).execute(args,{agent:child,signal:request.signal});
+  prompts.push(JSON.parse(request.prompt[0].text.split('\n').slice(1).join('\n')));
+  await invoke('ui_read_skill',{});await invoke('ui_inspect',{target:'page'});
+  const attempt=prompts.length;
+  if(attempt===1)await invoke('ui_wait_for_render',{timeoutMs:0}); // Only the previous field is visible.
+  if(attempt===2)await assert.rejects(invoke('ui_apply',{}),/完整 JSON/);
+  if(attempt===3)await invoke('ui_apply',{expectedRevision:'field',operations:[{op:'replace',slot:'aside',value:{type:'table',id:'summary'}}]});
+  const status=['pending','blocked','applied'][attempt-1];
+  return{id:'child-'+attempt,result:Promise.resolve({stopReason:'completed',structured:{status,summary:attempt<3?'还缺对照表':'对照表已显示'}}),dispose:async()=>{runs++;}};
+ }}};
+ const call=async(path,body)=>{
+  if(path.endsWith('/observe'))return{...facts('stable','completed'),dataRevision:'stable',task};
+  if(path.endsWith('/presenter')){states.push(body);return{};}
+  if(path.includes('/frontend')){
+   if(body){page.revision='table';page.uiRevision=2;page.presentationVersion=2;page.browser.presentationVersion=2;page.browser.revision=2;}
+   return structuredClone(page);
+  }
+  return{};
+ };
+ const h=mountPresenter(ctx,call,async()=> 'task'),agent={status:'idle',session:{header:{origin:'interactive'}}};
+ try{
+  h.request('task');await until(()=>runs===1);assert.equal(states.at(-1).state,'queued');assert.equal(states.at(-1).operator.confirmed,false);
+  now+=13000;h.notify(agent);await until(()=>runs===2);assert.equal(states.at(-1).state,'queued');assert.match(prompts[1].validationFeedback,/对照表/);
+  now+=13000;h.notify(agent);await until(()=>runs===3);assert.equal(prompts[2].calculationRequest,task.request);assert.match(prompts[2].validationFeedback,/完整 JSON/);
+  assert.equal(states.at(-1).state,'idle');assert.equal(states.at(-1).operator.mutations,1);assert.equal(states.at(-1).operator.confirmed,true);
+ }finally{for(const dispose of disposers)await dispose();}
+});
+
+test('a late browser receipt for an older result cannot swallow a CSV that appeared during the child',async t=>{
+ const hooks=new Map(),disposers=[],tools=new Map(),states=[];
+ let starts=0,disposals=0,now=100000,data='mesh';
+ t.mock.method(Date,'now',()=>now);
+ const page={revision:'view',task:{request:'展示现有结果'},presentationVersion:1,uiRevision:1,browser:{connected:false,ready:true,presentationVersion:1,revision:1,errors:[]}};
+ const ctx={tools:{},agentDefaultModel:{currentSelection:()=>({provider:'local',model:'test'})},agents:{create:async()=>({agent:{id:'owner'},dispose:async()=>{}})},on:(name,fn)=>hooks.set(name,fn),effect:fn=>disposers.push(fn()),subagents:{start:async(_kind,request)=>{
+  starts++;const child={ctx:{tools:{register:d=>tools.set(d.name,d)}},session:{header:{parentSession:'owner'}}};
+  hooks.get('agent/created')({agent:child});const invoke=(name,args)=>tools.get(name).execute(args,{agent:child,signal:request.signal});
+  await invoke('ui_read_skill',{});await invoke('ui_inspect',{target:'page'});
+  await invoke('ui_apply',{expectedRevision:'view',update:{panelTitle:'已有结果'}});
+  await invoke('ui_wait_for_render',{timeoutMs:0});data='new-csv';
+  return{id:'worker',result:Promise.resolve({stopReason:'completed',structured:{status:starts===1?'pending':'applied',summary:'汇总'}}),dispose:async()=>{disposals++;}};
+ }}};
+ const call=async(path,body)=>{
+  if(path.endsWith('/observe'))return{...facts(data,'completed'),task:{status:'completed',request:'展示现有结果'},dataRevision:data};
+  if(path.endsWith('/presenter')){states.push(body);return{};}return structuredClone(page);
+ };
+ const p=mountPresenter(ctx,call,async()=> 'task');
+ try{
+  p.request('task');await until(()=>disposals===1);assert.equal(states.at(-1).state,'waiting');
+  page.browser.connected=true;now+=13000;p.notify({status:'idle',session:{header:{origin:'interactive'}}});await until(()=>disposals===2);
+  assert.equal(starts,2);assert.equal(states.filter(s=>s.state==='idle').length,1);assert.equal(states.at(-1).dataRevision,'new-csv');
+ }finally{for(const dispose of disposers)await dispose();}
+});

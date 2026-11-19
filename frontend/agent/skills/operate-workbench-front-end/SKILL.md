@@ -15,6 +15,8 @@ description: 读取当前工作台状态，在授权插槽内编排或修改模�
 
 复杂页面分成几次小事务：先模型显示和精简组件树，再插入曲线、表格与标注。每次读取最新版本，检查一次成功再继续；避免输出数千字的整页配置后反复重发。`update.ui` 仅放 version/mode/scope/root/aside/datasets；`controls`、`viewState`、`rendering` 放在 `update` 中，坐标标注放在 `update.rendering.program.annotations` 中。参数值按工具的对象结构填写，不把整个对象序列化成字符串。
 
+已有结果文件时，优先完成一个用户要看的数据组件。局部操作可在同一次调用的顶层用 `datasets` 登记其数据源。例如把一张表放在聊天窗下方可以提交 `{"expectedRevision":"所读版本","datasets":{"summary":{"file":"实际文件.csv"}},"operations":[{"op":"replace","slot":"aside","value":{"id":"summaryTable","type":"table","source":{"kind":"dataset","dataset":"summary"}}}]}`。仅在 aside 为空或确需替换时使用 replace。随后从回执取得新版本，再添加曲线或其他面板。若工具收到空参数，检查 JSON 括号并缩短为一个组件。成功显示模型后继续核对原计算请求与本次追问中的其他交付。
+
 只调整已有自定义参数的数值时，读取 settings 的实际 ID 后提交 `update:{parameterValues:{实际参数ID:数值}}`，不要改控件 default 或重发显示程序。新增或修改控件定义才使用 settings upsert，形式为 `{op:"upsert",slot:"settings",value:{id:实际ID,...定义}}`，外层没有 id。`ui_wait_for_render` 返回 confirmed 且目标值已生效后结束；不要为了确认而重发当前 viewState、整套 rendering 或未变化的页面。
 
 导出新模型或增加字段时，先提交模型并检查实际字段，再编排引用它的图表；这样可选图表失败也不会阻断已经生效的物理场。切换页签、检索或图表缩放等直接用 interact 操作，不必为改变一次交互状态重建组件。

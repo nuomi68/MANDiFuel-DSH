@@ -2,6 +2,15 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {presentationActivity,PresentationActivity} from '../assets/presentation-activity.js';
 
+test('a final display error stays visible until the next attempt or task switch',()=>{
+ const issue={}, host={dataset:{},setAttribute(){}},activity=new PresentationActivity(host,issue);
+ activity.update({status:'completed',presenter:{state:'error',message:'曲线尚未提交'}});
+ assert.equal(issue.hidden,false);assert.match(issue.textContent,/曲线尚未提交/);assert.equal(host.hidden,true);
+ activity.update({status:'completed',presenter:{state:'queued'}});
+ assert.equal(issue.hidden,true);assert.equal(issue.textContent,'');assert.equal(host.hidden,false);
+ activity.update(null);assert.equal(issue.hidden,true);
+});
+
 test('computation keeps placeholders throughout UI worker idle, retry and acknowledgement gaps',()=>{
  for(const status of ['queued','starting','running','importing'])for(const state of ['idle','running','queued','waiting','warning','error']){
   assert.equal(presentationActivity({status,presenter:{state}}).active,true,`${status}/${state}`);

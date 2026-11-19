@@ -29,6 +29,18 @@ class FrontendSessionTests(unittest.TestCase):
         for op in [{'op':'update','slot':'main','id':'note','props':{'innerHTML':'<script>bad</script>'}},{'op':'insert','slot':'main','parent':'mainRoot','value':{'id':'note','type':'text','text':'重复'}}]:
             with self.assertRaises(ValueError):self.transact([op])
             self.assertEqual(snapshot(self.d,self.ident)['revision'],before['revision'])
+    def test_bind_csv_and_add_one_result_panel_atomically(self):
+        work=self.r._job(self.ident)['workspace']
+        (work/'profiles.csv').write_text('radius,T\n1,300\n2,305\n')
+        table={'id':'profile','type':'table','source':{'kind':'dataset','dataset':'temperatures'},'columns':['radius','T']}
+        op={'op':'insert','slot':'aside','parent':'asideRoot','value':table}
+        self.transact([op],datasets={'temperatures':{'file':'profiles.csv'}})
+        before=snapshot(self.d,self.ident,'aside')
+        self.assertEqual([node['id'] for node in before['tree']['children']],['other','profile'])
+        self.assertEqual(before['documentOptions']['datasets']['temperatures']['file'],'profiles.csv')
+        with self.assertRaises(ValueError):
+            self.transact([dict(op,value=dict(table,id='broken',columns=['missing']))],datasets={'temperatures':{'file':'profiles.csv'}})
+        self.assertEqual(snapshot(self.d,self.ident,'aside')['revision'],before['revision'])
     def test_manual_parameter_change_and_new_request_reject_stale_work(self):
         self.transact([{'op':'upsert','slot':'settings','value':{'id':'width','type':'number','label':'宽度','parameter':True,'min':1,'max':10,'default':2}}])
         stale=snapshot(self.d,self.ident)['revision'];self.d.parameter_values(self.ident,{'width':4})

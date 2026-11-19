@@ -7,4 +7,4 @@ export function readSkill(resource='SKILL.md'){
  if(!resources.has(resource))throw new Error('未注册的前端技能资源');
  return{name:SKILL.name,resource,text:readFileSync(new URL(resource,skillRoot),'utf8')};
 }
-export const AGENT_RESULT_SCHEMA={type:'object',properties:{status:{type:'string',enum:['applied','unchanged','pending','blocked']},summary:{type:'string'},revision:{type:'string'}},required:['status','summary'],additionalProperties:false};
+export const AGENT_RESULT_SCHEMA={type:'object',properties:{status:{type:'string',enum:['applied','unchanged','pending','partial','blocked']},summary:{type:'string'},revision:{type:'string'}},required:['status','summary'],additionalProperties:false};
