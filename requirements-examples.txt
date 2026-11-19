@@ -1,4 +1,4 @@
-# Optional scientific tools used by the examples; core plugin uses stdlib.
+# Optional scientific tools for plotting and parameter studies.
 numpy>=1.26,<3
 matplotlib>=3.8,<4
 optuna>=4,<5

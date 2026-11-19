@@ -104,20 +104,9 @@ def _version(root: Path) -> str:
 
 
 def _release_sources(root: Path, snapshot: bool = False) -> list[str]:
-    example_manifest = json.loads((root / "examples/manifest.json").read_text(encoding="utf-8"))
-    example_paths = {"examples/manifest.json"}
-    for record in example_manifest["files"]:
-        relative = record["path"]
-        parts = PurePosixPath(relative).parts
-        if not parts or parts[0] != "examples" or ".." in parts or any(part.startswith(".") for part in parts):
-            raise BuildError("unsafe example manifest path")
-        source = root / relative
-        if not source.resolve().is_relative_to(root / "examples") or not source.is_file() or source.is_symlink() or _sha256(source) != record["sha256"]:
-            raise BuildError(f"example input hash mismatch: {relative}")
-        example_paths.add(relative)
     tracked = ({p.relative_to(root).as_posix() for p in root.rglob("*") if p.is_file()}
                if snapshot else set(_git(root, "ls-files", "-z").split("\0")) - {""})
-    tracked = {p for p in tracked if p in RELEASE_FILES or p in example_paths or (all(
+    tracked = {p for p in tracked if p in RELEASE_FILES or (all(
         not part.startswith(".") and part not in {"__pycache__", "node_modules"}
         for part in PurePosixPath(p).parts
     ) and Path(p).suffix in {".py", ".md", ".json", ".mjs", ".yml", ".sh", ".txt", ".example"})}
@@ -125,7 +114,7 @@ def _release_sources(root: Path, snapshot: bool = False) -> list[str]:
 
     sources = (
         {path for path in tracked if path.startswith(RELEASE_PREFIXES)}
-        | set(RELEASE_FILES) | example_paths
+        | set(RELEASE_FILES)
     ) - DEVELOPMENT_ONLY_FILES
     missing = sorted(path for path in sources if path not in tracked)
     if missing:

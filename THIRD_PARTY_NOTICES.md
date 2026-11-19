@@ -12,7 +12,7 @@ OFFBEAT contributors. The historical filename does not indicate current count.
 - Upstream notice: https://gitlab.com/foam-for-nuclear/offbeat/-/blob/develop/LICENSE
 
 The corpus and original curation are provided under GPL-3.0-or-later to the
-extent copyright applies, preserving upstream rights. The examples contain engineering requests and a launcher. Runnable reference
+extent copyright applies, preserving upstream rights. Runnable reference
 cases are selected through RAG from a separately installed OFFBEAT source tree.
 The package includes no OFFBEAT executable, library or source-case input trees. Install the
 solver and cases separately; preserve their own copyright and license notices,

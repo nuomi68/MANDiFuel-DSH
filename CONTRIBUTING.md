@@ -8,16 +8,15 @@ read-only and execute studies in independent workspaces.
 Validate this distributed source with Python 3.12 and Bash:
 
 ```bash
-python3 examples/run.py --check
 python3 rag/build_index.py --check
 bash -n scripts/prepare-agent.sh scripts/resolve-node.sh scripts/start-dsh.sh
 python3 scripts/build-plugin.py --snapshot --output-dir /outside/source/releases
 ```
 
-With dependencies configured, use `bash scripts/start-dsh.sh --check headless`, then run
-the relevant example in a fresh workspace. Example file changes require
-updating examples/manifest.json before building. Preserve failure records;
-host exits and file-existence checks are not proof of physical validity.
+With dependencies configured, use `bash scripts/start-dsh.sh --check headless`,
+then run a task from the [benchmark bank](benchmark/题库总览.md) in a fresh
+workspace. Preserve failure records and verify completion against the solver log
+and saved results.
 Never commit local configuration, API keys, solver outputs or host histories.
 The source packager uses an explicit allowlist; it does not include unit tests.
 

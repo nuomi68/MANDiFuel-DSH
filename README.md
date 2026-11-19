@@ -25,7 +25,7 @@ python3 frontend/server.py
    ```
 
 2. 编辑 `configs/launcher.env`，填写 DSH、Node.js、Python 3.12、OpenFOAM 环境脚本和 OFFBEAT 可执行文件目录的绝对路径。`MANDIFUEL_CASE_LIBRARY_ROOT` 指向含 `Cases/` 的 OFFBEAT 源码根目录。模型和 API Key 在 DSH 中配置。使用外置数据盘的 `runs` 软链接时，把 `realpath runs` 的输出填入 `MANDIFUEL_RUNS_ROOT`。[配置模板](configs/launcher.env.example)
-3. 检查计算环境，再启动工作台。需要运行绘图或优化示例时，在所配置的 Python 3.12 环境中执行 `python3.12 -m pip install -r requirements-examples.txt`。
+3. 检查计算环境，再启动工作台。需要绘图或运行参数优化时，在所配置的 Python 3.12 环境中执行 `python3.12 -m pip install -r requirements-examples.txt`。
 
    ```bash
    bash scripts/start-dsh.sh --check web
@@ -34,17 +34,15 @@ python3 frontend/server.py
 
 ## 在网页里完成一次计算
 
-1. 点击右上角 **＋（新建任务）**，在 **DSH** 对话窗输入算例、工况和想看的结果。可以复制仓库里的完整题面，例如让助手计算水冷通道升功率过程中壁温与冷却剂温度的变化。[水冷通道示例题面](examples/D1/prompt.txt)
+1. 点击右上角 **＋（新建任务）**，在 **DSH** 对话窗输入算例、工况和想看的结果。首次使用可以复制题库中的 C01，让助手计算燃料棒的稳态温度分布，并核对燃料产热与包壳向外散热。[C01 完整题面](benchmark/题库总览.md#c01-燃料棒稳态传热建模与总热流)
 2. 打开 **执行过程** 查看进度。工作台观察任务目录，有网格时可先预览模型，有保存场后可选择物理量和时刻。在已关联曲线与物理场的任务中，点击曲线上的数据点会切换到对应工况及最近的保存帧。
 3. 继续在对话里提出显示要求，例如「把温度场改成蓝白红色带，标出当前帧最高温度的位置」。展示助手读取当前页面状态，按已有数据调整视图。打开 **结果核查** 可查看已支持工程量的来源文件、时刻、区域、单位、取数方法和核验状态。在 **交付文件** 中可查看本任务已登记的输入、日志和输出。
 
 每个网页任务有独立工作区，默认位于 `runs/workbench/task-*/workspace/`。计算助手通过五项工程技能完成算例准备、求解、提取和研究任务。独立的展示助手观察文件变化、编排页面。相同的计算流程也可以在终端单独执行。任务子进程离线运行，文件写入边界覆盖项目目录和已登记的 `runs` 目录。[工作台使用说明与项目写入边界](frontend/README.md) · [展示助手角色与接口](frontend/agent/CONTRACT.md) · [独立数值核查](lib/mandifuel_verify/README.md)
 
-## 工程示例与本地检索
+## 基准题库与本地检索
 
-仓库提供五份可直接粘贴到 DSH 对话窗的工程题面，包括水冷通道瞬态、TRISO 涂层厚度扫描、轴向功率形状优化、包壳氧化不确定性传播和铯扩散系数反演。[五个示例及计算条件](examples/README.md)
-
-基准题库另收录 29 道题，包括 18 道新建模型求解题、1 道接续计算题和 10 道辅助题。点击题号可跳至完整题面，接续计算和已有结果分析题还需准备相应输入。[燃料性能基准题库](benchmark/题库总览.md)
+基准题库收录 29 道题，包括 18 道新建模型求解题、1 道接续计算题和 10 道辅助题。点击题号可跳至完整题面，接续计算和已有结果分析题还需准备相应输入。[燃料性能基准题库](benchmark/题库总览.md)
 
 选取参考模型时，助手可以联合查询 **137 张算例卡**和 **34 张经验父卡**。算例检索使用本地 BM25 和显式提供的九分面标签。经验库返回审核过的操作及其适用条件。1024 维描述向量供索引维护使用。运行中遇到输入错误时，助手会保留失败日志，在独立目录修复输入后重试，并按实际终点和保存场核对结果。[算例索引与来源](rag/PROVENANCE.md) · [经验检索](rag/experience/README.md) · [软件能力表](skills/prepare-offbeat-case/references/software-capabilities.md) · [输入恢复流程](skills/execute-offbeat-case/references/input-recovery.md)
 
@@ -59,10 +57,9 @@ cd runs/manual
 bash "$plugin_root/scripts/start-dsh.sh" headless '请说明当前算例准备需要哪些输入。'
 ```
 
-在仓库根目录可校验随附题面和算例索引，或构建计算技能分发包。Web 工作台从完整仓库启动，以下打包命令面向后端技能。
+在仓库根目录可校验算例索引，或构建计算技能分发包。Web 工作台从完整仓库启动，以下打包命令面向后端技能。
 
 ```bash
-python3 examples/run.py --check
 python3 rag/build_index.py --check
 python3 scripts/build-plugin.py --snapshot --output-dir /outside/source/releases
 python3 scripts/package-source.py --output /outside/source/mandifuel-source.zip

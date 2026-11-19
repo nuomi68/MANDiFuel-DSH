@@ -42,27 +42,8 @@ Desktop.ini
 *.swp
 *~
 
-# 本地封存：发布示例之外的历史计算产物留在磁盘，不进入Git。
-/examples/*
-!/examples/D1/
-/examples/D1/*
-!/examples/D2/
-/examples/D2/*
-!/examples/D3/
-/examples/D3/*
-!/examples/D4/
-/examples/D4/*
-!/examples/D5/
-/examples/D5/*
-!/examples/D1/prompt.txt
-!/examples/D2/prompt.txt
-!/examples/D3/followup.txt
-!/examples/D3/prompt.txt
-!/examples/D4/prompt.txt
-!/examples/D5/prompt.txt
-!/examples/README.md
-!/examples/manifest.json
-!/examples/run.py
+# 旧工程示例和已有计算结果留在本机。
+/examples/
 
 # 导入源码包的旧清单单独留作来源，不是当前产品清单。
 /source-manifest.json
