@@ -1,0 +1,21 @@
+name: Check examples and package
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  verify-and-package:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: python3 examples/run.py --check
+      - run: python3 rag/build_index.py --check
+      - run: bash -n scripts/prepare-agent.sh scripts/resolve-node.sh scripts/start-dsh.sh
+      - run: node --check dsh/mandifuel-shell-env.mjs
+      - run: python3 scripts/build-plugin.py --output-dir "$RUNNER_TEMP/mandifuel-release"
+      - run: python3 scripts/package-source.py --output "$RUNNER_TEMP/mandifuel-source.zip"
