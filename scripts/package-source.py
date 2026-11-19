@@ -11,7 +11,6 @@ import zipfile
 
 SOURCE_FILES = {
     ".editorconfig", ".gitattributes", ".gitignore", ".python-version",
-    ".github/pull_request_template.md", ".github/workflows/check.yml",
     "CONTRIBUTING.md", "requirements-examples.txt", "scripts/package-source.py",
     "rag/audit_case_cards.py", "rag/rebuild_case_cards.py",
 }

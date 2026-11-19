@@ -1,4 +1,0 @@
-PyC sphere，半径200 μm，新建球对称热弹性模型。无压力，外表面自由；温度由无应力参考态298.15 K均匀升至873.15 K，求最终平衡变形。
-YoungModulusModel和thermalExpansionModel都用PyCPARFUME，asFabricatedAnisotropy=1.5，ν=0.33。PyC各向异性轴取径向，采用线弹性，不考虑蠕变、辐照和肿胀。
-
-给径向位移曲线。外表面至少列两个不同方位的点，各给坐标、Dx和径向位移，注明单位、实际取值位置和投影方式。请实际建立模型求解。

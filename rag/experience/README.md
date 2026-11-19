@@ -18,7 +18,7 @@ python3 -I -B rag/experience/experience_rag.py query --query 'fuelRodGap gapGas 
 
 默认语料在 2026-11-19 合入原 20 题提炼的 K21–K40 方法卡，保留 2026-11-16 旧库全部内容及审核边界。现有 34 张父卡、79 条子记录。66 条审核通过，其中 3 条历史数值示例仅在显式指定 `--include-case-examples` 时可返回；常规求解可用 63 条。其余 13 条限于排错。常规求解仅使用已完成计算或输入准备完成的通过项。`prepared` 表示输入准备完成。相邻条目也受来源与审核筛选约束。
 
-新增卡的来源题号、核验会话、交付文件及 SHA-256 见 [20 卡审核来源](data/card_transfer_review.json)。卡片只包含有适用条件的方法，不录入来源题的答案数值。合并前已经过 8 道新题的独立迁移实测；合并后的原 20 题复跑属于原题回归，不能当作新题迁移收益。出卡与复跑入口见 [经验卡实验](../../benchmarks/experience-card-transfer/README.md)。
+新增卡的来源题号、核验会话、交付文件及 SHA-256 见 [20 卡审核来源](data/card_transfer_review.json)。卡片只包含有适用条件的方法，不录入来源题的答案数值。合并前已经过 8 道新题的独立迁移实测；合并后的原 20 题复跑属于原题回归，不能当作新题迁移收益。出卡与复跑入口见 [归档版经验卡实验](https://github.com/nuomi68/MANDiFuel-DSH/blob/1bf63584c535270572338a17414569dc99db1195/benchmarks/experience-card-transfer/README.md)。
 
 逐条判定见 [审核记录](data/review_decisions.json)，审核文本、适用背景和来源组见 [经验语料](data/reviewed_corpus.json)。`source_question_server` 和 `source_session` 是相对于项目根的历史档案路径，查阅原始记录需要对应的 runs 档案。仅使用检索时，随包提供的语料和索引已经足够。经验的适用性仍需结合本次模型版本、输入、边界条件与结果核对。
 
@@ -26,9 +26,9 @@ python3 -I -B rag/experience/experience_rag.py query --query 'fuelRodGap gapGas 
 
 ```bash
 python3 -I -B rag/experience/experience_rag.py build
-python3 -m unittest discover -s benchmarks/experience-rag -p 'test_*.py'
-python3 -I -B benchmarks/experience-rag/audit_invariants.py
-python3 -I -B benchmarks/experience-rag/smoke_queries.py
+python3 -m unittest discover -s tests/experience-rag -p 'test_*.py'
+python3 -I -B tests/experience-rag/audit_invariants.py
+python3 -I -B tests/experience-rag/smoke_queries.py
 ```
 
 语料校验和或引擎版本变化后重新构建索引。以上检索测试使用审核语料中的场景，不执行 OFFBEAT。

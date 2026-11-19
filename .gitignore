@@ -75,3 +75,8 @@ Desktop.ini
 /*.docx
 .mandifuel-tmp/
 .mandifuel-cache/
+
+# 本地协作模板、旧评测批次与生成的发布记录
+/.github/
+/benchmarks/
+/releases/

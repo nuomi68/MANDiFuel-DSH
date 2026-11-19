@@ -44,6 +44,8 @@ python3 frontend/server.py
 
 仓库提供五份可直接粘贴到 DSH 对话窗的工程题面，包括水冷通道瞬态、TRISO 涂层厚度扫描、轴向功率形状优化、包壳氧化不确定性传播和铯扩散系数反演。[五个示例及计算条件](examples/README.md)
 
+基准题库另收录 29 道题，包括 18 道新建模型求解题、1 道接续计算题和 10 道辅助题。点击题号可跳至完整题面，接续计算和已有结果分析题还需准备相应输入。[燃料性能基准题库](benchmark/题库总览.md)
+
 选取参考模型时，助手可以联合查询 **137 张算例卡**和 **34 张经验父卡**。算例检索使用本地 BM25 和显式提供的九分面标签。经验库返回审核过的操作及其适用条件。1024 维描述向量供索引维护使用。运行中遇到输入错误时，助手会保留失败日志，在独立目录修复输入后重试，并按实际终点和保存场核对结果。[算例索引与来源](rag/PROVENANCE.md) · [经验检索](rag/experience/README.md) · [软件能力表](skills/prepare-offbeat-case/references/software-capabilities.md) · [输入恢复流程](skills/execute-offbeat-case/references/input-recovery.md)
 
 ## 终端运行与打包
