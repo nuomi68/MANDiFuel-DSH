@@ -52,11 +52,19 @@ export async function mountPresentationRouter(ctx,{call,sessions,presenter,class
       const id=sessions.get(String(request.sessionId));
       if(!id||request.content.some(part=>part.type!=='text'))return proceed();
       const text=request.content.map(p=>p.text).join('\n').trim();if(!text)return proceed();
-      let snapshot;try{snapshot=await call(`/api/tasks/${id}`);}catch{return proceed();}
-      if(!snapshot.task.modelReady&&!snapshot.task.resultReady)return proceed();
+      const key=String(request.sessionId)+':'+request.requestId;
+      if(accepted.has(key))return accepted.get(key);
+      const displayOnly=explicitPresentation(text);
+      let snapshot;try{snapshot=await call(`/api/tasks/${id}`);}catch{
+       if(displayOnly)throw new Error('展示服务暂不可用，请重试本次显示请求');
+       return proceed();
+      }
+      const task=snapshot.task;
+      if(task.draft)return proceed();
+      if(!displayOnly&&!task.modelReady&&!task.resultReady&&!task.study&&!task.presentation?.ui&&!task.fileCount&&!snapshot.files?.length)return proceed();
       const agent=ctx.agents.get(request.sessionId),selection=agent?.options||ctx.agentDefaultModel.currentSelection();
       const timeout=AbortSignal.timeout(12000),cancel=signal?AbortSignal.any([signal,timeout]):timeout;
-      let render=explicitPresentation(text);
+      let render=displayOnly;
       try{
        if(!render){
         const facts=await call(`/api/tasks/${id}/observe`);
@@ -67,22 +75,21 @@ export async function mountPresentationRouter(ctx,{call,sessions,presenter,class
       catch(error){if(signal?.aborted)throw error;console.warn('Presentation routing unavailable:',String(error.message||error));throw new Error('暂时无法判断本条请求用途，尚未提交给计算助手，请重试。已有计算继续运行。');}
       console.info('Presentation route:',render?'render':'compute',String(request.sessionId));
       if(!render)return proceed();
-      const key=String(request.sessionId)+':'+request.requestId;
       if(accepted.has(key))return accepted.get(key);
       const pending=(async()=>{
         const owner=agent||await commands.resolveAgent(request.sessionId);
         if(!owner.session.surface.nodes.some(seq=>!isPresentation(owner.session.eventAt(seq))))return proceed();
         // Transcript events do not enqueue a solver turn. The source also lets
         // the workbench distinguish a view request from a calculation prompt.
+        const queued=await call(`/api/tasks/${id}/native-event`,{kind:'display-prompt',text,sessionId:String(request.sessionId)});
         owner.session.append('user/message',createUserMessage({content:request.content,source:{kind:'user',rpcId:request.requestId,surface:'presentation',...(request.clientTimeZone?{clientTimeZone:request.clientTimeZone}:{})}}),{surfaceOp:'append'});
         owner.session.append('user/message',createUserMessage({source:{kind:'plugin',plugin:'mandifuel-workbench',form:'notice',summary:'正在更新显示设置'},content:[{type:'text',text:'已收到显示调整，正在更新界面。'}]}),{surfaceOp:'append'});
         hidePresentationMessages(owner.session);
-        await call(`/api/tasks/${id}/native-event`,{kind:'display-prompt',text,sessionId:String(request.sessionId)});
-        presenter.request(id);
+        presenter.request(id,queued.task.presenter?.displayRequestRevision);
         return {accepted:true};
       })();
       accepted.set(key,pending);if(accepted.size>256)accepted.delete(accepted.keys().next().value);
-      return pending;
+      try{return await pending;}catch(error){accepted.delete(key);throw error;}
     }finally{entered.delete(request);}
   }
   controller.prompt=function(request,signal){return route(request,signal,()=>original.call(this,request,signal));};

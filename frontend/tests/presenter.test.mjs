@@ -17,6 +17,43 @@ test('an explicit request arriving during observation discards the old snapshot 
  try{h.presenter.request('task');await until(()=>!!release);h.presenter.request('task');release(facts('old'));await delay(20);assert.equal(starts,0);h.presenter.notify(h.agent);await until(()=>disposed===1);assert.equal(starts,1);}finally{await h.close();}
 });
 
+test('opening a confirmed table-only study resumes scientific review with the delivered report',async t=>{
+ const hooks=new Map(),disposers=[],states=[],tools=new Map(),prompts=[];
+ let now=100000,runs=0;
+ t.mock.method(Date,'now',()=>now);
+ const ui={mode:'replace',root:{id:'rows',type:'table'},datasets:{measured:{file:'samples.csv'}}};
+ const task={status:'completed',request:'比较各工况的出口响应'};
+ const facts={task,dataRevision:'saved',revision:'saved',stage:'complete',presenter:{state:'idle',dataRevision:'saved'},
+  workspaceHistory:[{file:'history.json',comparableResponses:{'response.rise':6}}],availableTables:[{file:'samples.csv',rows:6}],
+  availableDocuments:['report.md'],presentation:{ui}};
+ const page={revision:'layout',uiRevision:1,presentationVersion:1,task,browser:{connected:true,ready:true,presentationVersion:1,revision:1,errors:[]}};
+ const ctx={tools:{},agentDefaultModel:{currentSelection:()=>({provider:'test',model:'test'})},agents:{create:async()=>({agent:{id:'owner'},dispose:async()=>{}})},
+  on:(k,fn)=>hooks.set(k,fn),effect:fn=>disposers.push(fn()),subagents:{start:async(_kind,request)=>{
+   const child={ctx:{tools:{register:d=>tools.set(d.name,d)}},session:{header:{parentSession:'owner'}}};
+   hooks.get('agent/created')({agent:child});
+   const invoke=(name,args)=>tools.get(name).execute(args,{agent:child,signal:request.signal});
+   prompts.push(JSON.parse(request.prompt[0].text.split('\n').slice(1).join('\n')));
+   await invoke('ui_read_skill',{});await invoke('ui_inspect',{target:'page'});
+   if(prompts.length===2)await invoke('ui_apply',{expectedRevision:'layout',operations:[{op:'replace',slot:'aside',value:{id:'responses',type:'scatterChart',series:[{source:{kind:'dataset',dataset:'measured'}}]}}]});
+   return {id:'child',result:Promise.resolve({stopReason:'completed',structured:{status:prompts.length===1?'unchanged':'applied',summary:'已核对'}}),dispose:async()=>runs++};
+  }}};
+ const call=async(path,body)=>{
+  if(path.endsWith('/observe'))return facts;
+  if(path.includes('node=report.md'))return {document:{file:'report.md',text:'出口取轴向最大值',truncated:false}};
+  if(path.endsWith('/presenter')){states.push(body);return {};}
+  if(body?.operations)ui.aside=body.operations[0].value;
+  return structuredClone(page);
+ };
+ const host=mountPresenter(ctx,call,async()=>'task');
+ try{
+  await host.reviewSaved('task');await until(()=>runs===1);
+  assert.equal(states.at(-1).state,'queued');assert.equal(prompts[0].comparisonReview.report.text,'出口取轴向最大值');
+  now+=13000;host.notify({status:'idle',session:{header:{origin:'interactive'}}});await until(()=>runs===2);
+  assert.match(prompts[1].validationFeedback,/缺少工况比较图/);
+  assert.deepEqual(states.at(-1).operator.comparison.charts,['responses']);assert.equal(states.at(-1).state,'idle');
+ }finally{for(const d of disposers)await d();}
+});
+
 test('a newer display request cancels the old child without publishing a retry error',async()=>{
  let starts=0,disposed=0,signal;const states=[],commits=[];
  const h=setup(async(_provider,request)=>{starts++;if(starts===1){signal=request.signal;return{id:'old',result:new Promise(resolve=>signal.addEventListener('abort',()=>resolve({stopReason:'completed',structured:{update:{rendering:{palette:'gray'}}}}),{once:true})),dispose:async()=>disposed++};}return{id:'new',result:Promise.resolve({stopReason:'completed',structured:{update:{}}}),dispose:async()=>disposed++};},async(path,body)=>{if(path.endsWith('/observe'))return facts();if(path.endsWith('/presenter'))states.push(body);if(path.endsWith('/present'))commits.push(body);return{};});
@@ -29,6 +66,30 @@ test('coalesces observations and does not mutate immutable late child output',as
  const h=setup(async()=>{starts++;return{id:'child',result:new Promise(r=>release=r),dispose:async()=>disposed++};},async(path,body)=>{if(path.endsWith('/observe'))return current;if(path.endsWith('/present')){published=body;return{};}return{};});
  try{h.presenter.notify(h.agent);await until(()=>starts===1);for(let i=0;i<10;i++)h.presenter.notify(h.agent);assert.equal(starts,1);current=facts('two');release({stopReason:'completed',structured:{update:original}});await until(()=>disposed===1);assert(!('progress' in published));assert(!('exports' in published));assert.equal(original.progress.summary,'旧进度');}
  finally{await h.close();}
+});
+
+test('a lost completion receipt for a display request is sent again without regenerating results',async()=>{
+ const updates=[];let starts=0,disposed=0,attempts=0;
+ const h=setup(async()=>{
+  starts++;
+  return{id:'display',result:Promise.resolve({stopReason:'completed',structured:{update:{}}}),dispose:async()=>disposed++};
+ },async(path,body)=>{
+  if(path.endsWith('/observe'))return facts('result','completed');
+  if(path.endsWith('/presenter')){
+   updates.push(body);
+   if(body.state==='idle'&&++attempts===1)throw Error('connection lost');
+  }
+  return {};
+ });
+ try{
+  h.presenter.request('task',7);
+  await until(()=>disposed===1);
+  assert.equal(attempts,1);
+  h.presenter.notify(h.agent);
+  await until(()=>attempts===2);
+  assert.equal(starts,1);
+  assert.ok(updates.every(update=>update.displayRequestRevision===7));
+ }finally{await h.close();}
 });
 
 test('validation failure is sent back to the next native presentation child',async t=>{
@@ -174,7 +235,7 @@ test('the private operator receives the current rendered page before planning an
  }}};
  const call=async path=>path.endsWith('/observe')?{...facts('data','completed'),dataRevision:'data',task:{status:'completed',latestRequest:'调整布局'}}:path.includes('/frontend')?structuredClone(page):{};
  const p=mountPresenter(ctx,call,async()=> 'task');
- try{p.request('task');await until(()=>finished);assert.deepEqual(captured.currentPage,page);assert.deepEqual([...definitions.keys()].sort(),['ui_apply','ui_inspect','ui_read_skill','ui_wait_for_render']);}
+ try{p.request('task');await until(()=>finished);assert.deepEqual(captured.currentPage,page);assert.equal(captured.requestKind,'display-edit');assert.deepEqual([...definitions.keys()].sort(),['ui_apply','ui_inspect','ui_read_skill','ui_wait_for_render']);}
  finally{for(const dispose of disposers)await dispose();}
 });
 
@@ -275,4 +336,21 @@ test('a late browser receipt for an older result cannot swallow a CSV that appea
   page.browser.connected=true;now+=13000;p.notify({status:'idle',session:{header:{origin:'interactive'}}});await until(()=>disposals===2);
   assert.equal(starts,2);assert.equal(states.filter(s=>s.state==='idle').length,1);assert.equal(states.at(-1).dataRevision,'new-csv');
  }finally{for(const dispose of disposers)await dispose();}
+});
+
+test('restart resumes a persisted display request without a workspace change and stops deep polling after its receipt',async t=>{
+ let tick,observations=0,lastState,disposed=0;
+ t.mock.method(globalThis,'setInterval',fn=>{tick=fn;return 1;});t.mock.method(globalThis,'clearInterval',()=>{});
+ const task={id:'task',workspaceRevision:0,status:'completed',presenter:{state:'queued',displayRequestRevision:4}};
+ const h=setup(async()=>({id:'resume',result:Promise.resolve({stopReason:'completed',structured:{update:{}}}),dispose:async()=>disposed++}),async(path,body)=>{
+  if(path==='/api/tasks')return [task];
+  if(path.endsWith('/observe')){observations++;return {...facts('saved','completed'),task:{status:'completed',displayOnly:true},dataRevision:'saved'};}
+  if(path.endsWith('/presenter'))lastState=body;
+  return {};
+ });
+ try{
+  await until(()=>disposed===1);assert.equal(lastState.state,'idle');assert.equal(lastState.displayRequestRevision,4);
+  const count=observations;tick();await delay(15);assert.equal(observations,count);
+  task.workspaceRevision++;tick();await until(()=>observations>count);
+ }finally{await h.close();}
 });

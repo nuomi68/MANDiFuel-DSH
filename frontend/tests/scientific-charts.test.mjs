@@ -2,6 +2,14 @@ import test from 'node:test';import assert from 'node:assert/strict';
 import {chartSVG,heatmapSVG,tableColumns,tableRows,formatCell,chartDataTable,tableCSV} from '../assets/chart-view.js';
 import {resolveSource,studyTable} from '../assets/data-sources.js';
 import {zoomViewport,centeredZoom} from '../assets/chart-navigation.js';
+import {ChartInteraction} from '../assets/chart-interaction.js';
+test('chart legend interaction round-trips numeric series IDs through the agent protocol',()=>{
+ const chart=Object.create(ChartInteraction.prototype);
+ chart.hidden=new Set(['series:1','ref:0']);
+ assert.deepEqual(chart.hiddenSeries,[1]);
+ chart.hiddenSeries=[2];assert.deepEqual([...chart.hidden],['ref:0','series:2']);
+ chart.hiddenSeries=[];assert.deepEqual([...chart.hidden],['ref:0']);
+});
 const table={columns:[{id:'x',label:'时间',unit:'s'},{id:'value',label:'温度',unit:'K'}],rows:[{x:0,value:300},{x:1,value:320},{x:2,value:310}]};
 test('mixed marks preserve requested marker, line style, step and target bands in exported SVG',()=>{
  const svg=chartSVG({id:'mixed',type:'chart',references:[{axis:'y',from:305,to:315,label:'容差',color:'#008800'},{axis:'x',value:1,label:'阶段分界'}]},[{label:'实际点',mark:'scatter',marker:'square',color:'#ff8800',table},{label:'最好值',mark:'line',step:true,dash:'dash',color:'#008800',table}]);

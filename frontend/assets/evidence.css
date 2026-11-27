@@ -5,3 +5,7 @@
 .evidence-check,.evidence-sources details{border-bottom:1px solid var(--line,#e2e5ec);padding:12px 0}.evidence-content summary{cursor:pointer;line-height:1.7;overflow-wrap:anywhere}.evidence-content pre{font:12px/1.65 ui-monospace,monospace;white-space:pre-wrap;overflow-wrap:anywhere;background:#f7f8fa;padding:12px;border-radius:7px}.evidence-sources code{display:block;font-size:11px;word-break:break-all;margin:10px 0}.adaptive-evidence-citations{display:flex;flex-wrap:wrap;gap:8px;padding:10px 16px;border-top:1px solid var(--line,#e2e5ec);font-size:12px}.adaptive-evidence-citations button{font-size:12px}
 @media(max-width:650px){.evidence-drawer{inset:8px 8px auto auto;width:calc(100vw - 16px);max-height:calc(100vh - 16px)}.evidence-content{padding:12px;max-height:calc(100vh - 92px)}}
 .evidence-content pre,.evidence-sources code{font-family:ui-monospace,"Workbench CJK",monospace}
+
+.evidence-group summary{cursor:pointer;line-height:1.6}
+.evidence-case-links{display:flex;flex-wrap:wrap;gap:8px 16px;margin:8px 0 2px}
+.evidence-origin{display:block;color:var(--muted,#687183);font-size:12px;margin-top:3px;overflow-wrap:anywhere}

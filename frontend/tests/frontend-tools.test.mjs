@@ -55,3 +55,31 @@ test('a generated layout gets one real selection check, also when the presenter 
  assert.equal(count,1);assert.equal(session.selectionCheck.status,'verified');
  await verifyRenderedSelection({checkSelection:true},{browser:{model:{kind:'mesh'},browserId:'live'}},call,'task');assert.equal(count,1);
 });
+
+test('receipt versions take precedence over old render errors and late browser reports',()=>{
+ const wanted={uiRevision:3,presentationVersion:5},page={browser:{connected:true,ready:true,revision:2,presentationVersion:4,errors:[{id:'old'}]}};
+ assert.equal(renderConfirmation(page,wanted),'pending');
+ page.presentationVersion=6;assert.equal(renderConfirmation(page,wanted),'stale');
+ page.presentationVersion=5;Object.assign(page.browser,{revision:3,presentationVersion:5});assert.equal(renderConfirmation(page,wanted),'error');
+});
+
+test('a table-only page can confirm without a viewer while retaining real component errors',()=>{
+ const page={modelRequirement:{required:false},viewer:{rendererError:'obsolete',revision:1},browser:{connected:true,ready:true,presentationVersion:4,errors:[]}};
+ const expected={presentationVersion:4,viewStateRevision:2};
+ assert.equal(renderConfirmation(page,expected),'confirmed');
+ delete page.browser.ready;assert.equal(renderConfirmation(page,expected),'pending');
+ page.browser.errors.push({id:'table'});assert.equal(renderConfirmation(page,expected),'error');
+});
+
+test('only selection-bearing edits trigger automatic switching and an explicit check needs proof',async()=>{
+ const h=setup();await h.call('ui_read_skill');await h.call('ui_inspect',{target:'page'});
+ const tabs={id:'notes',type:'tabs',children:[{id:'a',type:'text',text:'甲'},{id:'b',type:'text',text:'乙'}]};
+ await h.call('ui_apply',{expectedRevision:'r1',operations:[{slot:'main',op:'insert',value:tabs}]});
+ assert.equal(!!h.session.checkSelection,false);
+ await h.call('ui_apply',{expectedRevision:'r2',operations:[{slot:'main',op:'update',props:{source:{kind:'dataset',selection:{viewColumn:'view'}}}}]});
+ assert.equal(h.session.checkSelection,true);
+ h.session.selectionCheck={status:'not-applicable'};
+ assert.equal((await h.call('ui_wait_for_render',{timeoutMs:0})).status,'confirmed');
+ assert.equal((await h.call('ui_wait_for_render',{verifySelection:true,timeoutMs:0})).status,'selection-unconfirmed');
+ assert.equal(h.session.confirmed,false);
+});

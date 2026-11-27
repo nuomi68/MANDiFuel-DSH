@@ -19,10 +19,14 @@ export class NativeHarness{
   window.addEventListener('visibilitychange',()=>{if(!document.hidden)this.reconcile();});
  }
  receive(meta){if(!this.snapshots.accept(meta))return false;if(this.current?.id===meta.id)this.current=meta;if(this.defaultTask?.id===meta.id)this.defaultTask=meta;this.cb.onMeta(meta);return true;}
+ receiveSnapshot(snapshot){
+  const receipts=[...(snapshot.files||[]),...(snapshot.inputs||[])].filter(f=>f.path==='prepare.json'||f.path.endsWith('/prepare.json'));
+  return this.receive({...snapshot.task,inputReceipts:receipts});
+ }
  async reconcile(){
   if(this.polling||document.hidden||!this.current)return;
   const selection=this.selection,id=this.current.id;this.polling=true;
-  try{const r=await fetch(`${BASE}/api/tasks/${id}`,{credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(10000)});if(r.ok){const snapshot=await r.json();if(selection===this.selection&&this.current?.id===id)this.receive(snapshot.task);}}
+  try{const r=await fetch(`${BASE}/api/tasks/${id}`,{credentials:'same-origin',cache:'no-store',signal:AbortSignal.timeout(10000)});if(r.ok){const snapshot=await r.json();if(selection===this.selection&&this.current?.id===id)this.receiveSnapshot(snapshot);}}
   catch{/* Keep the last known state while SSE and recovery reads reconnect. */}
   finally{this.polling=false;}
  }
@@ -43,8 +47,8 @@ export class NativeHarness{
  async retry(){try{await this.init();await this.cb.onReconnect();}catch(error){this.connectionError(error);}}
  sync(){const dialog=$('dsh-window'),mobile=this.media.matches;$('workspace-body').classList.toggle('chat-open',this.open&&!mobile);this.moving=true;if(dialog.open&&(!this.open||dialog.matches(':modal')))dialog.close();if(this.open&&!dialog.open)dialog.show();const visible=dialog.open;$('conversation-column').hidden=!visible;$('dsh-button').setAttribute('aria-expanded',String(visible));$('dsh-button').setAttribute('aria-pressed',String(visible));$('dsh-button').setAttribute('aria-label',visible?'收起 DSH 对话':'打开 DSH 对话');this.moving=false;window.dispatchEvent(new Event('workbench-layout'));}
  toggle(value=!this.open){this.open=value;this.sync();}
- async select(task){const selection=++this.selection;this.events?.close();this.events=null;this.current=task;this.navigate();const r=await fetch(`${BASE}/api/tasks/${task.id}`,{cache:'no-store'}),snapshot=await r.json();if(!r.ok)throw new Error(snapshot.error);if(selection!==this.selection)return null;if(!this.receive(snapshot.task))this.current=this.snapshots.get(task.id);this.navigate();
-  this.events=new EventSource(`${BASE}/api/tasks/${task.id}/stream`);this.events.addEventListener('snapshot',event=>{if(selection!==this.selection)return;this.receive(JSON.parse(event.data).task);});this.events.addEventListener('state',event=>{if(selection!==this.selection)return;if(this.receive(JSON.parse(event.data))&&this.current.resultReady)this.cb.onResult({ready:true});});this.events.addEventListener('selection-check',event=>{if(selection===this.selection)this.cb.onSelectionCheck?.(task.id,JSON.parse(event.data));});this.events.addEventListener('error',()=>{if(selection===this.selection)this.reconcile();});
+ async select(task){const selection=++this.selection;this.events?.close();this.events=null;this.current=task;this.navigate();const r=await fetch(`${BASE}/api/tasks/${task.id}`,{cache:'no-store'}),snapshot=await r.json();if(!r.ok)throw new Error(snapshot.error);if(selection!==this.selection)return null;if(!this.receiveSnapshot(snapshot))this.current=this.snapshots.get(task.id);this.navigate();
+  this.events=new EventSource(`${BASE}/api/tasks/${task.id}/stream`);this.events.addEventListener('snapshot',event=>{if(selection!==this.selection)return;this.receiveSnapshot(JSON.parse(event.data));});this.events.addEventListener('state',event=>{if(selection!==this.selection)return;if(this.receive(JSON.parse(event.data))&&this.current.resultReady)this.cb.onResult({ready:true});});this.events.addEventListener('selection-check',event=>{if(selection===this.selection)this.cb.onSelectionCheck?.(task.id,JSON.parse(event.data));});this.events.addEventListener('error',()=>{if(selection===this.selection)this.reconcile();});
   this.reconcileTimer??=setInterval(()=>this.reconcile(),5000);return snapshot;
  }
 }

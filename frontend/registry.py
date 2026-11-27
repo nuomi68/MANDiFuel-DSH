@@ -24,6 +24,21 @@ SOLVER_GUIDANCE='你是 OFFBEAT 计算运行助手。使用准备好的 MANDiFue
 
 def now():return datetime.now(timezone.utc).isoformat()
 def latest_request(meta):return meta.get('latestDisplayPrompt') or meta.get('latestPrompt') or meta.get('prompt','')
+
+
+def current_render_errors(meta):
+    presentation=meta.get('presentation',{})
+    browser=meta.get('uiState',{})
+    viewer=meta.get('viewerState',{})
+    errors={}
+    if (browser.get('errors') and browser.get('revision')==presentation.get('uiRevision',0)
+            and ('presentationVersion' not in browser or browser['presentationVersion']==meta.get('presentationVersion',0))):
+        errors['uiErrors']=browser['errors']
+    if viewer.get('rendererError') and viewer.get('revision',0)==presentation.get('viewStateRevision',0):
+        errors['rendererError']=viewer['rendererError']
+    return errors
+
+
 def read_json(path):
     if path.stat().st_size>MAX_JSON:raise ValueError('交付文件超过 64 MB，请拆分结果')
     return json.loads(path.read_text(),parse_constant=lambda s:(_ for _ in ()).throw(ValueError('非有限数值')))
@@ -101,9 +116,14 @@ class TaskRegistry:
                     if 'bundle' in view:validate_bundle(view['bundle'])
                     else:inside(p.parent/'workspace',view['source'])
                 self.jobs[meta['id']]={'meta':meta,'workspace':p.parent.resolve()/'workspace','bundle':bundle,'views':views,'journal':deque(maxlen=1000),'seq':0}
+                interrupted_display='displayRequestRevision' in meta.get('presenter',{})
+                if interrupted_display:
+                    meta['presenter']={'state':'warning','message':'工作台已重启，上次显示调整尚未确认'}
                 if 'progressHistory' not in meta:
                     meta['progressHistory']=[];meta['progressHistoryComplete']=False
-                    record_progress(meta,timestamp=meta.get('updatedAt',meta.get('createdAt')),restored=True);self._save(self.jobs[meta['id']])
+                    record_progress(meta,timestamp=meta.get('updatedAt',meta.get('createdAt')),restored=True)
+                    self._save(self.jobs[meta['id']])
+                elif interrupted_display:self._save(self.jobs[meta['id']])
             except (ValueError,KeyError,OSError):continue
         # Retire the previously generated UI instructions without changing case
         # inputs or rewriting historical session transcripts.
@@ -148,12 +168,14 @@ class TaskRegistry:
         for row in viewrows:
             view=views[row['id']]
             from source_metadata import case_time_unit
-            try:
-                case=inside(job['workspace'],view.get('caseRoot') or view.get('bundle',{}).get('caseRoot',''))
-                row['caseRoot']=str(case.relative_to(job['workspace'].resolve()))
-                verified_unit=case_time_unit(case)
-                if verified_unit:row['task']['timeUnit']=verified_unit
-            except (OSError,ValueError):pass
+            root=view.get('caseRoot') or view.get('bundle',{}).get('caseRoot')
+            if root:
+                try:
+                    case=inside(job['workspace'],root)
+                    row['caseRoot']=str(case.relative_to(job['workspace'].resolve()))
+                    verified_unit=case_time_unit(case)
+                    if verified_unit:row['task']['timeUnit']=verified_unit
+                except (OSError,ValueError):pass
             if 'coordinateBounds' not in view and 'bundle' in view:
                 data=view['bundle']['data'];mesh=data.get('mesh')
                 if mesh is None and data.get('meshes') and data.get('frames'):mesh=data['meshes'].get(data['frames'][0].get('mesh'))
@@ -181,6 +203,8 @@ class TaskRegistry:
         case_events=[e for e in m.get('workspaceWatch',{}).get('events',[]) if e.get('kind')=='case']
         result['modelExpected']=bool(primary_task or result['study'] or case_events or m.get('processState',{}).get('cases') or m['status']!='completed')
         result['evidence']=copy.deepcopy(m.get('evidence',{}))
+        issues=current_render_errors(m)
+        if issues:result['renderIssue']=hashlib.sha256(json.dumps(issues,sort_keys=True).encode()).hexdigest()[:16]
         result.pop('code',None);return result
     def list(self):
         with self.lock:return [self.public(j) for j in sorted(self.jobs.values(),key=lambda j:j['meta']['createdAt'],reverse=True)]
@@ -230,6 +254,18 @@ class TaskRegistry:
             for ident,job in self.jobs.items():
                 if Path(cwd).resolve()==job['workspace'].resolve():self.bind(ident,session_id);return {'taskId':ident}
         return {'taskId':None}
+    def set_presenter(self,ident,data):
+        with self.lock:
+            job=self._job(ident)
+            presenter=dict(data)
+            if presenter.get('displayRequestRevision')!=job['meta'].get('presenter',{}).get('displayRequestRevision'):
+                return False
+            if presenter.get('state') not in {'queued','running','waiting'}:
+                presenter.pop('displayRequestRevision',None)
+            job['meta']['presenter']=presenter
+            self._save(job)
+            self._emit(job,'state',self.public(job))
+            return True
     def native_event(self,ident,payload):
         with self.lock:
             job=self._job(ident);meta=job['meta'];kind=payload['kind'];meta['updatedAt']=now()
@@ -243,6 +279,7 @@ class TaskRegistry:
                 text=payload.get('text','').strip()
                 if text:
                     meta.pop('latestDisplayPrompt',None)
+                    meta.get('presenter',{}).pop('displayRequestRevision',None)
                     meta['latestPrompt']=text;meta['promptRevision']=meta.get('promptRevision',0)+1
                     presentation=dict(meta.get('presentation',{}));presentation.pop('deliveryRequirements',None);presentation['progress']={'summary':'正在处理新请求' if meta['promptRevision']>1 else '正在准备任务','stages':[]};meta['presentation']=presentation;meta['presentationVersion']=meta.get('presentationVersion',0)+1
                     if meta.get('draft'):meta.update(prompt=text,title=text.splitlines()[0][:24],draft=False);(job['workspace']/'request.txt').write_text(text)
@@ -252,6 +289,8 @@ class TaskRegistry:
                 meta['latestDisplayPrompt']=text;meta['displayPromptRevision']=meta.get('displayPromptRevision',0)+1
                 presentation=dict(meta.get('presentation',{}));presentation.pop('deliveryRequirements',None);meta['presentation']=presentation;meta['presentationVersion']=meta.get('presentationVersion',0)+1
                 meta['presenter']={'state':'queued','message':'等待更新展示'}
+                if meta['status'] in {'completed','failed','stopped','interrupted'}:
+                    meta['presenter']['displayRequestRevision']=meta['displayPromptRevision']
             elif kind=='failure':
                 meta['status']='failed';meta['error']=payload.get('error','原生会话创建失败');presentation=dict(meta.get('presentation',{}));presentation['progress']={'summary':'本轮执行失败','stages':[]};meta['presentation']=presentation;meta['presentationVersion']=meta.get('presentationVersion',0)+1
             elif kind=='tool':

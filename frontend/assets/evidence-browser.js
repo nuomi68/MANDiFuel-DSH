@@ -3,41 +3,73 @@ export const evidenceLabels={verified:'本项通过',failed:'超出本项标准'
 const el=(tag,text,cls)=>{const n=document.createElement(tag);if(text!==undefined)n.textContent=text;if(cls)n.className=cls;return n;};
 export const evidenceNumber=value=>typeof value==='number'?(value!==0&&(Math.abs(value)<.001||Math.abs(value)>=1e5)?value.toExponential(6):Number(value.toPrecision(8)).toString()):'—';
 const unitLabel=unit=>unit==='1'?'（无量纲）':unit;
-export function evidenceLink(claim,open){
- const button=el('button',claim.title+' · '+evidenceNumber(claim.value)+' '+unitLabel(claim.unit)+(claim.status==='stale'?'（证据已变化）':''),'evidence-claim-link');button.type='button';button.dataset.evidenceId=claim.id;button.title='查看响应定义、核查范围和原始文件';button.addEventListener('click',()=>open(claim.id));return button;
+export function evidenceLink(claim,open,label){
+ const button=el('button',label??(claim.title+' · '+evidenceNumber(claim.value)+' '+unitLabel(claim.unit)+(claim.status==='stale'?'（证据已变化）':'')),'evidence-claim-link');button.type='button';button.dataset.evidenceId=claim.id;button.title='查看响应定义、核查范围和原始文件';button.addEventListener('click',()=>open(claim.id));return button;
+}
+// Only execution receipts with the same meaning may share a summary.
+export function evidenceGroups(claims){
+ const groups=[],endpoints=new Map();
+ for(const claim of claims){
+  if(claim.key!=='execution.final_time'){groups.push([claim]);continue;}
+  const key=JSON.stringify([claim.value,claim.unit,claim.timeUnit,claim.status,claim.execution]);
+  if(!endpoints.has(key)){const group=[];endpoints.set(key,group);groups.push(group);}
+  endpoints.get(key).push(claim);
+ }
+ const priority=([c])=>(['failed','stale','not_verified'].includes(c.status)?0:2)+Number(c.key==='execution.final_time');
+ return groups.sort((a,b)=>priority(a)-priority(b));
 }
 function status(value){const n=el('span',evidenceLabels[value]||value,'evidence-status');n.dataset.state=value;return n;}
 function describe(value){return typeof value==='string'?value:JSON.stringify(value,null,2);}
 
 export class EvidenceBrowser{
  constructor({button,dialog,onData}){
-  Object.assign(this,{button,dialog,onData});this.task=null;this.data=null;this.generation=0;this.selected=null;this.map=new Map();this.loaded=null;
+  Object.assign(this,{button,dialog,onData});this.task=null;this.data=null;this.indexRequest=null;this.detailRequest=null;this.selected=null;this.map=new Map();this.loaded=null;
   this.content=dialog.querySelector('[data-evidence-content]');this.subtitle=dialog.querySelector('[data-evidence-subtitle]');
   button.addEventListener('click',()=>this.open());dialog.querySelector('[data-evidence-close]').addEventListener('click',()=>dialog.close());
-  dialog.querySelector('[data-evidence-back]').addEventListener('click',()=>{this.selected=null;this.renderIndex();});
-  dialog.addEventListener('close',()=>{button.setAttribute('aria-expanded','false');});
+  dialog.querySelector('[data-evidence-back]').addEventListener('click',()=>{void this.open();});
+  dialog.addEventListener('close',()=>{if(dialog.open)return;this.cancelDetail();button.setAttribute('aria-expanded','false');});
   this.timer=setInterval(()=>{if(this.dialog.open)this.refresh();},5000);
-  window.addEventListener('pagehide',()=>{this.request?.abort();clearInterval(this.timer);});
+  window.addEventListener('pagehide',()=>{this.indexRequest?.abort();this.cancelDetail();clearInterval(this.timer);});
  }
  async api(query='',signal){const r=await fetch(`/workbench/api/tasks/${this.task.id}/evidence${query}`,{credentials:'same-origin',cache:'no-store',signal});const data=await r.json();if(!r.ok)throw new Error(data.error||'核查记录暂时无法读取');return data;}
  setTask(task){
   const changed=task?.id!==this.task?.id;this.task=task;this.button.disabled=!task;
-  if(changed){this.request?.abort();this.generation++;this.loaded=null;this.selected=null;this.data=null;this.map=new Map();this.content.replaceChildren();if(this.dialog.open)this.dialog.close();}
+  if(changed){this.indexRequest?.abort();this.indexRequest=null;this.cancelDetail();this.loaded=null;this.data=null;this.map=new Map();this.content.replaceChildren();if(this.dialog.open)this.dialog.close();}
   const key=task?JSON.stringify([task.id,task.evidence?.revision]):null;
   if(task&&key!==this.loaded){this.loaded=key;void this.refresh();}
  }
+ cancelDetail(){
+  this.detailRequest?.abort();this.detailRequest=null;this.selected=null;this.detailRevision=null;
+ }
  async refresh(){
-  if(!this.task)return;this.request?.abort();const controller=new AbortController();this.request=controller;const generation=++this.generation;
+  if(!this.task||this.indexRequest)return;
+  const controller=new AbortController();this.indexRequest=controller;
+  const requested=this.loaded;
   try{
-   const data=await this.api('',controller.signal);if(generation!==this.generation)return;
-   const changed=data.revision!==this.data?.revision;this.data=data;this.map=new Map(data.claims.map(c=>[c.id,c]));
-   if(changed)this.onData?.();
-   if(this.dialog.open){if(this.selected)await this.select(this.selected,generation);else this.renderIndex();}
-  }catch(error){if(error.name!=='AbortError'&&generation===this.generation&&this.dialog.open)this.content.replaceChildren(el('p',error.message));}
+   const data=await this.api('',controller.signal);if(controller.signal.aborted)return;
+   const changed=data.revision!==this.data?.revision;this.data=data;
+   if(changed){this.map=new Map(data.claims.map(c=>[c.id,c]));this.onData?.();}
+   if(this.dialog.open){
+    if(this.selected){if(!this.detailRequest&&this.detailRevision!==this.claimRevision(this.selected))void this.select(this.selected);}
+    else if(changed||!this.content.querySelector('.evidence-note'))this.renderIndex();
+   }
+  }catch(error){if(!controller.signal.aborted&&this.dialog.open&&!this.selected&&!this.data)this.content.replaceChildren(el('p',error.message));}
+  finally{if(this.indexRequest===controller){this.indexRequest=null;if(requested!==this.loaded)void this.refresh();}}
+ }
+ claimRevision(id){
+  const claim=this.map.get(id),row=claim&&this.data?.cases.find(c=>c.caseRoot===claim.caseRoot);
+  return JSON.stringify([row?.revision,row?.state,claim?.status,claim?.execution]);
  }
  async open(id=null){
-  if(!this.task)return;this.selected=id;this.dialog.show();this.button.setAttribute('aria-expanded','true');
-  this.content.replaceChildren(el('p','正在读取原始证据核查记录…'));await this.refresh();
+  if(!this.task)return;
+  if(!this.dialog.open)this.dialog.show();
+  this.button.setAttribute('aria-expanded','true');
+  if(id&&id===this.selected&&this.detailRequest)return;
+  this.cancelDetail();this.selected=id;
+  this.dialog.querySelector('[data-evidence-back]').hidden=!id;
+  if(!id&&this.data)this.renderIndex();
+  else{this.subtitle.textContent=this.map.get(id)?.caseRoot||'';this.content.replaceChildren(el('p','正在读取原始证据核查记录…'));}
+  if(id)await this.select(id);else await this.refresh();
  }
  renderIndex(){
   const data=this.data;if(!data)return;
@@ -58,9 +90,18 @@ export class EvidenceBrowser{
   }
   if(!data.cases.length)this.content.append(el('p','保存场到达并稳定后，独立程序会自动核查。网格预览和未求解的初值不作为已完成结果。'));
  }
- async select(id,generation=this.generation){
-  const data=await this.api('?claim='+encodeURIComponent(id),this.request?.signal);if(generation!==this.generation)return;
-  const q=data.claim;this.selected=id;this.dialog.querySelector('[data-evidence-back]').hidden=false;this.subtitle.textContent=q.caseRoot;
+ async select(id){
+  const controller=new AbortController();this.detailRequest=controller;
+  const revision=this.claimRevision(id);
+  try{
+   const data=await this.api('?claim='+encodeURIComponent(id),controller.signal);
+   if(controller.signal.aborted||this.selected!==id)return;
+   this.detailRevision=revision;this.renderDetail(id,data);
+  }catch(error){if(!controller.signal.aborted&&this.selected===id)this.content.replaceChildren(el('p',error.message));}
+  finally{if(this.detailRequest===controller)this.detailRequest=null;}
+ }
+ renderDetail(id,data){
+  const q=data.claim;this.dialog.querySelector('[data-evidence-back]').hidden=false;this.subtitle.textContent=q.caseRoot;
   this.content.replaceChildren(el('h3',q.title));
   const context=el('p',evidenceNumber(q.value)+' '+unitLabel(q.unit)+' · 保存时刻 '+q.time+' '+(q.timeUnit||'单位未核实'));context.append(document.createTextNode(' '),status(q.status));this.content.append(context);
   if(data.state!=='ready')this.content.append(el('p','原始证据已变化；以下为历史核查定义，不能当作当前已核验结果。','evidence-note'));

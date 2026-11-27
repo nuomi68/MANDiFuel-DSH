@@ -17,6 +17,14 @@ class RegistryTests(unittest.TestCase):
         (delivery/'viewer.json').write_text(json.dumps(bundle));manifest={'schema':'mandifuel.handoff/v1','inputs':['case/system/controlDict']}
         if viewer:manifest['viewer']='delivery/viewer.json'
         (delivery/'workbench.json').write_text(json.dumps(manifest));return bundle
+    def test_unbound_model_cannot_inherit_workspace_root_inputs(self):
+        bundle=self.handoff()
+        job=self.registry._job(self.ident)
+        for declared,expected in [(None,None),('.','.'),('case','case')]:
+            bundle.pop('caseRoot',None)
+            if declared:bundle['caseRoot']=declared
+            job['views']={'selected':{'label':'当前模型','bundle':bundle}}
+            self.assertEqual(self.registry.public(job)['views'][0].get('caseRoot'),expected)
     def finish(self):
         self.registry.native_event(self.ident,{'kind':'status','status':'running'});self.registry.native_event(self.ident,{'kind':'turn','reason':'completed'});self.registry.native_event(self.ident,{'kind':'status','status':'idle'});return self.registry.snapshot(self.ident)
     def test_solver_workspace_has_no_ui_contract_or_frontend_instructions(self):
@@ -51,7 +59,38 @@ class RegistryTests(unittest.TestCase):
         self.assertTrue(self.registry.dashboard.inspect(self.ident)['task']['displayOnly'])
         self.registry.native_event(self.ident,{'kind':'prompt','text':'修改真实材料后重算'})
         self.assertNotIn('latestDisplayPrompt',job['meta'])
+        self.assertNotIn('displayRequestRevision',job['meta']['presenter'])
         self.assertFalse((self.work/'WORKBENCH.md').exists());self.assertFalse((self.work/'STUDY_HANDOFF.md').exists())
+
+    def test_only_explicit_requests_after_exit_keep_their_waiting_state(self):
+        self.registry.native_event(self.ident,{'kind':'status','status':'running'})
+        def request(text):
+            return self.registry.native_event(self.ident,{'kind':'display-prompt','text':text})['task']['presenter']
+        self.assertNotIn('displayRequestRevision',request('计算中调整色带'))
+        self.finish()
+        for terminal in ['idle','error','warning']:
+            first=request('修改颜色')
+            second=request('调整曲线')
+            self.assertGreater(second['displayRequestRevision'],first['displayRequestRevision'])
+            self.assertFalse(self.registry.set_presenter(self.ident,{'state':'idle'}))
+            self.assertFalse(self.registry.set_presenter(self.ident,dict(first,state='idle')))
+            for state in ['queued','running','waiting',terminal]:
+                self.assertTrue(self.registry.set_presenter(self.ident,dict(second,state=state)))
+                public=self.registry.snapshot(self.ident)['task']['presenter']
+                self.assertEqual(public['state'],state)
+                self.assertEqual(public.get('displayRequestRevision'),None if state==terminal else second['displayRequestRevision'])
+            self.assertFalse(self.registry.set_presenter(self.ident,dict(second,state='running')))
+            self.assertTrue(self.registry.set_presenter(self.ident,{'state':'queued'}))
+            self.assertNotIn('displayRequestRevision',self.registry.snapshot(self.ident)['task']['presenter'])
+
+    def test_restart_closes_pending_display_feedback(self):
+        self.finish()
+        self.registry.native_event(self.ident,{'kind':'display-prompt','text':'调整曲线'})
+        self.registry.close();self.registry=TaskRegistry(self.registry.root)
+        task=self.registry.snapshot(self.ident)['task']
+        self.assertEqual(task['status'],'completed')
+        self.assertEqual(task['presenter']['state'],'warning')
+        self.assertNotIn('displayRequestRevision',task['presenter'])
 
     def test_native_completion_imports_real_mapping(self):
         self.handoff();s=self.finish();self.assertTrue(s['task']['resultReady']);self.assertEqual(s['task']['resultVersion'],1);self.assertEqual(len(s['inputs']),1)

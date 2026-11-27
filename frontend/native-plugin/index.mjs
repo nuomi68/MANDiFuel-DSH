@@ -33,6 +33,8 @@ export async function apply(ctx){
    if(!ctx.connection.authorizeIndex(request,response))return;
   }else{const rejection=ctx.connection.requestRejection(req);if(rejection)return json(res,rejection,{error:'请使用原生 Harness 启动链接登录'});}
   if(url.pathname==='/workbench'){res.writeHead(302,{Location:'/workbench/'+url.search});res.end();return;}
+  const opened=req.method==='GET'&&relative.match(/^\/api\/tasks\/(task-[a-f0-9]+)\/stream$/);
+  if(opened)void presenter.reviewSaved?.(opened[1]);
   if(req.method==='POST'&&(relative==='/api/tasks'||relative==='/api/bootstrap')){
    let prepared;
    try{

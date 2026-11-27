@@ -278,9 +278,25 @@ def history_facts(work,files):
         if spec.get('kind')!='history':continue
         try:
             rows=read_json(inside(work,spec['path']));samples=[]
+            if not isinstance(rows,list):continue
             for row in rows[:3]:
+                if not isinstance(row,dict):continue
                 sample={k:row[k] for k in ['point','status','response','reporting_response','result_root'] if k in row}
                 if len(json.dumps(sample))<=6000:samples.append(sample)
-            result.append({'file':spec['path'],'count':len(rows),'samples':samples})
+            # A history can begin with failures. Look for repeated measurements
+            # over distinct completed points independently of the short preview.
+            measured={}
+            for row in rows:
+                if not isinstance(row,dict) or row.get('status')!='completed':continue
+                point=row.get('point')
+                ident=point.get('id') if isinstance(point,dict) else None
+                if not isinstance(ident,(str,int)):continue
+                for source in ('response','reporting_response'):
+                    values=row.get(source)
+                    for key,value in (values.items() if isinstance(values,dict) else [('',values)]):
+                        if type(value) in (int,float) and math.isfinite(value):
+                            measured.setdefault(source+('.'+key if key else ''),set()).add(ident)
+            comparable={key:len(ids) for key,ids in measured.items() if len(ids)>=2}
+            result.append({'file':spec['path'],'count':len(rows),'samples':samples,'comparableResponses':comparable})
         except (ValueError,OSError):continue
     return result[:4]

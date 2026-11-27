@@ -1,3 +1,4 @@
+import {readbackSections,receiptFor,caseParameterSections} from './model-parameters.js';
 import {EvidenceBrowser} from './evidence-browser.js';
 import {ModelViewer} from './model-viewer.js';
 import {gradient,stops,showScaleControls} from './render-style.js';
@@ -213,7 +214,8 @@ function availableControls(){
   return true;
  }).map(c=>c.id==='cameraView'&&!c.parameter?{...c,default:c.default==='3d'?'auto':c.default,options:c.options?.filter(o=>o.value!=='3d')}:c);
 }
-function applyPresentation(){const key=task?`${task.id}:${task.presentationVersion||0}:${state.view||''}`:null;if(key===presentationKey){syncAdaptiveUI();return;}presentationKey=key;const nextParameters=JSON.stringify([task?.id,task?.presentation?.parameterRevision||0,(task?.presentation?.controls||[]).filter(c=>c.parameter)]);if(nextParameters!==parameterKey){clearTimeout(parameterSyncTimer);parameterKey=nextParameters;state.parameters=Object.fromEntries((task?.presentation?.controls||[]).filter(c=>c.parameter).map(c=>[c.id,task?.presentation?.parameterValues?.[c.id]??c.default]));}const nextRendering=JSON.stringify([task?.id,task?.presentation?.renderingRevision||0,task?.presentation?.rendering||{}]);if(nextRendering!==renderingKey){renderingKey=nextRendering;for(const name of overrides.keys())if(renderIds.some(id=>name.endsWith(':'+id)))overrides.delete(name);Object.assign(state,{scale:'fixed',scaleX:1,scaleY:1,scaleZ:1,palette:'coolwarm',reversePalette:false,opacity:1,background:'#fbfbfc',wireColor:'#5b6472',colorMin:0,colorMax:1});for(const[id,value]of Object.entries(renderingBindings()))if(value!==undefined)state[id]=value;}for(const c of availableControls()){if(c.parameter)continue;const name=`${task.id}:${state.view}:${c.id}`;if(c.id!=='view'){if(overrides.has(name))state[c.id]=overrides.get(name);else if(renderingBindings()[c.id]!==undefined)state[c.id]=renderingBindings()[c.id];else if(c.default!==undefined)state[c.id]=c.default;}}els['cut-button'].hidden=!availableControls().some(c=>c.id==='cut');syncViewerShortcuts();if(!fields&&task?.presentation?.parameters?.length){document.querySelector('.result-bar').hidden=false;document.querySelector('.result-metrics').hidden=true;els['parameters-button'].disabled=false;}if(els.drawer.open&&drawerView==='parameters')renderParameters();if(els.drawer.open&&drawerView==='settings')renderSettings();if(fields&&loadedVersion?.endsWith(`:${state.view||''}`))refresh();syncAdaptiveUI();}
+function currentReceipt(){return receiptFor(task?.inputReceipts,activeView()?.caseRoot);}
+function applyPresentation(){const receipt=currentReceipt();const key=task?`${task.id}:${task.presentationVersion||0}:${state.view||''}:${receipt?.modifiedNs||receipt?.bytes||''}`:null;if(key===presentationKey){syncAdaptiveUI();return;}presentationKey=key;const nextParameters=JSON.stringify([task?.id,task?.presentation?.parameterRevision||0,(task?.presentation?.controls||[]).filter(c=>c.parameter)]);if(nextParameters!==parameterKey){clearTimeout(parameterSyncTimer);parameterKey=nextParameters;state.parameters=Object.fromEntries((task?.presentation?.controls||[]).filter(c=>c.parameter).map(c=>[c.id,task?.presentation?.parameterValues?.[c.id]??c.default]));}const nextRendering=JSON.stringify([task?.id,task?.presentation?.renderingRevision||0,task?.presentation?.rendering||{}]);if(nextRendering!==renderingKey){renderingKey=nextRendering;for(const name of overrides.keys())if(renderIds.some(id=>name.endsWith(':'+id)))overrides.delete(name);Object.assign(state,{scale:'fixed',scaleX:1,scaleY:1,scaleZ:1,palette:'coolwarm',reversePalette:false,opacity:1,background:'#fbfbfc',wireColor:'#5b6472',colorMin:0,colorMax:1});for(const[id,value]of Object.entries(renderingBindings()))if(value!==undefined)state[id]=value;}for(const c of availableControls()){if(c.parameter)continue;const name=`${task.id}:${state.view}:${c.id}`;if(c.id!=='view'){if(overrides.has(name))state[c.id]=overrides.get(name);else if(renderingBindings()[c.id]!==undefined)state[c.id]=renderingBindings()[c.id];else if(c.default!==undefined)state[c.id]=c.default;}}els['cut-button'].hidden=!availableControls().some(c=>c.id==='cut');syncViewerShortcuts();if(!fields&&task?.presentation?.parameters?.length){document.querySelector('.result-bar').hidden=false;document.querySelector('.result-metrics').hidden=true;els['parameters-button'].disabled=false;}if(els.drawer.open&&drawerView==='parameters')renderParameters();if(els.drawer.open&&drawerView==='settings')renderSettings();if(fields&&loadedVersion?.endsWith(`:${state.view||''}`))refresh();syncAdaptiveUI();}
 function values(id=state.field){return fields.series?fields.frames[state.frame].fields[id]:fields[id];}
 function frame(){return fields?.frames?.[state.frame];}
 function timeText(){return frame()?`${clock(frame().time)} ${model?.timeUnit||'s'}`:'稳态';}
@@ -283,7 +285,7 @@ function stop(){if(interval){clearInterval(interval);interval=null;}els['play-bu
 function play(){if(!task||!fields?.frames||fields.frames.length<=1)return;if(interval){stop();remember();return;}if(state.frame===fields.frames.length-1)state.frame=0;refresh();els['play-button'].innerHTML=icon('pause');els['play-button'].setAttribute('aria-label','暂停时间序列');interval=setInterval(()=>{if(state.frame>=fields.frames.length-1){stop();remember();announce('已播放至最终时刻');return;}state.frame++;refresh();},500);}
 
 function openDrawer(view){
- if(!task&&view!=='tasks')return;stop();closeMenus();drawerView=view;els.drawer.dataset.view=view;drawerToken++;
+ if(!task&&view!=='tasks')return;stop();closeMenus();drawerView=view;els.drawer.dataset.view=view;drawerToken++;els['drawer-content'].removeAttribute('aria-busy');
  const inspecting=['settings','parameters'].includes(view);
  els['drawer-title'].textContent={tasks:'计算任务',settings:'显示设置',parameters:'模型参数',runs:'参数组'}[view];els['drawer-content'].replaceChildren();
  if(els.drawer.open&&els.drawer.matches(':modal')===inspecting)els.drawer.close();
@@ -294,7 +296,56 @@ function openDrawer(view){
 function syncDrawerTriggers(){for(const view of ['settings','parameters'])els[view+'-button'].setAttribute('aria-expanded',String(els.drawer.open&&drawerView===view));}
 function toggleDrawer(view){if(els.drawer.open&&drawerView===view)els.drawer.close();else openDrawer(view);}
 function renderTasks(){els['drawer-content'].innerHTML=`<p class="drawer-note">${tasks.length} 个任务</p>`+tasks.map(t=>`<button class="task-card ${task.id===t.id?'current':''}" data-select-task="${t.id}"><span class="task-card-icon">${icon(t.shape==='rod'?'rod':'sphere')}</span><span><strong>${escape(t.title)}</strong><small>${statusLabel[t.status]||'已完成'}${t.cells?' · '+t.cells+' 单元':''}</small></span>${task.id===t.id?icon('check'):''}</button>`).join('');}
-function renderParameters(){let sections=task.presentation?.parameters||[{title:'模型参数',items:((model||task).parameters||[]).map(([label,value])=>({label,value,unit:''}))}];if(studyData&&activeRun()){const r=activeRun();sections=[{title:'当前参数组 · '+runLabel(studyData,r),items:studyData.parameters.map(d=>({label:d.label,value:d.type==='category'?r.parameters[d.id]??'—':displayNumber(r.parameters[d.id]),unit:d.unit}))},{title:'本组响应',items:studyData.responses.map(d=>({label:d.label,value:displayNumber(r.responses[d.id]),unit:d.unit}))},...sections];}els['drawer-content'].innerHTML=sections.length?sections.map(section=>`<section class="parameter-group">${section.title?`<h3>${escape(section.title)}</h3>`:''}<dl class="parameter-list">${section.items.map(row=>`<div><dt>${escape(row.label)}</dt><dd>${escape(parameterDisplayValue(row))}${row.unit?' '+escape(row.unit):''}</dd></div>`).join('')}</dl></section>`).join(''):'<p class="drawer-note">尚未发布模型参数</p>';}
+const receiptCache=new Map();
+async function renderParameters(){
+ const view=activeView(),root=view?.caseRoot,ident=task.id,token=++drawerToken;
+ const assigned=caseParameterSections(task.presentation?.parameters,root),r=activeRun();
+ const receipt=currentReceipt(),key=receipt&&JSON.stringify([ident,receipt.path,receipt.modifiedNs,receipt.bytes]);
+ let record,error;
+ if(receipt){
+  if(!receiptCache.has(key)){
+   const request=api('/api/tasks/'+ident+'/file?path='+encodeURIComponent(receipt.path)).catch(e=>{receiptCache.delete(key);throw e;});
+   receiptCache.set(key,request);
+   if(receiptCache.size>24)receiptCache.delete(receiptCache.keys().next().value);
+  }
+  els['drawer-content'].setAttribute('aria-busy','true');
+  // Never leave the previous case's inputs on screen while loading this one.
+  els['drawer-content'].textContent='正在读取 '+root+' 的输入记录…';
+  try{record=await receiptCache.get(key);}catch(e){error=e;}
+ }
+ if(token!==drawerToken||task?.id!==ident||view?.id!==activeView()?.id||!els.drawer.open||drawerView!=='parameters')return;
+ const sections=[];
+ if(studyData&&r){
+  sections.push({title:'当前参数组 · '+runLabel(studyData,r),items:studyData.parameters.map(d=>({label:d.label,value:d.type==='category'?r.parameters[d.id]??'—':displayNumber(r.parameters[d.id]),unit:d.unit}))});
+  sections.push({title:'本组响应',items:studyData.responses.map(d=>({label:d.label,value:displayNumber(r.responses[d.id]),unit:d.unit}))});
+ }
+ const readbacks=readbackSections(record);
+ const curated=assigned.some(section=>section.caseRoot===root&&section.items.length)||!!r;
+ if(curated){
+  sections.push(...assigned);
+ }else sections.push(...readbacks,...assigned);
+ const metadata=view?.task||task;
+ const mesh=(metadata.parameters||[]).map(([label,value])=>({label,value,unit:label==='结果时间'?metadata.timeUnit:''}));
+ if(mesh.length)sections.push({title:'结果与网格',items:mesh});
+ const body=els['drawer-content'];body.removeAttribute('aria-busy');
+ const groupHTML=section=>`<section class="parameter-group">${section.title?`<h3>${escape(section.title)}</h3>`:''}<dl class="parameter-list">${section.items.map(row=>`<div><dt${row.source?` title="${escape(row.source)}"`:''}>${escape(row.label)}</dt><dd${row.raw?` title="${escape(row.raw)}"`:''}>${escape(parameterDisplayValue(row))}${row.unit?' '+escape(row.unit):''}</dd></div>`).join('')}</dl></section>`;
+ body.innerHTML=sections.filter(s=>s.items.length).map(groupHTML).join('')||'<p class="drawer-note">尚未发布模型参数</p>';
+ if(curated&&readbacks.length){
+  const details=document.createElement('details'),summary=document.createElement('summary');
+  summary.textContent='查看当前算例的输入回读';details.className='parameter-readback';details.append(summary);
+  details.insertAdjacentHTML('beforeend',readbacks.map(groupHTML).join(''));body.append(details);
+ }
+ if(root){
+  const context=document.createElement('p');context.className='drawer-note parameter-case';
+  context.textContent='当前算例 · '+root;
+  if(receipt){
+   const link=document.createElement('a');link.href=BASE+'/api/tasks/'+ident+'/file?path='+encodeURIComponent(receipt.path);
+   link.download='prepare.json';link.textContent='输入回读文件';context.append('　',link);
+  }
+  body.prepend(context);
+ }
+ if(error)body.insertAdjacentHTML('afterbegin','<p class="drawer-note">当前工况的输入记录暂时无法读取。</p>');
+}
 function viewOptions(control){const views=currentViews();if(!control.options?.length)return views.map(v=>({value:v.id,label:v.label}));const rows=[];for(const option of control.options){const exact=views.find(v=>v.id===option.value);if(exact){rows.push({value:exact.id,label:option.label});continue;}let matches=views.filter(v=>v.task.shape===option.value);const results=matches.filter(v=>v.kind==='results');if(results.length)matches=results;for(const v of matches)rows.push({value:v.id,label:matches.length===1?option.label:v.label});}return rows.length?[...new Map(rows.map(o=>[o.value,o])).values()]:views.map(v=>({value:v.id,label:v.label}));}
 function renderSettings(){
  const rows=availableControls().filter(c=>c.parameter||!model||!fields||!['mesh','cameraView','extrema','compare'].includes(c.id)).filter(c=>c.parameter||!['scaleX','scaleY','scaleZ'].includes(c.id)||showScaleControls(task?.presentation?.rendering,[state.scaleX,state.scaleY,state.scaleZ])).filter(c=>c.parameter||!['sliceAxis','slicePosition'].includes(c.id)||state.displayMode==='slice').filter(c=>c.parameter||c.id!=='compareField'||state.compare).filter(c=>c.parameter||!['colorMin','colorMax'].includes(c.id)||state.scale==='custom').filter(c=>c.parameter||!['cut','cutAngle'].includes(c.id)||state.displayMode!=='slice');

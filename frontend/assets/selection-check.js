@@ -3,7 +3,7 @@
 export async function checkLinkedSelection({read,restore,current}){
  const before=read(),same=(a,b)=>a.view===b.view&&a.time===b.time&&a.run===b.run;
  if(!before.ready||!current())return {status:'unavailable'};
- const selector='[role=tab][data-select-view],[data-case-switch],[data-chart-point][data-linked-view],tr[data-linked-view],tr[data-chart-run]';
+ const selector='[role=tab][data-select-view],[data-case-switch],[data-chart-point][data-linked-view],[data-chart-point][data-chart-run],tr[data-linked-view],tr[data-chart-run]';
  let candidate;
  for(const el of document.querySelectorAll(selector)){
   const d=el.dataset,view=d.selectView||d.linkedView,run=d.chartRun,time=d.linkedTime===undefined?undefined:Number(d.linkedTime);

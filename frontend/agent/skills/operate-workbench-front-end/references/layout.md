@@ -4,7 +4,7 @@
 
 物理场选择框旁不追加模型类型、维度、缩放等说明。显示用途与比例在“显示设置”或必要的简短图注中说明。最大/最小值及极值位置是可选显示，默认关闭 extrema，不把极值标注或最大最小值指标当作每次渲染的必需项；仅用户明确要求或已主动开启时保留，用户取消后关闭，不能擅自恢复。提取或报告最大最小值，不代表用户要求在云图上标注它们。
 
-观察方向仅提供自动、XY、XZ、YZ，不添加“三维/立体”选项或按钮；自动相机仍可观察真实三维模型。先把模型放在主区域上方，说明保持简短，不能用长篇说明代替缺少的物理场。模型节点放在未选中的页签、条件隐藏或被布局替代时，宿主会将原生窗口放回主区，保持网格/物理场可见。
+观察方向仅提供自动、XY、XZ、YZ，不添加“三维/立体”选项或按钮；自动相机仍可观察真实三维模型。以空间分布为重点时先放模型；研究跨工况响应时可以先放主图。说明保持简短。模型节点放在未选中的页签、条件隐藏或被布局替代时，宿主会将原生窗口放回主区，保持网格/物理场可见。
 
 生成式 UI 的布局规则：视角、网格、剖切、显示缩放、色标、测点参数等操作项默认归入悬浮的“显示设置”；主区域用于模型、图表、数据和必要结果说明。controls 组件默认 placement:"settings"，按 title 分组，并复用已声明控件，不在主区域复制一份。仅用户明确要求把操作项放在图旁时使用 placement:"inline"。这一规则适用于后续生成的任意操作组，不是只针对某几个标题。
 
@@ -34,13 +34,13 @@ parameterValues:{任意已定义参数ID:值} 可在后续指令中只更新值�
 
 标题流程及执行过程属于 process-observer，只读，不属于 UI 操作插槽。计算子任务、网格、求解日志和保存场会独立推进这条流程。
 
-parameters:[{title:分组名称,items:[{label:参数名,value:字符串,unit:单位字符串}]}]。条目可完全替换，按当前模型选取；请求中的值可标注在“任务设定”分组，不能冒充已核验值。
+模型参数用 `parameters:[{title,caseRoot?,items:[{label,value,unit}]}]`。先用 `ui_inspect(target="model",node="视图ID")` 读取该视图的输入回读记录与现有分组。每组取该工况真实输入并绑定完全一致的 caseRoot，共用几何和边界可省略 caseRoot。每个工况优先列本题改变的量；补齐有来源的材料、几何与载荷。宿主会读取已登记的 prepare.json，有工况专属分组时优先展示该分组，原始回读可展开查看；提交前保留其他工况仍有效的组。单位从输入定义或报告确认。只从请求得知的值放入“任务设定”组。
 
-已有交付控件的兼容格式：controls:[{id,label,default?,min?,max?,step?,options?:[{value,label}]}]。兼容的基础 id 包括 cut(剖切开关)、cutAngle(0–180度)、mesh(线框)、scale(下拉 fixed/frame)、axialScale(0.08–1)、view(原始/重建视图下拉)。view 的 options 可省略，由实际交付视图自动生成；定制 value 只能使用实际视图 id 或 mesh/rod/sphere/shell 类型别名。摘要不含文件路径、工具名和数据格式，只写用户能理解的大节点。还可使用 cameraView(auto/3d/xy/xz/yz)、aspectMode(physical/fit，二维坐标展开时明确标注缩放)、displayMode(surface/slice)、sliceAxis(x/y/z)、slicePosition(0–1)、compare(布尔)、compareField(实际字段id)。默认提供观察方向；存在多个真实字段时可提供双变量比较；真实切片只适用于带内部拓扑的原始网格。只展示适用于当前模型的选项，没有结果时不要放色标选择。控件列表可替换，不写 HTML/JS。
+已有交付控件的兼容格式：controls:[{id,label,default?,min?,max?,step?,options?:[{value,label}]}]。兼容的基础 id 包括 cut(剖切开关)、cutAngle(0–180度)、mesh(线框)、scale(下拉 fixed/frame)、axialScale(0.08–1)、view(原始/重建视图下拉)。view 的 options 可省略，由实际交付视图自动生成；定制 value 只能使用实际视图 id 或 mesh/rod/sphere/shell 类型别名。摘要不含文件路径、工具名和数据格式，只写用户能理解的大节点。还可使用 cameraView(auto/xy/xz/yz)、aspectMode(physical/fit，二维坐标展开时明确标注缩放)、displayMode(surface/slice)、sliceAxis(x/y/z)、slicePosition(0–1)、compare(布尔)、compareField(实际字段id)。默认提供观察方向；存在多个真实字段时可提供双变量比较；真实切片只适用于带内部拓扑的原始网格。只展示适用于当前模型的选项，没有结果时不要放色标选择。控件列表可替换，不写 HTML/JS。
 
-exports:[{id,label,caseRoot,kind:"mesh"|"results",fields?:[字段及分量],time?:"latest"|"all"|逗号分隔的真实保存时刻,shape?:"mesh"|"rod"|"sphere"|"shell"|"revolve",axis?:"x"|"y"|"z",sweepAngle?:0到360的正数,radius?,innerRadius?,length?,radialBands?:[[内半径米,外半径米,径向格数]],timeUnit?:"s"}]，defaultView:已交付视图id。
+exports:[{id,label,caseRoot,runId?:正式研究的绑定工况ID,kind:"mesh"|"results",fields?:[字段及分量],time?:"latest"|"all"|逗号分隔的真实保存时刻,shape?:"mesh"|"rod"|"sphere"|"shell"|"revolve",axis?:"x"|"y"|"z",sweepAngle?:0到360的正数,radius?,innerRadius?,length?,radialBands?:[[内半径米,外半径米,径向格数]],timeUnit?:"s"}]，defaultView:已交付视图id。
 
-facts.fieldFacts 给出当前实际保存帧的真实 min/max/uniform。若 T 或其他场 uniform:true，应明确说明保存场全域均匀，核对主任务的求解设定，不编造温度梯度，不用更换色标掩盖。真实数据范围与为了绘图避免零跨度扩展的色标范围不同。
+ui_inspect(target="model",node="视图ID").fieldFacts 给出当前实际保存帧的真实 min/max/uniform。若 T 或其他场 uniform:true，应明确说明保存场全域均匀，核对主任务的求解设定，不编造温度梯度，不用更换色标掩盖。真实数据范围与为了绘图避免零跨度扩展的色标范围不同。
 
 网格已存在但无结果时，用 kind mesh。真实结果已存在时可请求 results；fields 仅选当前实际存在且用户关心的字段，向量/张量分量可写 D:x、sigma:principal_max。瞬态任务选择 time all。kind results 不代表求解已收敛，只表示展示已存在的保存场。
 

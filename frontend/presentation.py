@@ -1,6 +1,6 @@
 """Validated, task-owned presentation state and lightweight workspace observations."""
 from pathlib import Path
-from registry import latest_request
+from registry import current_render_errors,latest_request
 import copy
 import hashlib
 import json
@@ -80,9 +80,15 @@ def validate_presentation(update):
         if not isinstance(sections,list) or len(sections)>30:raise ValueError('参数分组无效')
         result['parameters']=[]
         for section in sections:
+            if not isinstance(section,dict):raise ValueError('参数分组无效')
             items=section.get('items',[])
             if not isinstance(items,list) or len(items)>100:raise ValueError('参数条目无效')
             result['parameters'].append({'title':text(section.get('title',''),60),'items':[{'label':text(i['label'],80),'value':text(str(i['value']),500),'unit':text(i.get('unit',''),60)} for i in items]})
+            if 'caseRoot' in section:
+                root=text(section['caseRoot'],500)
+                if not root or Path(root).is_absolute() or '..' in Path(root).parts or Path(root).as_posix()!=root:
+                    raise ValueError('模型参数需要工作区内的相对算例目录')
+                result['parameters'][-1]['caseRoot']=root
     if 'controls' in update:
         controls=update['controls']
         if not isinstance(controls,list) or len(controls)>100:raise ValueError('显示选项列表无效')
@@ -208,6 +214,32 @@ def requested_delivery(request):
     return req
 
 
+def saved_case_facts(work,case):
+    mesh=case/'constant/polyMesh';ready=all((mesh/n).is_file() for n in ('points','faces','owner','neighbour'))
+    times=[]
+    for d in case.iterdir():
+        if not d.is_dir() or d.is_symlink():continue
+        try:v=float(d.name)
+        except ValueError:continue
+        if math.isfinite(v) and v>0:times.append((v,d))
+    latest=max(times,key=lambda t:t[0])[1] if times else None
+    fields=[];signature=[]
+    if latest:
+        for p in sorted(latest.iterdir()):
+            if p.is_file() and not p.is_symlink() and re.fullmatch(r'[A-Za-z][A-Za-z0-9_]*',p.name):
+                fields.append(p.name);s=p.stat();signature.append([p.name,s.st_mtime_ns,s.st_size])
+    meshstamp=[]
+    if ready:
+        for name in ('points','faces','owner','neighbour'):
+            s=(mesh/name).stat();meshstamp.append([s.st_size,s.st_mtime_ns])
+    receipt={};receipt_path=case/'.mandifuel-execution.json'
+    if receipt_path.is_file() and not receipt_path.is_symlink() and receipt_path.stat().st_size<=65536:
+        try:
+            raw=json.loads(receipt_path.read_text());receipt={k:raw[k] for k in ('status','exit_code','final_time','terminal_marker') if k in raw}
+        except (ValueError,OSError):pass
+    return {'caseRoot':str(case.relative_to(work)), 'meshReady':ready,'latestTime':latest.name if latest else None,'fields':fields,'signature':signature,'meshSignature':meshstamp,'execution':receipt}
+
+
 def case_facts(work):
     cases=[]
     for base,dirs,files in os.walk(work,followlinks=False):
@@ -217,32 +249,27 @@ def case_facts(work):
         if 'system' not in dirs or 'constant' not in dirs:continue
         case=Path(base)
         if not (case/'system/controlDict').is_file():continue
-        mesh=case/'constant/polyMesh';ready=all((mesh/n).is_file() for n in ('points','faces','owner','neighbour'))
-        times=[]
-        for d in case.iterdir():
-            if not d.is_dir() or d.is_symlink():continue
-            try:v=float(d.name)
-            except ValueError:continue
-            if math.isfinite(v) and v>0:times.append((v,d))
-        latest=max(times,key=lambda t:t[0])[1] if times else None
-        fields=[];signature=[]
-        if latest:
-            for p in sorted(latest.iterdir()):
-                if p.is_file() and not p.is_symlink() and re.fullmatch(r'[A-Za-z][A-Za-z0-9_]*',p.name):
-                    fields.append(p.name);s=p.stat();signature.append([p.name,s.st_mtime_ns,s.st_size])
-        meshstamp=[]
-        if ready:
-            for name in ('points','faces','owner','neighbour'):
-                s=(mesh/name).stat();meshstamp.append([s.st_size,s.st_mtime_ns])
-        receipt={};receipt_path=case/'.mandifuel-execution.json'
-        if receipt_path.is_file() and not receipt_path.is_symlink() and receipt_path.stat().st_size<=65536:
-            try:
-                raw=json.loads(receipt_path.read_text());receipt={k:raw[k] for k in ('status','exit_code','final_time','terminal_marker') if k in raw}
-            except (ValueError,OSError):pass
-        cases.append({'caseRoot':str(rel) or '.', 'meshReady':ready,'latestTime':latest.name if latest else None,'fields':fields,'signature':signature,'meshSignature':meshstamp,'execution':receipt})
+        cases.append(saved_case_facts(work,case))
         dirs[:]=[d for d in dirs if d not in {'system','constant','0'} and not re.fullmatch(r'[0-9.eE+-]+',d)]
         if len(cases)>=20:break
     return cases
+
+
+def has_case_comparison(table):
+    # Without a study manifest, require two distinct completed cases with a
+    # numeric value in the same column. Row numbers alone do not identify cases.
+    columns={c['id'].lower().replace('_',''):c['id'] for c in table['columns']}
+    case_col=next((columns[k] for k in ('runid','caseid','pointid','caseroot','工况编号','样本编号') if k in columns),None)
+    status_col=next((columns[k] for k in ('solverstatus','statuscode','status','运行状态') if k in columns),None)
+    if not case_col or not status_col:return False
+    measures=[name for key,name in columns.items() if name not in (case_col,status_col) and key not in ('row','iteration','exitcode','finaltime')]
+    first={}
+    for row in table['rows']:
+        case=row.get(case_col)
+        if case in (None,'') or str(row.get(status_col,'')).lower() not in ('completed','succeeded','success','已完成','成功'):continue
+        for key in measures:
+            if type(row.get(key)) in (int,float) and first.setdefault(key,case)!=case:return True
+    return False
 
 
 class Dashboard:
@@ -327,21 +354,32 @@ class Dashboard:
             if selectors:spec['fields']=selectors
             self.publish(ident,{'exports':[spec],'defaultView':key})
             self.previews[ident]=signature
+    def field_facts(self,ident,meta,view):
+        """The displayed frame of this view, or its last saved frame when inactive."""
+        current=meta.get('viewerState',{})
+        time=current.get('time') if current.get('view')==view else None
+        cache_key=(ident,meta.get('modelVersion',0),view,time)
+        if cache_key not in self.field_cache:
+            try:
+                frames=self.registry.fields(ident,view).get('frames',[])
+                if not frames:return []
+                frame=min(frames,key=lambda f:abs(f['time']-time)) if isinstance(time,(int,float)) else frames[-1]
+                stats=[]
+                for name,values in frame.get('fields',{}).items():
+                    if values:
+                        lo,hi=min(values),max(values)
+                        stats.append({'id':name,'time':frame['time'],'min':lo,'max':hi,'uniform':lo==hi})
+                self.field_cache[cache_key]=stats
+                while len(self.field_cache)>32:self.field_cache.pop(next(iter(self.field_cache)))
+            except (ValueError,OSError,KeyError):return []
+        return self.field_cache[cache_key]
+
     def inspect(self,ident):
         r=self.registry
         with r.lock:
             job=r._job(ident);m=copy.deepcopy(job['meta']);work=job['workspace'];task=r.public(job)
-            current=m.get('viewerState',{});view=current.get('view') or task.get('defaultView');field_facts=[]
-            cache_key=(ident,m.get('modelVersion',0),view,current.get('time'))
-            try:
-                if cache_key not in self.field_cache:
-                    data=r.fields(ident,view);frames=data.get('frames',[])
-                    frame=min(frames,key=lambda f:abs(f['time']-current['time'])) if frames and isinstance(current.get('time'),(int,float)) else frames[-1] if frames else {}
-                    stats=[{'id':key,'time':frame['time'],'min':min(values),'max':max(values),'uniform':min(values)==max(values)} for key,values in frame.get('fields',{}).items() if values]
-                    self.field_cache[cache_key]=stats
-                    while len(self.field_cache)>32:self.field_cache.pop(next(iter(self.field_cache)))
-                field_facts=self.field_cache[cache_key]
-            except (ValueError,OSError,KeyError):pass
+            current=m.get('viewerState',{});view=current.get('view') or task.get('defaultView')
+            field_facts=self.field_facts(ident,m,view)
         cases=[] if m.get('study') else case_facts(work)
         from field_catalog import saved_field_catalog
         for case in cases[:8]:
@@ -374,7 +412,7 @@ class Dashboard:
                         if isinstance(value,str) and value not in values:values.append(value)
                         if len(values)>16:break
                     if len(values)<=16:categories[key]=values
-                tables.append({'file':spec['path'],'columns':table['columns'],'rows':len(table['rows']),'sample':table['rows'][:2],'categories':categories})
+                tables.append({'file':spec['path'],'columns':table['columns'],'rows':len(table['rows']),'sample':table['rows'][:2],'categories':categories,'hasCaseComparison':has_case_comparison(table)})
             except (ValueError,OSError):
                 try:
                     from registry import inside,read_json
@@ -408,9 +446,7 @@ class Dashboard:
                 except (ValueError,OSError):continue
         observed={'studyVersion':m.get('studyVersion',0),'status':status,'stage':stage,'cases':cases,'promptRevision':m.get('promptRevision',0),'displayPromptRevision':m.get('displayPromptRevision',0),'workspaceRevision':m.get('workspaceWatch',{}).get('revision',0),'evidenceRevision':m.get('evidence',{}).get('revision')}
         data_revision=hashlib.sha256(json.dumps(observed,sort_keys=True).encode()).hexdigest()[:20]
-        ui_state=m.get('uiState',{})
-        if ui_state.get('revision')==m.get('presentation',{}).get('uiRevision',0) and ui_state.get('errors'):observed['uiErrors']=ui_state['errors']
-        if m.get('viewerState',{}).get('rendererError'):observed['rendererError']=m['viewerState']['rendererError']
+        observed.update(current_render_errors(m))
         revision=hashlib.sha256(json.dumps(observed,sort_keys=True).encode()).hexdigest()[:20]
         visible_views=task.get('views',[])
         if m.get('study'):visible_views=sorted(visible_views,key=lambda v:(v['id']!=view,v['id']!=task.get('defaultView')))[:2]
@@ -422,7 +458,8 @@ class Dashboard:
             for name in sorted(names):
                 p=Path(base)/name
                 if len(images)<12 and p.suffix.lower() in {'.png','.jpg','.jpeg','.webp'} and not p.is_symlink() and 0<p.stat().st_size<=10*1024*1024:images.append({'file':str(p.relative_to(work)),'bytes':p.stat().st_size})
-        return {'observer':self.health(),'workspaceHistory':workspace_history,'revision':revision,'dataRevision':data_revision,'presenter':m.get('presenter',{}),'task':{'title':m['title'],'request':m['prompt'],'latestRequest':latest_request(m),'displayOnly':bool(m.get('latestDisplayPrompt')),'status':status},'stage':stage,'summary':summary,'recentActions':actions,'cases':cases,'presentation':m.get('presentation',{}),'viewerState':m.get('viewerState',{}),'fieldFacts':field_facts,'deliveryRequirements':requested_delivery(latest_request(m)),'study':task.get('study'),'studyFile':'delivery/study.json' if (work/'delivery/study.json').is_file() else None,'studyVariables':{'parameters':m['study']['parameters'],'responses':m['study']['responses']} if m.get('study') else None,'viewCount':len(task.get('views',[])),'views':visible_views,'capabilities':list(CONTROL_SPECS),'renderingCapabilities':CAPABILITIES,'uiCapabilities':CATALOG,'uiState':m.get('uiState',{}),'deliveryFiles':m.get('files',[])[:40],'availableTables':tables,'availableReports':reports,'availableImages':images,'availableRecords':record_files[:8],'workspaceChanges':m.get('workspaceWatch',{}),'studyRuns':[run for run in m.get('study',{}).get('runs',[]) if run.get('caseRoot')][:20]}
+        documents=[f['path'] for f in m.get('files',[]) if f['path'].lower().endswith('.md')]
+        return {'availableDocuments':documents,'observer':self.health(),'workspaceHistory':workspace_history,'revision':revision,'dataRevision':data_revision,'presenter':m.get('presenter',{}),'task':{'title':m['title'],'request':m.get('latestPrompt') or m['prompt'],'latestRequest':latest_request(m),'displayOnly':bool(m.get('latestDisplayPrompt')),'status':status},'stage':stage,'summary':summary,'recentActions':actions,'cases':cases,'presentation':m.get('presentation',{}),'viewerState':m.get('viewerState',{}),'fieldFacts':field_facts,'deliveryRequirements':requested_delivery(latest_request(m)),'study':task.get('study'),'studyFile':'delivery/study.json' if (work/'delivery/study.json').is_file() else None,'studyVariables':{'parameters':m['study']['parameters'],'responses':m['study']['responses']} if m.get('study') else None,'viewCount':len(task.get('views',[])),'views':visible_views,'capabilities':list(CONTROL_SPECS),'renderingCapabilities':CAPABILITIES,'uiCapabilities':CATALOG,'uiState':m.get('uiState',{}),'deliveryFiles':m.get('files',[])[:40],'availableTables':tables,'availableReports':reports,'availableImages':images,'availableRecords':record_files[:8],'workspaceChanges':m.get('workspaceWatch',{}),'studyRuns':[run for run in m.get('study',{}).get('runs',[]) if run.get('caseRoot')][:20]}
     def publish(self,ident,update,*,expected_frontend_revision=None):
         # Export only existing case data. No shell or solver capability is provided.
         r=self.registry;config=validate_presentation(update)
@@ -464,7 +501,7 @@ class Dashboard:
                 if spec.get('kind')=='mesh':export_mesh(case,target,title=title,write_handoff=False)
                 elif spec.get('kind')=='results':
                     # Never promote initial conditions to solved results.
-                    facts=next((c for c in case_facts(work) if (work/c['caseRoot']).resolve()==case),None)
+                    facts=saved_case_facts(work,case) if job['meta'].get('study') else next((c for c in case_facts(work) if (work/c['caseRoot']).resolve()==case),None)
                     if not facts or not facts['latestTime']:raise ValueError('尚无已保存的计算结果')
                     export_case(case,target,title=title,selectors=spec.get('fields'),time=spec.get('time','latest'),shape=spec.get('shape','mesh'),radius=spec.get('radius'),inner_radius=spec.get('innerRadius',0),length=spec.get('length'),time_unit=spec.get('timeUnit'),radial_bands=spec.get('radialBands'),axis=spec.get('axis','z'),sweep_angle=spec.get('sweepAngle',270.),write_handoff=False)
                 else:raise ValueError('未知交付类型')

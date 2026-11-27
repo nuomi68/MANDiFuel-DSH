@@ -17,6 +17,15 @@ class PresentationTests(unittest.TestCase):
         self.temp=tempfile.TemporaryDirectory();self.registry=TaskRegistry(Path(self.temp.name)/'tasks');self.prepared=self.registry.prepare('展示交付');self.ident=self.prepared['task']['id'];self.work=Path(self.prepared['workspace'])
         for name in ['0','constant','system']:shutil.copytree(SOURCE/name,self.work/'case'/name)
     def tearDown(self):self.registry.close();self.temp.cleanup()
+    def test_plain_csv_requires_distinct_completed_cases_and_a_shared_numeric_column(self):
+        from presentation import has_case_comparison
+        columns=[{'id':key} for key in ('case_id','status','response','other')]
+        rows=[{'case_id':'a','status':'completed','response':0},{'case_id':'b','status':'failed','response':1}]
+        table={'columns':columns,'rows':rows}
+        rows.append(dict(rows[0]));rows.append({'case_id':'b','status':'completed','other':23})
+        self.assertFalse(has_case_comparison(table))
+        rows[-1]['response']=3
+        self.assertTrue(has_case_comparison(table))
     def test_view_observations_are_bound_to_the_current_instruction_revision(self):
         self.registry.dashboard.publish(self.ident,{'exports':[{'id':'raw','caseRoot':'case','kind':'mesh'}],'viewState':{'cameraView':'xy'}})
         revision=self.registry.snapshot(self.ident)['task']['presentation']['viewStateRevision']

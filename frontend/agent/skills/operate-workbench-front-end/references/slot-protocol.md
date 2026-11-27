@@ -1,6 +1,6 @@
 # 插槽和操作协议
 
-`ui_inspect` 的 `target` 可为 page、main、aside、settings、model、data、capabilities；读取 main/aside 时可另给 node，定位唯一组件 ID。每次返回当前不透明 revision。page 的 browser 是实际页面上报状态，包含连接情况、视口、插槽尺寸、节点可见性、当前页签、表格搜索/排序/分页和图表缩放。
+`ui_inspect` 的 `target` 可为 page、main、aside、settings、model、data、capabilities、evidence；读取 main/aside 时可另给 node，定位唯一组件 ID。每次返回当前不透明 revision。page 的 browser 是实际页面上报状态，包含连接情况、视口、插槽尺寸、节点可见性、当前页签、表格搜索/排序/分页和图表缩放。
 
 `ui_apply` 参数为 `{expectedRevision, datasets?, operations?, update?}`。顶层 datasets 按 ID 合并进现有数据源，可和引用该数据源的节点操作一起提交。完整替换页面时统一使用 update.ui.datasets。至少有一项修改。operations 最多 24 个，最终组件树和数据绑定仍由宿主校验；错误事务不提交。
 
@@ -26,10 +26,10 @@ slot 为 settings：replace 的 value 是整套控件数组；upsert 的 value �
 
 ## 模型、数据和完整更新
 
-`update` 使用既有展示协议的 controls、parameterValues、rendering、viewState、ui、exports、defaultView、parameters、progress、studyMapping 等属性；完整 ui 可声明 version/mode/scope/root/aside/datasets。不要同时用 operations 和 update.ui 修改组件树，或同时用 settings 操作与 update.controls 修改控件。
+`update` 使用既有展示协议的 controls、parameterValues、rendering、viewState、ui、exports、defaultView、parameters、studyMapping 等属性；完整 ui 可声明 version/mode/scope/root/aside/datasets。不要同时用 operations 和 update.ui 修改组件树，或同时用 settings 操作与 update.controls 修改控件。
 
 `update.rendering` 和 `update.viewState` 操作模型；`exports` 只导出已有保存场。model 是保留的渲染设施，不接收 HTML/JS。需要整块图表或模型更新时可用完整 update；局部页面变更优先使用 operations。
 
 导出模型与引用它的组件分成两笔提交，先核对实际模型和字段。`update.interactions` 也可直接填写 [{id,state}]，效果与 interact 一致。
 
-成功返回新的 revision、presentationVersion、uiRevision、viewStateRevision 和 renderStatus。`ui_wait_for_render` 等待最后一次修改的浏览器回执，可给 timeoutMs（最多 10000）；返回 confirmed、pending、offline、error 或 stale。保存配置不等于页面已确认。版本冲突必须重新观察，不能自动用新版本强行重试旧操作。
+成功返回新的 revision、presentationVersion、uiRevision、viewStateRevision 和 renderStatus。`ui_wait_for_render` 等待最后一次修改的浏览器回执，可给 timeoutMs（最多 10000）；返回 confirmed、pending、offline、error、stale 或 selection-unconfirmed。保存配置不等于页面已确认。版本冲突必须重新观察，不能自动用新版本强行重试旧操作。

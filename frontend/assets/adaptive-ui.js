@@ -4,7 +4,7 @@ import {resolveSource} from './data-sources.js';
 import {chartSVG,CHART_TYPES,escape,format,tableCSV,tableColumns,tableRows,formatCell,chartDataTable} from './chart-view.js';
 import {hasWorkspaceContent,settingsControlGroups,uiInScope,caseTabs} from './ui-placement.js';
 import {ChartInteraction} from './chart-interaction.js';
-import {evidenceLink,evidenceLabels} from './evidence-browser.js';
+import {evidenceLink,evidenceLabels,evidenceGroups,evidenceNumber} from './evidence-browser.js';
 
 const containers=new Set(['row','column','grid','tabs']);
 const element=(tag,className,text)=>{const e=document.createElement(tag);if(className)e.className=className;if(text!==undefined)e.textContent=text;return e;};
@@ -76,7 +76,7 @@ export class AdaptiveUI{
      if(s.sort!==undefined){entry.sort=s.sort;entry.page=0;}if(s.page!==undefined)entry.page=s.page;
      if(entry.table)this.renderTable(entry);
     }
-    if(entry.interaction){if(Object.hasOwn(s,'viewport'))entry.interaction.viewport=s.viewport;if(s.hiddenSeries!==undefined)entry.interaction.hidden=new Set(s.hiddenSeries);if(entry.series)entry.interaction.repaint();}
+    if(entry.interaction){if(Object.hasOwn(s,'viewport'))entry.interaction.viewport=s.viewport;if(s.hiddenSeries!==undefined)entry.interaction.hiddenSeries=s.hiddenSeries;if(entry.series)entry.interaction.repaint();}
     if(s.focus)entry.element.scrollIntoView({block:'nearest'});
    }catch(error){this.showError(entry,error);}
   }
@@ -149,16 +149,36 @@ export class AdaptiveUI{
  renderEvidence(entry,citations=false){
   const ids=citations?entry.node.evidence:entry.node.claims,context=this.context;
   if(citations&&!entry.citations){entry.citations=element('div','adaptive-evidence-citations');entry.element.append(entry.citations);}
-  const host=citations?entry.citations:entry.body;host.replaceChildren();
-  if(!context?.openEvidence)return;
+  const host=citations?entry.citations:entry.body;
+  const claims=[...new Set(ids)].map(id=>context?.evidenceClaims?.get(id));
+  const key=JSON.stringify(claims),cache=citations?'citationKey':'evidenceKey';
+  if(entry[cache]===key)return;
+  entry[cache]=key;const expanded=new Set([...host.querySelectorAll('details[open]')].map(n=>n.dataset.group));
+  host.replaceChildren();if(!context?.openEvidence)return;
   const table=citations?host:element('table','adaptive-evidence-table');
-  for(const id of ids){
-   const claim=context.evidenceClaims?.get(id);
-   if(!claim){host.append(element('p','evidence-note','核查记录尚未就绪或已失效，请打开“结果核查”查看当前依据。'));continue;}
-   const link=evidenceLink(claim,context.openEvidence);
-   if(citations)table.append(link);
-   else{const row=element('tr'),name=element('td'),state=element('td');name.append(link);const badge=element('span','evidence-status',evidenceLabels[claim.status]||claim.status);badge.dataset.state=claim.status;state.append(badge);row.append(name,state);table.append(row);}
-  }if(!citations)host.append(table);
+  for(const group of evidenceGroups(claims.filter(Boolean))){
+   const claim=group[0];let name;
+   if(group.length>1){
+    name=element('details','evidence-group');name.dataset.group=group.map(c=>c.id).join(' ');name.open=expanded.has(name.dataset.group);
+    const roots=new Set(group.map(c=>c.caseRoot));
+    name.append(element('summary','',`${claim.title} · ${evidenceNumber(claim.value)} ${claim.unit}（${roots.size} 个算例）`));
+    const links=element('div','evidence-case-links');
+    for(const c of group)links.append(evidenceLink(c,context.openEvidence,c.caseRoot));
+    name.append(links);
+   }else{
+    name=element('div');name.append(evidenceLink(claim,context.openEvidence));
+    if(claim.caseRoot)name.append(element('small','evidence-origin',claim.caseRoot));
+   }
+   if(citations)table.append(name);
+   else{
+    const row=element('tr'),cell=element('td'),state=element('td');
+    const label=claim.key==='execution.final_time'&&claim.status==='verified'?'终点核对通过':evidenceLabels[claim.status]||claim.status;
+    const badge=element('span','evidence-status',label);
+    badge.dataset.state=claim.status;cell.append(name);state.append(badge);row.append(cell,state);table.append(row);
+   }
+  }
+  if(!citations)host.append(table);
+  if(claims.some(c=>!c))host.append(element('p','evidence-note','部分引用尚无当前记录，可在“结果核查”中查看。'));
  }
  theme(){const s=getComputedStyle(this.host),get=(key,fallback)=>s.getPropertyValue(key).trim()||fallback;return{ink:get('--ink','#17171a'),accent:get('--accent','#4f46e5'),line:get('--line','#e5e5e8'),panel:get('--panel','#ffffff')};}
  paintChart(entry,series){

@@ -1,4 +1,5 @@
 import {SKILL,readSkill} from './frontend-agent.mjs';
+import {caseTabs} from '../assets/ui-placement.js';
 
 const object=(properties={},required=[])=>({type:'object',properties,required,additionalProperties:false});
 export const TOOL_SCHEMAS={
@@ -11,13 +12,17 @@ const descriptions={ui_read_skill:'Read the registered frontend skill or one of 
 export function renderConfirmation(page,wanted){
  const browser=page.browser||{};
  if(!browser.connected)return'offline';
- if(browser.revision>wanted.uiRevision)return'stale';
- if((browser.errors||[]).length||page.viewer?.rendererError)return'error';
+ const versions=[['revision','uiRevision'],['presentationVersion','presentationVersion'],['interactionRevision','interactionRevision']];
+ if(versions.some(([observed,key])=>page[key]>wanted[key]||browser[observed]>wanted[key]))return 'stale';
+ if(versions.some(([observed,key])=>(browser[observed]??0)<wanted[key]))return 'pending';
+ const needsViewer=page.modelRequirement?.required!==false;
+ if(needsViewer&&wanted.viewStateRevision&&page.viewer?.revision!==wanted.viewStateRevision)return 'pending';
+ if(browser.errors?.length||needsViewer&&page.viewer?.rendererError)return 'error';
  if(page.modelRequirement?.required){
-  if(browser.model?.visible===false)return'error';
-  if(!browser.model?.ready||browser.model.kind!==page.modelRequirement.kind)return'pending';
+  if(browser.model?.visible===false)return 'error';
+  if(!browser.model?.ready||browser.model.kind!==page.modelRequirement.kind)return 'pending';
  }
- return browser.ready!==false&&browser.presentationVersion>=wanted.presentationVersion&&browser.revision===wanted.uiRevision&&(!wanted.interactionRevision||browser.interactionRevision===wanted.interactionRevision)&&(!wanted.viewStateRevision||page.viewer?.revision===wanted.viewStateRevision)?'confirmed':'pending';
+ return browser.ready===true?'confirmed':'pending';
 }
 const sleep=(ms,signal)=>new Promise((resolve,reject)=>{
  if(signal?.aborted)return reject(signal.reason||new Error('frontend operation cancelled'));
@@ -25,6 +30,16 @@ const sleep=(ms,signal)=>new Promise((resolve,reject)=>{
  const timer=setTimeout(()=>{signal?.removeEventListener('abort',abort);resolve();},ms);signal?.addEventListener('abort',abort,{once:true});
 });
 
+function changesSelectionBinding(node){
+ if(!node||typeof node!=='object')return false;
+ if(node.type==='tabs'&&caseTabs(node.children||[])||node.action?.state?.view||node.source?.selection||node.source?.runId||['study','history'].includes(node.source?.kind))return true;
+ return (node.series||[]).some(changesSelectionBinding)||(node.children||[]).some(changesSelectionBinding);
+}
+export function selectionConfirmed(session){
+ const status=session.selectionCheck?.status;
+ if(session.requireSelection)return status==='verified';
+ return !status||status==='verified'||status==='not-applicable';
+}
 export async function verifyRenderedSelection(session,page,call,id,signal){
  if(session.checkSelection&&!session.selectionCheck&&page.browser?.model?.kind==='fields'&&page.browser.browserId){
   const proof=await call('/api/tasks/'+id+'/selection-check',{revision:page.revision},signal);
@@ -66,21 +81,24 @@ export function attachFrontendTools(agent,{id,call,current,session}){
      value=await call(`/api/tasks/${id}/frontend`,{...args,...session.request!==undefined?{expectedRequest:session.request}:{}},exec.signal);
     }
     catch(error){session.applyError=String(error.message||error);throw error;}
-    if(args.update?.ui||args.operations?.some(op=>['main','aside'].includes(op.slot)&&op.op!=='interact')){session.checkSelection=true;delete session.selectionCheck;}
+    if(changesSelectionBinding(args.update?.ui?.root)||changesSelectionBinding(args.update?.ui?.aside)||args.operations?.some(op=>['main','aside'].includes(op.slot)&&changesSelectionBinding(op.props||op.value))){session.checkSelection=true;delete session.selectionCheck;}
     revisions.add(value.revision);session.lastPublished=value;session.mutations=(session.mutations||0)+1;session.applyError=null;session.confirmed=false;return value;
    }
    const timeout=args.timeoutMs??8000;
    if(!Number.isInteger(timeout)||timeout<0||timeout>10000)throw new Error('等待时间必须为 0–10000 毫秒');
    const deadline=Date.now()+timeout,expected=session.lastPublished;
+   if(args.verifySelection){
+    session.requireSelection=true;session.checkSelection=true;
+    if(['busy','offline','unavailable','unconfirmed'].includes(session.selectionCheck?.status))delete session.selectionCheck;
+   }
    do{
     const page=await call(`/api/tasks/${id}/frontend?target=page`,undefined,exec.signal),browser=page.browser||{};
     const wanted=expected||page;
     session.renderExpected=wanted;
     let status=renderConfirmation(page,wanted);
-    if(args.verifySelection)session.checkSelection=true;
     if(status==='confirmed')await verifyRenderedSelection(session,page,call,id,exec.signal);
     if(status==='confirmed'&&session.selectionCheck?.status==='failed')status='error';
-    else if(status==='confirmed'&&session.selectionCheck&&!['verified','not-applicable'].includes(session.selectionCheck.status))status='selection-unconfirmed';
+    else if(status==='confirmed'&&!selectionConfirmed(session))status='selection-unconfirmed';
     if(status!=='pending'||Date.now()>=deadline){revisions.add(page.revision);session.confirmed=status==='confirmed';session.renderStatus=status;return{status,revision:page.revision,presentationVersion:page.presentationVersion,browser,viewer:page.viewer||{},selectionCheck:session.selectionCheck};}
     await sleep(250,exec.signal);
    }while(current());

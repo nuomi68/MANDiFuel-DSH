@@ -35,8 +35,11 @@ def presenter_directory(runtime,project):
 class Handler(SimpleHTTPRequestHandler):
     def send_json(self,value,status=200,head=False):
         body=json.dumps(value,ensure_ascii=False,allow_nan=False,separators=(',',':')).encode()
-        self.send_response(status);self.send_header('Content-Type','application/json; charset=utf-8');self.send_header('Content-Length',str(len(body)));self.end_headers()
-        if not head:self.wfile.write(body)
+        try:
+            self.send_response(status);self.send_header('Content-Type','application/json; charset=utf-8');self.send_header('Content-Length',str(len(body)));self.end_headers()
+            if not head:self.wfile.write(body)
+        except (BrokenPipeError,ConnectionResetError,ConnectionAbortedError):
+            self.close_connection=True
     def end_headers(self):
         self.send_header('X-Content-Type-Options','nosniff');self.send_header('Cache-Control','no-store')
         self.send_header('Content-Security-Policy',"default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; connect-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'")
@@ -114,9 +117,7 @@ class Handler(SimpleHTTPRequestHandler):
                 if parts[3]=='viewer-state':return self.send_json(manager.dashboard.viewer_state(parts[2],data))
                 if parts[3]=='ui-state':return self.send_json(manager.dashboard.ui_state(parts[2],data))
                 if parts[3]=='presenter':
-                    with manager.lock:
-                        job=manager._job(parts[2]);job['meta']['presenter']=data;manager._save(job);manager._emit(job,'state',manager.public(job))
-                    return self.send_json({'updated':True})
+                    return self.send_json({'updated':manager.set_presenter(parts[2],data)})
                 if parts[3]=='bind':return self.send_json(manager.bind(parts[2],str(data['sessionId']),data.get('workspaceId')))
                 if parts[3]=='native-event':return self.send_json(manager.native_event(parts[2],data))
             return self.send_json({'error':'未找到资源'},404)

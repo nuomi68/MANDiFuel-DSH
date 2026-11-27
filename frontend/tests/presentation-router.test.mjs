@@ -11,7 +11,7 @@ function sessionFixture(){
  }};
 }
 
-async function setup(render=true,backendFailure=false){
+async function setup(render=true,backendFailure=false,snapshot={task:{modelReady:true}}){
  const events=[],calls=[],effects=[],hooks={};let admitted=0,requested=0;
  const session=sessionFixture();session.append('user/message',{source:{kind:'user'},content:[]},{surfaceOp:'append'});
  const agent={options:{provider:'local-test',model:'test'},session};
@@ -20,7 +20,7 @@ async function setup(render=true,backendFailure=false){
  const controller={commands,prompt(request){return this.commands.prompt(request);}};
  const ctx={sessionController:controller,agents:{get:()=>agent},agentDefaultModel:{currentSelection:()=>agent.options},effect(fn){effects.push(fn());},on(name,fn){hooks[name]=fn;}};
  const messages={createUserMessage:value=>({...value,role:'user',id:'user'}),createMessage:value=>({...value,id:'ack'})};
- await mountPresentationRouter(ctx,{call:async(path,body)=>{if(backendFailure)throw new Error('UI backend unavailable');calls.push({path,body});return path.endsWith('/observe')?{task:{latestRequest:'之前的请求'}}:{task:{modelReady:true}};},sessions:new Map([['session','task']]),presenter:{request(){requested++;}},classify:async()=>{if(render instanceof Error)throw render;return render;},messages});
+ await mountPresentationRouter(ctx,{call:async(path,body)=>{if(typeof backendFailure==='function'?backendFailure(path):backendFailure)throw new Error('UI backend unavailable');calls.push({path,body});return path.endsWith('/observe')?{task:{latestRequest:'之前的请求'}}:snapshot;},sessions:new Map([['session','task']]),presenter:{request(){requested++;}},classify:async()=>{if(render instanceof Error)throw render;return render;},messages});
  return{controller,commands,events,calls,hooks,agent,counts:()=>({admitted,requested}),close:()=>effects.reverse().forEach(fn=>fn?.())};
 }
 const request=(text='把截面显示成梯形')=>({sessionId:'session',requestId:'request',mode:'queue',content:[{type:'text',text}]});
@@ -77,4 +77,22 @@ test('routing uses semantic model output rather than a list of supported control
 test('incomplete classification cannot masquerade as a compute decision',async()=>{
  const llm={async *stream(){yield{type:'finish',reason:{kind:'max-tokens'}};}};
  await assert.rejects(classifyPresentation(llm,{provider:'test',model:'test'},'修改显示配置',undefined,x=>x),/no complete decision/);
+});
+
+test('a report-only task can rearrange a table without creating a solver turn',async()=>{
+ const h=await setup(true,false,{task:{fileCount:2,modelReady:false,resultReady:false}});
+ try{await h.controller.prompt(request('把表格放在右侧'));assert.deepEqual(h.counts(),{admitted:0,requested:1});}finally{h.close();}
+});
+test('an explicit display request survives a failed backend write and retry without a phantom notice',async()=>{
+ let rejectOnce=true;
+ const h=await setup(true,path=>{if(path.endsWith('/native-event')&&rejectOnce){rejectOnce=false;return true;}});
+ try{
+  await assert.rejects(h.controller.prompt(request()),/unavailable/);assert.equal(h.events.length,0);
+  await h.controller.prompt(request());await h.controller.prompt(request());
+  assert.equal(h.events.length,2);assert.deepEqual(h.counts(),{admitted:0,requested:1});
+ }finally{h.close();}
+});
+test('explicit display-only requests stay outside the solver while the backend is offline',async()=>{
+ const h=await setup(true,true);
+ try{await assert.rejects(h.controller.prompt(request('仅前端展示：改色')),/展示服务暂不可用/);assert.deepEqual(h.counts(),{admitted:0,requested:0});}finally{h.close();}
 });

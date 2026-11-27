@@ -81,6 +81,15 @@ class WorkspaceWatchTests(unittest.TestCase):
         run=self.r.study(self.id)['runs'][0];self.assertEqual(run['responses']['temperature'],1156.7);self.assertTrue(run['viewIds']);self.assertFalse((self.work/'delivery/study.json').exists());self.assertEqual(json.loads((self.work/'history.json').read_text()),history)
         history.append({'point':{'id':'b','power':20000},'status':'queued'});atomic(self.work/'history.json',history);self.observe();self.assertEqual(len(self.r.study(self.id)['runs']),2);self.assertEqual(self.r.study(self.id)['runs'][1]['responses'],{})
 
+    def test_comparison_uses_distinct_completed_points_beyond_the_short_preview(self):
+        from workspace_watch import history_facts
+        rows=[{'point':{'id':i},'status':'failed','reporting_response':{'rise':99}} for i in range(3)]
+        for ident,value in [('a',0),('a',1),('b',3)]:
+            rows.append({'point':{'id':ident},'status':'completed','response':None,'reporting_response':{'rise':value,'converged':True}})
+        atomic(self.work/'history.json',rows)
+        facts=history_facts(self.work,[{'path':'history.json','kind':'history'}])[0]
+        self.assertEqual(facts['comparableResponses'],{'reporting_response.rise':2})
+
     def test_presentation_child_exports_are_bound_to_one_explicit_run_and_seed_preview_fields(self):
         self.case('a');shutil.copytree(SOURCE/'1',self.work/'cases/a/1');self.study['runs'][0]['status']='completed';atomic(self.work/'delivery/study.json',self.study);self.observe()
         self.d.publish(self.id,{'exports':[{'id':'chosen-a','runId':'a','caseRoot':'cases/a','kind':'results','fields':['T']}]})

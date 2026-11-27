@@ -2,8 +2,9 @@ import {randomUUID} from 'node:crypto';
 // UI children belong to a private, unprompted presentation owner.
 // Solver agents receive no UI instructions, child lineage, or completion messages.
 // Coalesce observations; only one presentation child runs per main session at a time.
-import {FRONTEND_ROLE as ROLE,AGENT_RESULT_SCHEMA,SKILL} from './frontend-agent.mjs';
-import {attachFrontendTools,renderConfirmation,verifyRenderedSelection} from './frontend-tools.mjs';
+import {readFrontendRole,AGENT_RESULT_SCHEMA,SKILL} from './frontend-agent.mjs';
+import {attachFrontendTools,renderConfirmation,verifyRenderedSelection,selectionConfirmed} from './frontend-tools.mjs';
+import {comparisonReview,missingComparison} from './scientific-comparison.mjs';
 function containsModel(node){return node?.type==='model'||(node?.children||[]).some(containsModel);}
 const UPDATE_KEYS={parameters:{type:'array'},controls:{type:'array'},rendering:{type:'object'},parameterValues:{type:'object'},viewState:{type:'object'},interactions:{type:'array'},ui:{oneOf:[{type:'object'},{type:'null'}]},exports:{type:'array'},defaultView:{type:'string'},study:{type:'string'},studyMapping:{type:'object'},deliveryRequirements:{type:'object'},panelTitle:{type:'string'},panelDescription:{type:'string'}};
 export const SCHEMA={type:'object',properties:{update:{type:'object',properties:UPDATE_KEYS,additionalProperties:false}},required:['update'],additionalProperties:false};
@@ -31,19 +32,42 @@ export function mountPresenter(ctx,call,resolveTask,{timeoutMs=300000,maxWorkers
   attachFrontendTools(agent,{id:state.taskId,call,session,current:()=>!closed&&state.toolSession===session&&!state.controller?.signal.aborted});
  });
  const stateFor=id=>{if(!states.has(id))states.set(id,{taskId:id,agent:null,busy:false,revision:null,lastRun:0,settled:false});return states.get(id);};
- const publishState=(id,value)=>call(`/api/tasks/${id}/presenter`,{...value,...value.state==='idle'&&states.get(id)?.lastDataRevision?{dataRevision:states.get(id).lastDataRevision}:{},...states.get(id)?.operator?{operator:states.get(id).operator}:{}}).catch(()=>{});
  async function pump(state){
   if(closed||state.busy||Date.now()<(state.retryAt||0))return;state.busy=true;
   const requestEpoch=state.requestEpoch||0,superseded=()=>requestEpoch!==(state.requestEpoch||0);
+  const displayRequestRevision=state.displayRequestRevision;
+  const publishState=async(id,value)=>{
+   if(superseded())return;
+   const payload={...value};
+   if(displayRequestRevision!==undefined)payload.displayRequestRevision=displayRequestRevision;
+   if(value.state==='idle'&&state.lastDataRevision)payload.dataRevision=state.lastDataRevision;
+   if(state.operator)payload.operator=state.operator;
+   const endsDisplayRequest=displayRequestRevision!==undefined&&['idle','warning','error'].includes(value.state);
+   try{await call(`/api/tasks/${id}/presenter`,payload);}
+   catch{
+    if(endsDisplayRequest&&!superseded())state.pendingDisplayReceipt=payload;
+    return;
+   }
+   if(endsDisplayRequest&&!superseded()){
+    delete state.displayRequestRevision;
+    delete state.pendingDisplayReceipt;
+   }
+  };
   try{
    const id=state.taskId;
+   if(state.pendingDisplayReceipt){await publishState(id,state.pendingDisplayReceipt);return;}
    let facts=await call(`/api/tasks/${id}/observe`);
    if(superseded())return;
    state.lastDataRevision=facts.dataRevision;
    if(!state.initialized){
     state.initialized=true;
     const saved=facts.presenter;
-    if(!state.displayRequest&&!state.triggeredByFiles&&saved?.state==='idle'&&saved.dataRevision===facts.dataRevision&&facts.dataRevision&&['completed','failed','stopped','interrupted'].includes(facts.task.status)&&!facts.viewerState?.rendererError&&!(facts.uiState?.errors||[]).length){state.revision=facts.revision;state.settled=true;state.settledDataRevision=facts.dataRevision;return;}
+    if(!state.displayRequest&&!state.triggeredByFiles&&saved?.state==='idle'&&saved.dataRevision===facts.dataRevision&&facts.dataRevision&&['completed','failed','stopped','interrupted'].includes(facts.task.status)&&!facts.viewerState?.rendererError&&!(facts.uiState?.errors||[]).length){
+     const review=toolMode?comparisonReview(facts):null;
+     if(!missingComparison(review,saved.operator?.comparison?.exception,facts.task.latestRequest||facts.task.request)){
+      state.revision=facts.revision;state.settled=true;state.settledDataRevision=facts.dataRevision;return;
+     }
+    }
    }
    if(state.settled){if(facts.dataRevision===state.settledDataRevision||facts.dataRevision===undefined&&facts.revision===state.revision)return;state.settled=false;state.uiRepairAttempts=0;state.awaitingUI=null;state.awaitingView=null;}
    const request=facts.task.latestRequest||facts.task.request||'';
@@ -62,7 +86,7 @@ export function mountPresenter(ctx,call,resolveTask,{timeoutMs=300000,maxWorkers
       state.feedback='浏览器已连接。请对照当前请求核对已有组件，补齐仍未提交的内容。';
       await publishState(id,{state:'queued',message:'正在核对未完成的展示'});return;
      }
-     const confirmed=!proof||['verified','not-applicable'].includes(proof.status);
+     const confirmed=!advanced&&selectionConfirmed(pending);
      if(confirmed&&!advanced)state.failures=0;
      if(state.operator)Object.assign(state.operator,{confirmed,...proof?{selectionCheck:proof}:{}});
      state.settled=!advanced&&['completed','failed','stopped','interrupted'].includes(facts.task.status);if(state.settled)state.settledDataRevision=facts.dataRevision;
@@ -106,13 +130,24 @@ export function mountPresenter(ctx,call,resolveTask,{timeoutMs=300000,maxWorkers
    if(superseded())return;
    const agentOptions=state.agent?.options||ctx.agentDefaultModel?.currentSelection();
    if(!agentOptions?.provider||!agentOptions.model)throw new Error('展示模型尚未配置；请检查工作台默认模型设置');
-   const parent=await (state.ownerPromise??=ctx.agents.create({sessionId:'session-'+randomUUID(),meta:{origin:'subagent',cwd:process.env.MANDIFUEL_PRESENTER_WORKSPACE||process.cwd()},agentOptions,setup:agentCtx=>{agentCtx.systemPrompt.section({name:'mandifuel:presentation-isolated',order:0,text:ROLE,complete:true});}}));
+   const role=readFrontendRole();
+   const parent=await (state.ownerPromise??=ctx.agents.create({sessionId:'session-'+randomUUID(),meta:{origin:'subagent',cwd:process.env.MANDIFUEL_PRESENTER_WORKSPACE||process.cwd()},agentOptions,setup:agentCtx=>{agentCtx.systemPrompt.section({name:'mandifuel:presentation-isolated',order:0,text:role,complete:true});}}).catch(error=>{state.ownerPromise=null;throw error;}));
    if(superseded())return;
    const session=toolMode?{closed:false,request,cancel:()=>controller.abort(new Error('新的用户请求已替代当前前端操作'))}:null;state.toolSession=session;
    if(toolMode)owners.set(String(parent.agent.id),state);
-   const prompt=toolMode?{request,calculationRequest:facts.task.request,trigger:facts.stage,skill:SKILL,currentPage:await call(`/api/tasks/${id}/frontend?target=page`),validationFeedback:state.feedback||null}:{...facts,validationFeedback:state.feedback||null,rejectedUpdate:state.rejectedUpdate||null};
+   const prompt=toolMode?{request,requestKind:facts.task.displayOnly||state.displayRequest?'display-edit':'results',calculationRequest:facts.task.request,trigger:facts.stage,comparisonReview:comparisonReview(facts),skill:SKILL,currentPage:await call(`/api/tasks/${id}/frontend?target=page`),validationFeedback:state.feedback||null}:{...facts,validationFeedback:state.feedback||null,rejectedUpdate:state.rejectedUpdate||null};
+   if(prompt.comparisonReview){
+    const documents=facts.availableDocuments||[];
+    const report=documents.find(path=>/^report\.md$/i.test(path))||(documents.length===1?documents[0]:null);
+    if(report){
+     try{
+      const source=await call(`/api/tasks/${id}/frontend?target=data&node=${encodeURIComponent(report)}`);
+      prompt.comparisonReview.report=source.document;
+     }catch{prompt.comparisonReview.report={file:report,available:false};}
+    }
+   }
    if(superseded())return;
-   const run=await ctx.subagents.start('spawn',{label:'前端操作',parent:parent.agent,signal:controller.signal,persona:ROLE,toolFilter:{allow:[]},outputSchema:toolMode?AGENT_RESULT_SCHEMA:SCHEMA,prompt:[{type:'text',text:'读取前端技能并操作当前任务的授权插槽。\n'+JSON.stringify(prompt)}]});state.run=run;
+   const run=await ctx.subagents.start('spawn',{label:'前端操作',parent:parent.agent,signal:controller.signal,persona:role,toolFilter:{allow:[]},outputSchema:toolMode?AGENT_RESULT_SCHEMA:SCHEMA,prompt:[{type:'text',text:'读取前端技能并操作当前任务的授权插槽。\n'+JSON.stringify(prompt)}]});state.run=run;
    await publishState(id,{state:'running',sessionId:String(run.id),message:'正在整理界面'});
    let timer;const result=await Promise.race([run.result,new Promise((_,reject)=>{timer=setTimeout(()=>{controller.abort();reject(new Error('展示生成超时，将在后台有限重试；计算任务继续运行'));},timeoutMs);})]).finally(()=>clearTimeout(timer));
    if(superseded())return;
@@ -134,9 +169,14 @@ export function mountPresenter(ctx,call,resolveTask,{timeoutMs=300000,maxWorkers
     // Verify even a no-op claim: the model may still be loading, or the page
     // may have disconnected since the child's last successful observation.
     const page=await call(`/api/tasks/${id}/frontend?target=page`),expected=published||session.renderExpected||page;
+    const review=comparisonReview(latest),exception=result.structured.comparisonException;
+    if(missingComparison(review,exception,latest.task.latestRequest||latest.task.request)){
+     throw new Error('已有多个完成工况，当前页面还缺少工况比较图。读取 data 中的结果表和报告，选择可比输入与响应，先提交一幅有单位的真实数据图，再核对页面。显式格式限制或数据无法比较时填写 comparisonException。');
+    }
+    if(review)state.operator.comparison={...review,...exception?{exception}:{}};
     const confirmed=renderConfirmation(page,expected)==='confirmed',pending=!confirmed;
     // A pending plan is not a browser receipt for the already visible model.
-    const waitingForReceipt=['pending','offline'].includes(session.renderStatus);
+    const waitingForReceipt=['pending','offline','selection-unconfirmed'].includes(session.renderStatus);
     if(status==='pending'&&!waitingForReceipt&&(!published||confirmed)){
      if(['completed','failed','stopped','interrupted'].includes(latest.task.status))throw new Error(summary||'计算已结束，请继续提交尚缺的展示内容');
      await publishState(id,{state:'waiting',message:summary||'等待计算结果'});return;
@@ -145,16 +185,17 @@ export function mountPresenter(ctx,call,resolveTask,{timeoutMs=300000,maxWorkers
     if(session.selectionCheck?.status==='failed')throw new Error('联动复验失败，请检查工况或保存帧绑定');
     state.feedback=null;state.failedFeedback=null;state.retryAt=0;
     if(confirmed)state.failures=0;
-    if(pending){state.awaitingFrontend={...expected,checkSelection:session.checkSelection,resumeAfterAck:status==='pending'&&!published,dataRevision:facts.dataRevision,deadline:Date.now()+30000};state.ackExpired=false;}
+    if(pending){state.awaitingFrontend={...expected,checkSelection:session.checkSelection,requireSelection:session.requireSelection,resumeAfterAck:status==='pending'&&!published,dataRevision:facts.dataRevision,deadline:Date.now()+30000};state.ackExpired=false;}
     state.settled=!pending&&latest.revision===facts.revision&&['completed','failed','stopped','interrupted'].includes(latest.task.status);if(state.settled)state.settledDataRevision=latest.dataRevision;
     state.triggeredByFiles=false;state.displayRequest=false;
     Object.assign(state.operator,{confirmed,...session.selectionCheck?{selectionCheck:session.selectionCheck}:{}});
     const advanced=latest.revision!==facts.revision;
-    if(confirmed&&session.selectionCheck&&!['verified','not-applicable'].includes(session.selectionCheck.status)){
+    if(confirmed&&!selectionConfirmed(session)){
      state.operator.confirmed=false;state.settled=latest.dataRevision===facts.dataRevision;state.settledDataRevision=facts.dataRevision;
      await publishState(id,{state:'warning',message:'页面已显示，本次工况或时刻切换尚未得到浏览器确认'});return;
     }
-    await publishState(id,{state:pending?'waiting':advanced?'queued':'idle',sessionId:String(run.id),message:pending?'配置已保存，等待页面确认':advanced?'等待同步最新结果':String(result.structured.summary||'界面已确认').slice(0,160)});
+    const visibleSummary=summary.trim().split(/\n\s*\n|(?<=[。！？])/,1)[0]||'界面已确认';
+    await publishState(id,{state:pending?'waiting':advanced?'queued':'idle',sessionId:String(run.id),message:pending?'配置已保存，等待页面确认':advanced?'等待同步最新结果':visibleSummary});
     return;
    }
    if(result.stopReason!=='completed'||!result.structured?.update)throw new Error(result.diagnostic||'展示子任务未能生成有效配置（'+result.stopReason+'）');
@@ -187,15 +228,49 @@ export function mountPresenter(ctx,call,resolveTask,{timeoutMs=300000,maxWorkers
  };
  const discover=async()=>{
   for(const agent of ctx.agents?.roots?.()||[])if(agent.session.header.origin!=='subagent'&&![...states.values()].some(s=>s.agent===agent))notify(agent);
-  const tasks=await call('/api/tasks');if(!Array.isArray(tasks))return;
+  const tasks=await call('/api/tasks');
+  if(!Array.isArray(tasks)){
+   // Older embedders expose individual observations without a task index.
+   for(const state of states.values())if(state.settled)void pump(state);
+   return;
+  }
   for(const task of tasks){
-   if(task.draft)continue;const previous=observedTasks.get(task.id),observed=JSON.stringify([task.workspaceRevision||0,task.evidence?.revision]);observedTasks.set(task.id,observed);
-   const changed=previous!==undefined&&previous!==observed,missed=previous===undefined&&(task.workspaceRevision||0)>0&&task.status&&task.presenter?.state!=='idle';
-   if(changed||missed){const state=stateFor(task.id);state.triggeredByFiles=true;state.settled=false;state.uiRepairAttempts=0;state.failures=0;state.retryAt=0;void pump(state);}
+   if(task.draft)continue;
+   const previous=observedTasks.get(task.id);
+   const data=JSON.stringify([task.workspaceRevision||0,task.evidence?.revision,task.study?.version,task.status]);
+   observedTasks.set(task.id,{data,issue:task.renderIssue});
+   const changed=previous&&previous.data!==data;
+   const savedRequest=task.presenter?.displayRequestRevision;
+   const missed=!previous&&(savedRequest!==undefined||(task.workspaceRevision||0)>0&&task.status&&task.presenter?.state!=='idle');
+   const newError=task.renderIssue&&task.renderIssue!==previous?.issue;
+   if(!changed&&!missed&&!newError)continue;
+   const state=stateFor(task.id);
+   if(!changed&&!missed&&(state.busy||state.awaitingFrontend||state.failures>2||state.uiRepairAttempts>2))continue;
+   if(missed&&savedRequest!==undefined&&state.displayRequestRevision===undefined){
+    state.displayRequestRevision=savedRequest;state.displayRequest=true;
+   }
+   state.triggeredByFiles=true;state.settled=false;
+   if(changed||missed){state.uiRepairAttempts=0;state.failures=0;state.retryAt=0;}
+   void pump(state);
   }
  };
- const timer=setInterval(()=>{void discover().catch(()=>{});for(const state of states.values())void pump(state);},3000);void discover().catch(()=>{});
+ const timer=setInterval(()=>{void discover().catch(()=>{});for(const state of states.values())if(!state.settled||state.pendingDisplayReceipt)void pump(state);},3000);void discover().catch(()=>{});
+ const reviewedOnOpen=new Set();
+ async function reviewSaved(id){
+  if(!toolMode||closed||states.has(id)||reviewedOnOpen.has(id))return;
+  reviewedOnOpen.add(id);
+  try{
+   const facts=await call(`/api/tasks/${id}/observe`);
+   if(closed||states.has(id)||facts.presenter?.state!=='idle')return;
+   const review=comparisonReview(facts);
+   if(missingComparison(review,facts.presenter.operator?.comparison?.exception,facts.task.latestRequest||facts.task.request))void pump(stateFor(id));
+  }catch{reviewedOnOpen.delete(id);}
+ }
  ctx.on('agent/disposed',({agent})=>{for(const state of states.values())if(state.agent===agent)state.agent=null;});
  ctx.effect(()=>async()=>{closed=true;clearInterval(timer);const runs=[];for(const s of states.values()){s.controller?.abort();if(s.run)runs.push(s.run.dispose());if(s.ownerPromise)runs.push(s.ownerPromise.then(h=>h.dispose()));}await Promise.allSettled(runs);states.clear();owners.clear();});
- return {notify,request(id){const state=stateFor(id);state.requestEpoch=(state.requestEpoch||0)+1;state.controller?.abort(new Error('新的显示请求已替代当前前端操作'));state.awaitingFrontend=null;state.awaitingUI=null;state.awaitingView=null;state.uiRepairAttempts=0;state.settled=false;state.displayRequest=true;state.failures=0;state.feedback=null;state.failedFeedback=null;state.retryAt=0;state.revision=null;void pump(state);}};
+ return {notify,reviewSaved,request(id,displayRequestRevision){
+  const state=stateFor(id);state.requestEpoch=(state.requestEpoch||0)+1;
+  state.displayRequestRevision=displayRequestRevision;delete state.pendingDisplayReceipt;
+  state.controller?.abort(new Error('新的显示请求已替代当前前端操作'));state.awaitingFrontend=null;state.awaitingUI=null;state.awaitingView=null;state.uiRepairAttempts=0;state.settled=false;state.displayRequest=true;state.failures=0;state.feedback=null;state.failedFeedback=null;state.retryAt=0;state.revision=null;void pump(state);
+ }};
 }

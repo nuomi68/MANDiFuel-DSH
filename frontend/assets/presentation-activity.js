@@ -1,7 +1,7 @@
 export function presentationActivity(task){
  if(!task||task.draft)return{active:false,state:'idle',label:''};
  const computing=['queued','starting','running','importing'].includes(task.status);
- const presenting=['queued','running','waiting'].includes(task.presenter?.state);
+ const presenting=Number.isInteger(task.presenter?.displayRequestRevision)&&['queued','running','waiting'].includes(task.presenter.state);
  return{active:computing||presenting,state:computing?'computing':presenting?task.presenter.state:'idle',label:''};
 }
 

@@ -170,7 +170,10 @@ class EvidenceService:
 
     def index(self,ident,claim=None,source=None):
         with self.registry.lock:work=self.registry._job(ident)['workspace']
-        with self.lock:self.requested.add(ident);cases=copy.deepcopy(self.reports.get(ident,[]));state=self.states.get(ident,'idle')
+        with self.lock:
+            self.requested.add(ident);cases=self.reports.get(ident,[])
+            if claim:cases=[c for c in cases if any(item['id']==claim for item in c.get('claims',[]))]
+            cases=copy.deepcopy(cases);state=self.states.get(ident,'idle')
         summaries=[];case_rows=[]
         for case in cases:
             fresh=self.fresh(work,case) and state not in {'pending','error'};case_state=case['state'] if fresh else 'stale' if case.get('claims') else case['state']

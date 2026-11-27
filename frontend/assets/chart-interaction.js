@@ -20,6 +20,11 @@ export class ChartInteraction{
   body.addEventListener('wheel',e=>{if(!e.ctrlKey||!this.domain())return;e.preventDefault();this.viewport=centeredZoom(this.domain(),e.deltaY<0?.8:1.25);this.repaint();},{passive:false});
  }
  get svg(){return this.entry.body.querySelector('svg');}
+ get hiddenSeries(){return [...this.hidden].filter(key=>key.startsWith('series:')).map(key=>Number(key.slice(7)));}
+ set hiddenSeries(indices){
+  this.hidden=new Set([...this.hidden].filter(key=>!key.startsWith('series:')));
+  for(const index of indices)this.hidden.add('series:'+index);
+ }
  domain(){const value=this.svg?.dataset.chartDomain;return value?JSON.parse(value):null;}
  toolbar(){
   const bar=el('div','adaptive-chart-tools');

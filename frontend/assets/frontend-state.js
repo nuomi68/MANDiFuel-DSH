@@ -11,7 +11,7 @@ function coverage(element){
  return{inViewport,coveredBy:[...covered].slice(0,3)};
 }
 export function captureFrontendState({task,state,adaptive,style,modelReady=true}){
- const nodes=[...(adaptive?.nodes?.values()||[])].slice(0,64).map(entry=>({id:entry.node.id,type:entry.node.type,visible:visible(entry.element),rect:box(entry.element),...coverage(entry.element),...(entry.activeTab?{activeTab:entry.activeTab}:{}),...(entry.node.type==='table'?{table:{query:(entry.query||'').slice(0,200),page:entry.page||0,rows:Math.min(20000,entry.table?.rows?.length||0),sort:entry.sort||null}}:{}),...(entry.interaction?{chart:{viewport:entry.interaction.viewport,hiddenSeries:[...entry.interaction.hidden]}}:{})}));
+ const nodes=[...(adaptive?.nodes?.values()||[])].slice(0,64).map(entry=>({id:entry.node.id,type:entry.node.type,visible:visible(entry.element),rect:box(entry.element),...coverage(entry.element),...(entry.activeTab?{activeTab:entry.activeTab}:{}),...(entry.node.type==='table'?{table:{query:(entry.query||'').slice(0,200),page:entry.page||0,rows:Math.min(20000,entry.table?.rows?.length||0),sort:entry.sort||null}}:{}),...(entry.interaction?{chart:{viewport:entry.interaction.viewport,hiddenSeries:entry.interaction.hiddenSeries}}:{})}));
  const slot=id=>{const element=document.querySelector(id);return{visible:visible(element),rect:box(element)};};
  const selection=Object.fromEntries(['run','panel','field','view','frame'].map(k=>[k,state[k]??null]));selection.settingsOpen=document.querySelector('#drawer')?.open===true&&document.querySelector('#drawer')?.dataset.view==='settings';
  const fieldAvailable=modelReady&&!document.querySelector('#model-stage')?.classList.contains('mesh-preview');

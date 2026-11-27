@@ -72,3 +72,6 @@
 @keyframes presentation-placeholder-sweep{to{transform:translateX(100%)}}
 @media(max-width:650px){.presentation-skeletons{grid-template-columns:minmax(0,1fr);gap:16px}.presentation-placeholder{height:260px;padding:18px;gap:14px}}
 @media(prefers-reduced-motion:reduce){.presentation-placeholder-bar:after{animation:none}}
+
+.parameter-readback summary{cursor:pointer;color:var(--muted);padding:12px 0}
+.parameter-case a{color:var(--accent);text-underline-offset:3px}
