@@ -12,6 +12,13 @@ function coverage(element){
 }
 export function captureFrontendState({task,state,adaptive,style,modelReady=true}){
  const nodes=[...(adaptive?.nodes?.values()||[])].slice(0,64).map(entry=>({id:entry.node.id,type:entry.node.type,visible:visible(entry.element),rect:box(entry.element),...coverage(entry.element),...(entry.activeTab?{activeTab:entry.activeTab}:{}),...(entry.node.type==='table'?{table:{query:(entry.query||'').slice(0,200),page:entry.page||0,rows:Math.min(20000,entry.table?.rows?.length||0),sort:entry.sort||null}}:{}),...(entry.interaction?{chart:{viewport:entry.interaction.viewport,hiddenSeries:entry.interaction.hiddenSeries}}:{})}));
+ for(const node of nodes){
+  const record=adaptive.nodes.get(node.id)?.probe;
+  if(record&&!adaptive.nodes.get(node.id).error){
+   const {view,field,unit,timeUnit,valueUnit,x:time,value,cell,targetRadius,sampleRadius,sampleX,sampleY,sampleZ}=record;
+   node.probe={view,field,unit,timeUnit,valueUnit,time,value,cell,targetRadius,sampleRadius,sampleX,sampleY,sampleZ};
+  }
+ }
  const slot=id=>{const element=document.querySelector(id);return{visible:visible(element),rect:box(element)};};
  const selection=Object.fromEntries(['run','panel','field','view','frame'].map(k=>[k,state[k]??null]));selection.settingsOpen=document.querySelector('#drawer')?.open===true&&document.querySelector('#drawer')?.dataset.view==='settings';
  const fieldAvailable=modelReady&&!document.querySelector('#model-stage')?.classList.contains('mesh-preview');
@@ -19,6 +26,11 @@ export function captureFrontendState({task,state,adaptive,style,modelReady=true}
  if(fieldAvailable&&Number.isFinite(adaptive?.context?.time)){selection.time=adaptive.context.time;selection.timeUnit=adaptive.context.timeUnit||null;}
  const display=Object.fromEntries(['mesh','extrema','cut','cutAngle','cameraView','aspectMode','displayMode','sliceAxis','slicePosition','compare','compareField','scale','colorMin','colorMax'].map(k=>[k,state[k]??null]));if(style)display.appearance=style;
  const mapping=document.querySelector('#model-canvas')?.dataset.fieldMapping;if(mapping)display.fieldMapping=JSON.parse(mapping);
+ const overlay=document.querySelector('.extrema-overlay[data-for="model-canvas"]');
+ if(fieldAvailable&&overlay&&!overlay.hidden){
+  const samples=JSON.parse(overlay.dataset.markers||'[]').filter(m=>m.kind==='boundaryProbe');
+  if(samples.length)display.boundarySamples=samples.slice(0,12).map(({patch,field,value,unit,sourceFace,sourcePoint})=>({patch,field,value,unit,face:sourceFace,centre:sourcePoint}));
+ }
  const stage=document.querySelector('#model-stage'),model={visible:visible(stage),ready:modelReady&&!!stage&&!stage.classList.contains('unready')&&document.querySelector('#viewer-error')?.hidden!==false,kind:stage?.classList.contains('unready')?'pending':stage?.classList.contains('mesh-preview')?'mesh':'fields',view:state.view||null,field:fieldAvailable?state.field||null:null};
  return{model,pickedPoint:state.pickedPoint||null,revision:task.presentation?.uiRevision||0,presentationVersion:task.presentationVersion||0,interactionRevision:task.presentation?.interactionRevision||0,ready:!adaptive?.document||adaptive.ready,panels:nodes.map(n=>n.id),errors:[...(adaptive?.nodes?.values()||[])].filter(e=>e.error||e.visibilityError).map(e=>({id:e.node.id,message:e.error||e.visibilityError})),viewport:{width:window.innerWidth,height:window.innerHeight,dpr:window.devicePixelRatio,scrollX:window.scrollX,scrollY:window.scrollY},slots:{main:slot('.model-column'),aside:slot('#adaptive-aside'),settings:slot('#drawer'),model:slot('#model-stage'),conversation:slot('#conversation-column'),evidence:slot('#evidence-dialog')},nodes,selection,parameters:{...state.parameters},display};
 }

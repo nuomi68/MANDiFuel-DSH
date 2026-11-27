@@ -11,7 +11,7 @@ import threading
 import time
 from rendering import validate_rendering,merge_rendering,show_scale_controls,CAPABILITIES,PALETTES
 from agent_panel import validate_parameter,program_parameters,parameter_state,check_program_values,validate_view_state
-from adaptive_ui import validate_ui,validate_ui_delivery,ui_parameters,load_dataset,CATALOG
+from adaptive_ui import validate_ui,validate_ui_delivery,ui_parameters,load_dataset,link_case_rows,CATALOG
 
 CONTROL_SPECS={
  'cut':{'type':'toggle','label':'剖切模型','default':False},
@@ -178,6 +178,11 @@ def validate_delivery(config, views, preferred, previous=None, workspace=None, s
         targets=[views[v]['task'] for v in annotation.get('views',[preferred]) if v in views]
         for target in targets:
             if target.get('shape') not in {'mesh','sphere','shell','rod'}:raise ValueError('坐标标注需要已交付的几何视图')
+            if annotation['type']=='boundaryProbe':
+                available=set(target.get('boundaryPatches',{}).get(annotation['patch'],[]))
+                field=annotation.get('field','selected')
+                required={f['id'] for f in target.get('fields',[])} if field=='selected' else {field}
+                if not required or required-available:raise ValueError('边界测点缺少同一保存帧的面值，请用 shell 重新导出含指定字段的视图并核对 patch')
             if annotation['type']=='probe':
                 fields={f['id'] for f in target.get('fields',[])}
                 if not fields or not target.get('supportsExtrema'):raise ValueError('点值标注需要实际字段和原始单元中心，请重新导出已有结果')
@@ -445,6 +450,9 @@ class Dashboard:
                         record_files.append({'file':spec['path'],'rowsPath':rows_path,'count':len(rows),'sample':sample,'context':context,**({'omittedFields':sorted(omitted)} if omitted else {})})
                 except (ValueError,OSError):continue
         observed={'studyVersion':m.get('studyVersion',0),'status':status,'stage':stage,'cases':cases,'promptRevision':m.get('promptRevision',0),'displayPromptRevision':m.get('displayPromptRevision',0),'workspaceRevision':m.get('workspaceWatch',{}).get('revision',0),'evidenceRevision':m.get('evidence',{}).get('revision')}
+        from calculator_api import published_views
+        applications=published_views(work,task.get('views',[]))
+        if applications:observed['applicationViews']=applications
         data_revision=hashlib.sha256(json.dumps(observed,sort_keys=True).encode()).hexdigest()[:20]
         observed.update(current_render_errors(m))
         revision=hashlib.sha256(json.dumps(observed,sort_keys=True).encode()).hexdigest()[:20]
@@ -459,7 +467,7 @@ class Dashboard:
                 p=Path(base)/name
                 if len(images)<12 and p.suffix.lower() in {'.png','.jpg','.jpeg','.webp'} and not p.is_symlink() and 0<p.stat().st_size<=10*1024*1024:images.append({'file':str(p.relative_to(work)),'bytes':p.stat().st_size})
         documents=[f['path'] for f in m.get('files',[]) if f['path'].lower().endswith('.md')]
-        return {'availableDocuments':documents,'observer':self.health(),'workspaceHistory':workspace_history,'revision':revision,'dataRevision':data_revision,'presenter':m.get('presenter',{}),'task':{'title':m['title'],'request':m.get('latestPrompt') or m['prompt'],'latestRequest':latest_request(m),'displayOnly':bool(m.get('latestDisplayPrompt')),'status':status},'stage':stage,'summary':summary,'recentActions':actions,'cases':cases,'presentation':m.get('presentation',{}),'viewerState':m.get('viewerState',{}),'fieldFacts':field_facts,'deliveryRequirements':requested_delivery(latest_request(m)),'study':task.get('study'),'studyFile':'delivery/study.json' if (work/'delivery/study.json').is_file() else None,'studyVariables':{'parameters':m['study']['parameters'],'responses':m['study']['responses']} if m.get('study') else None,'viewCount':len(task.get('views',[])),'views':visible_views,'capabilities':list(CONTROL_SPECS),'renderingCapabilities':CAPABILITIES,'uiCapabilities':CATALOG,'uiState':m.get('uiState',{}),'deliveryFiles':m.get('files',[])[:40],'availableTables':tables,'availableReports':reports,'availableImages':images,'availableRecords':record_files[:8],'workspaceChanges':m.get('workspaceWatch',{}),'studyRuns':[run for run in m.get('study',{}).get('runs',[]) if run.get('caseRoot')][:20]}
+        return {'applicationViews':applications,'availableDocuments':documents,'observer':self.health(),'workspaceHistory':workspace_history,'revision':revision,'dataRevision':data_revision,'presenter':m.get('presenter',{}),'task':{'title':m['title'],'request':m.get('latestPrompt') or m['prompt'],'latestRequest':latest_request(m),'displayOnly':bool(m.get('latestDisplayPrompt')),'status':status},'stage':stage,'summary':summary,'recentActions':actions,'cases':cases,'presentation':m.get('presentation',{}),'viewerState':m.get('viewerState',{}),'fieldFacts':field_facts,'deliveryRequirements':requested_delivery(latest_request(m)),'study':task.get('study'),'studyFile':'delivery/study.json' if (work/'delivery/study.json').is_file() else None,'studyVariables':{'parameters':m['study']['parameters'],'responses':m['study']['responses']} if m.get('study') else None,'viewCount':len(task.get('views',[])),'views':visible_views,'capabilities':list(CONTROL_SPECS),'renderingCapabilities':CAPABILITIES,'uiCapabilities':CATALOG,'uiState':m.get('uiState',{}),'deliveryFiles':m.get('files',[])[:40],'availableTables':tables,'availableReports':reports,'availableImages':images,'availableRecords':record_files[:8],'workspaceChanges':m.get('workspaceWatch',{}),'studyRuns':[run for run in m.get('study',{}).get('runs',[]) if run.get('caseRoot')][:20]}
     def publish(self,ident,update,*,expected_frontend_revision=None):
         # Export only existing case data. No shell or solver capability is provided.
         r=self.registry;config=validate_presentation(update)
@@ -505,7 +513,7 @@ class Dashboard:
                     if not facts or not facts['latestTime']:raise ValueError('尚无已保存的计算结果')
                     export_case(case,target,title=title,selectors=spec.get('fields'),time=spec.get('time','latest'),shape=spec.get('shape','mesh'),radius=spec.get('radius'),inner_radius=spec.get('innerRadius',0),length=spec.get('length'),time_unit=spec.get('timeUnit'),radial_bands=spec.get('radialBands'),axis=spec.get('axis','z'),sweep_angle=spec.get('sweepAngle',270.),write_handoff=False)
                 else:raise ValueError('未知交付类型')
-                bundle=validate_bundle(read_json(target));pending.append((target,final));candidate[key]={'task':bundle['task']}
+                bundle=validate_bundle(read_json(target));pending.append((target,final));candidate[key]={'task':bundle['task'],'caseRoot':spec['caseRoot']}
                 outputs.append({'id':key,**({'runId':spec['runId']} if spec.get('runId') else {}),'label':text(spec.get('label','网格预览' if spec['kind']=='mesh' else '计算结果'),60),'viewer':str(final.relative_to(work))})
         with r.lock:
             job=r._job(ident);m=job['meta']
@@ -526,7 +534,7 @@ class Dashboard:
                 manifest_path.parent.mkdir(parents=True,exist_ok=True)
                 manifest=read_json(manifest_path) if manifest_path.exists() else {'schema':'mandifuel.handoff/v1'}
                 if config.get('ui'):
-                    manifest['files']=sorted(set(manifest.get('files',[]))|{spec['file'] for spec in config['ui'].get('datasets',{}).values()})
+                    manifest['files']=sorted(set(manifest.get('files',[]))|{spec['file'] for spec in config['ui'].get('datasets',{}).values() if 'file' in spec})
                 views={}
                 from registry import inside,validate_bundle
                 for v in manifest.get('views',[]):
@@ -600,10 +608,26 @@ class Dashboard:
     def ui_dataset(self,ident,dataset,revision=None):
         r=self.registry
         with r.lock:
-            job=r._job(ident);spec=(job['meta'].get('presentation',{}).get('ui') or {}).get('datasets',{}).get(dataset)
+            job=r._job(ident);document=job['meta'].get('presentation',{}).get('ui') or {}
+            spec=document.get('datasets',{}).get(dataset)
             if revision is not None and revision!=job['meta'].get('presentation',{}).get('uiRevision',0):raise ValueError('展示数据版本已变化，请等待刷新')
             if spec is None:raise ValueError('展示数据表尚未声明')
-            return load_dataset(job['workspace'],spec)
+            work=job['workspace']
+            from adaptive_ui import ui_sources,exact_dataset_frames
+            bindings=[source for source in ui_sources(document) if source.get('dataset')==dataset and source.get('selection',{}).get('timeColumn')]
+            preferred=job['meta'].get('defaultView')
+            views=r.public(job)['views']
+            if bindings or 'quantity' in spec:
+                for v in views:
+                    if v['kind']=='results' and 'savedTimes' not in v['task']:
+                        bundle=r._view_bundle(job,v['id'])
+                        v['task']['savedTimes']=[f['time'] for f in bundle['data']['frames']]
+        by_id={v['id']:v for v in views}
+        table=load_dataset(work,spec,by_id)
+        for source in bindings:exact_dataset_frames(table,source,by_id,preferred,spec,work)
+        if 'quantity' in spec:return table
+        from scientific_samples import channel_rows
+        return channel_rows(work,spec,link_case_rows(work,spec,table,views),views)
     def ui_image(self,ident,relative):
         from adaptive_ui import walk_ui,image_file
         r=self.registry

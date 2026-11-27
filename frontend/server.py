@@ -60,6 +60,9 @@ class Handler(SimpleHTTPRequestHandler):
                 if len(parts)>=3 and parts[1]=='tasks':
                     ident=parts[2];resource=parts[3] if len(parts)==4 else None
                     if len(parts)==3:return self.send_json(manager.snapshot(ident),head=head)
+                    if resource=='calculator':
+                        from calculator_api import get
+                        return self.send_json(get(manager,ident,parse_qs(parsed.query)),head=head)
                     if resource=='fields':return self.send_json(manager.fields(ident,parse_qs(parsed.query).get('view',[None])[0]),head=head)
                     if resource=='study':return self.send_json(manager.study(ident),head=head)
                     if resource=='observe':return self.send_json(manager.dashboard.inspect(ident),head=head)
@@ -101,10 +104,22 @@ class Handler(SimpleHTTPRequestHandler):
             data=json.loads(self.rfile.read(length))
             if not isinstance(data,dict):raise ValueError('请求必须是 JSON 对象')
             path=urlsplit(self.path).path;parts=path.strip('/').split('/');manager=self.server.manager
+            if path=='/api/process-briefs':
+                from process_briefs import pending
+                return self.send_json(pending(manager))
             if path=='/api/draft':return self.send_json(manager.draft())
             if path=='/api/adopt':return self.send_json(manager.adopt(str(data['cwd']),str(data['sessionId'])))
             if path=='/api/tasks':return self.send_json(manager.prepare(str(data.get('prompt','')),str(data.get('title','')),data.get('source')),201)
             if len(parts)==4 and parts[:2]==['api','tasks']:
+                if parts[3]=='process-summary':
+                    from process_briefs import publish
+                    return self.send_json(publish(manager,parts[2],data))
+                if parts[3]=='calculator-build-state':
+                    from calculator_api import build
+                    return self.send_json(build(manager,parts[2],data))
+                if parts[3]=='calculator':
+                    from calculator_api import post
+                    return self.send_json(post(manager,parts[2],data))
                 if parts[3] in {'selection-check','selection-check-result'}:
                     from frontend_session import selection_check,selection_check_result
                     operation=selection_check if parts[3]=='selection-check' else selection_check_result

@@ -14,16 +14,43 @@ import threading
 import time
 import uuid
 
-from progress_history import current_progress,record_progress
+from progress_history import current_progress,record_progress,execution_history
 
 REPO=Path(__file__).resolve().parents[1]
 RUNNING={'queued','starting','running','importing'}
 MAX_JSON=64*1024*1024
-SOLVER_GUIDANCE='你是 OFFBEAT 计算运行助手。使用准备好的 MANDiFuel Skills 与本地资源，不联网，不查看或修改求解器、插件和解析器实现。按用户请求独立完成输入准备、网格、求解、结果提取与报告。resources.md 提供资料。保留实际输入、结果根、运行回执及必要脚本；扫描、优化和不确定度使用已有 Study 工作流记录参数计划、候选、状态与真实响应。遵守用户给定的预算、停止条件和失败处理要求。\n'
+SOLVER_GUIDANCE='你是 OFFBEAT 计算运行助手。使用准备好的 MANDiFuel Skills 与本地资料，选源使用宿主工具 mandifuel_retrieve，任务脚本离线运行，不查看或修改求解器、插件和解析器实现。按用户请求独立完成输入准备、网格、求解、结果提取与报告。resources.md 提供资料。保留实际输入、结果根、运行回执及必要脚本；扫描、优化和不确定度使用已有 Study 工作流记录参数计划、候选、状态与真实响应。遵守用户给定的预算、停止条件和失败处理要求。\n'
 
 
 def now():return datetime.now(timezone.utc).isoformat()
 def latest_request(meta):return meta.get('latestDisplayPrompt') or meta.get('latestPrompt') or meta.get('prompt','')
+
+def render_step(presenter):
+    state=presenter.get('state')
+    message=str(presenter.get('message',''))
+    if state=='idle':
+        label='浏览器已确认展示' if presenter.get('operator',{}).get('confirmed') or message in {'界面已显示','前端操作已由页面确认','应用组件已在工作台显示'} else '本轮展示已结束'
+    elif state=='running':label=presenter.get('operation') or '正在编排页面'
+    elif state=='queued':label='等待重试' if presenter.get('retryAt') else '等待编排页面'
+    elif state=='waiting':label='等待浏览器确认' if '确认' in message or '回执' in message else '等待计算结果'
+    elif state=='warning':label='展示待确认'
+    elif state=='error':label='展示遇到问题'
+    else:return None
+    return {'state':state,'label':label,'detail':message[:350] if state in {'warning','error'} or presenter.get('retryAt') else ''}
+
+
+def current_render_step(meta):
+    step=render_step(meta.get('presenter',{}))
+    if step and step['state']=='idle' and current_render_errors(meta):
+        return {'state':'warning','label':'展示待确认','detail':'当前页面回执有显示错误'}
+    return step
+
+
+def record_render(meta):
+    step=current_render_step(meta)
+    history=meta.setdefault('renderHistory',[])
+    if step and (not history or any(step[k]!=history[-1].get(k) for k in step)):
+        history.append(dict(step,timestamp=now()))
 
 
 def current_render_errors(meta):
@@ -89,7 +116,23 @@ def validate_bundle(bundle):
     for v in variables:
         a,b=v['range']
         if not number(a) or not number(b) or b<=a:raise ValueError('色标范围无效')
+    boundary_fields = None
     for frame in frames:
+        patches = frame.get('boundarySamples', {})
+        if not isinstance(patches, dict): raise ValueError('边界采样表无效')
+        available = set()
+        for patch,sample in patches.items():
+            if not isinstance(sample,dict) or not isinstance(patch,str): raise ValueError('边界采样无效')
+            point = sample.get('point')
+            if (type(sample.get('face')) is not int or sample['face']<0 or
+                not isinstance(point,list) or len(point)!=3 or not all(map(number,point)) or
+                not number(sample.get('radius')) or not math.isclose(math.hypot(*point),sample['radius'],rel_tol=1e-12)):
+                raise ValueError('边界面位置无效')
+            values = sample.get('fields')
+            if not isinstance(values,dict) or values.keys()-frame['fields'].keys() or not all(map(number,values.values())):
+                raise ValueError('边界字段无效')
+            available.update((patch,key) for key in values)
+        boundary_fields = available if boundary_fields is None else boundary_fields & available
         if not number(frame['time']):raise ValueError('时间无效')
         for v in variables:
             values=frame['fields'][v['id']]
@@ -100,6 +143,10 @@ def validate_bundle(bundle):
             if meta.get('reconstruction')!=mesh.get('reconstruction'):raise ValueError('重建声明与实际几何不一致')
             if meta.get('supportsExtrema') and not mesh.get('cellCenters'):raise ValueError('极值标注缺少真实单元中心')
     if meta['shape']!='mesh' and any(a>b for a,b in zip(r,r[1:])):raise ValueError('径向坐标必须递增')
+    times=[f['time'] for f in frames]
+    if any(b<=a for a,b in zip(times,times[1:])):raise ValueError('保存帧时刻必须唯一且递增')
+    meta['savedTimes']=times
+    meta['boundaryPatches']={p:sorted(k for patch,k in boundary_fields if patch==p) for p in sorted({patch for patch,_ in boundary_fields})}
     return bundle
 
 class TaskRegistry:
@@ -116,14 +163,18 @@ class TaskRegistry:
                     if 'bundle' in view:validate_bundle(view['bundle'])
                     else:inside(p.parent/'workspace',view['source'])
                 self.jobs[meta['id']]={'meta':meta,'workspace':p.parent.resolve()/'workspace','bundle':bundle,'views':views,'journal':deque(maxlen=1000),'seq':0}
-                interrupted_display='displayRequestRevision' in meta.get('presenter',{})
+                interrupted_build=meta.get('calculatorRequest',{}).get('state')=='building'
+                if interrupted_build:
+                    meta['calculatorRequest'].update(state='waiting')
+                interrupted_display='displayRequestRevision' in meta.get('presenter',{}) or meta.get('presenter',{}).get('state') in {'running','queued','waiting'}
                 if interrupted_display:
                     meta['presenter']={'state':'warning','message':'工作台已重启，上次显示调整尚未确认'}
+                    record_render(meta)
                 if 'progressHistory' not in meta:
                     meta['progressHistory']=[];meta['progressHistoryComplete']=False
                     record_progress(meta,timestamp=meta.get('updatedAt',meta.get('createdAt')),restored=True)
                     self._save(self.jobs[meta['id']])
-                elif interrupted_display:self._save(self.jobs[meta['id']])
+                elif interrupted_display or interrupted_build:self._save(self.jobs[meta['id']])
             except (ValueError,KeyError,OSError):continue
         # Retire the previously generated UI instructions without changing case
         # inputs or rewriting historical session transcripts.
@@ -155,7 +206,7 @@ class TaskRegistry:
         return self.jobs[ident]
     def _save(self,job):
         job['meta']['stateVersion']=job['meta'].get('stateVersion',0)+1
-        record_progress(job['meta']);atomic(job['workspace'].parent/'task.json',job['meta'])
+        record_progress(job['meta']);record_render(job['meta']);atomic(job['workspace'].parent/'task.json',job['meta'])
     def _emit(self,job,kind,data):job['seq']+=1;job['journal'].append({'id':job['seq'],'kind':kind,'data':copy.deepcopy(data)});self.condition.notify_all()
     def public(self,job):
         m=job['meta'];bundle=job['bundle'];views=job.get('views',{});primary=views.get(m.get('defaultView')) or next(iter(views.values()),None)
@@ -194,17 +245,21 @@ class TaskRegistry:
         presentation.pop('progress',None)
         presentation.setdefault('controls',default_controls(result,viewrows,presentation.get('rendering')))
         result.update(id=m['id'],title=m['title'],status=m['status'],presentation=presentation,presentationVersion=m.get('presentationVersion',0),views=viewrows,defaultView=m.get('defaultView','main'),presenter=copy.deepcopy(m.get('presenter',{})))
+        result['renderProgress']={'current':current_render_step(m)}
+        result['calculatorRequest']=copy.deepcopy(m.get('calculatorRequest',{'state':'off'}))
         if m.get('study'):
             from study import summary
             result['study']=summary(m['study'],m.get('studyVersion',0))
         else:result['study']=None
         result.update(workspaceRevision=m.get('workspaceWatch',{}).get('revision',0),progress=current_progress(m),progressCount=sum(row.get('source')=='process-observer' for row in m.get('progressHistory',[])),progressVersion=sum(row.get('source')=='process-observer' for row in m.get('progressHistory',[])),deliveryVersion=m.get('deliveryVersion',0),artifactCount=len({f['path'] for f in m.get('inputs',[])+m.get('files',[])}))
         result['stateVersion']=m.get('stateVersion',0)
+        result['progressCount']+=len(m.get('renderHistory',[]))
         case_events=[e for e in m.get('workspaceWatch',{}).get('events',[]) if e.get('kind')=='case']
         result['modelExpected']=bool(primary_task or result['study'] or case_events or m.get('processState',{}).get('cases') or m['status']!='completed')
         result['evidence']=copy.deepcopy(m.get('evidence',{}))
         issues=current_render_errors(m)
-        if issues:result['renderIssue']=hashlib.sha256(json.dumps(issues,sort_keys=True).encode()).hexdigest()[:16]
+        if issues:
+            result['renderIssue']=hashlib.sha256(json.dumps(issues,sort_keys=True).encode()).hexdigest()[:16]
         result.pop('code',None);return result
     def list(self):
         with self.lock:return [self.public(j) for j in sorted(self.jobs.values(),key=lambda j:j['meta']['createdAt'],reverse=True)]
@@ -230,7 +285,7 @@ class TaskRegistry:
                 if (case/name).is_file():shutil.copy2(case/name,target/name)
         (work/'AGENTS.md').write_text(SOLVER_GUIDANCE)
         (work/'request.txt').write_text(prompt)
-        (work/'resources.md').write_text(f'插件: {REPO}\n本地算例与经验联合检索: {REPO}/rag/experience/dual_query.py\n审核经验检索: {REPO}/rag/experience/experience_rag.py query\n'+('source-case/ 是当前模型输入副本。\n' if source else '按请求使用本地 RAG 准备算例。\n'))
+        (work/'resources.md').write_text(f'插件: {REPO}\n选源工具: mandifuel_retrieve（短句联合检索算例与审核经验）\n离线备选: {REPO}/rag/experience/dual_query.py --case-mode local\n审核经验检索: {REPO}/rag/experience/experience_rag.py query\n'+('source-case/ 是当前模型输入副本。\n' if source else '按请求选取并核对参考算例。\n'))
         meta={'id':ident,'title':(title.strip() or (prompt.splitlines()[0] if prompt else '新任务'))[:24],'prompt':prompt,'status':'draft' if draft else 'queued','draft':draft,'createdAt':now(),'updatedAt':now(),'nativeSessionId':None,'events':[],'progressHistory':[],'progressHistoryComplete':True,'inputs':[],'files':[],'resultVersion':0}
         job={'meta':meta,'workspace':work,'bundle':None,'views':{},'journal':deque(maxlen=1000),'seq':0}
         with self.lock:self.jobs[ident]=job;self._save(job)
@@ -263,12 +318,14 @@ class TaskRegistry:
             if presenter.get('state') not in {'queued','running','waiting'}:
                 presenter.pop('displayRequestRevision',None)
             job['meta']['presenter']=presenter
+            record_render(job['meta'])
             self._save(job)
             self._emit(job,'state',self.public(job))
             return True
     def native_event(self,ident,payload):
         with self.lock:
             job=self._job(ident);meta=job['meta'];kind=payload['kind'];meta['updatedAt']=now()
+            previous_status=meta['status']
             if kind=='title':
                 title=payload.get('title')
                 if not isinstance(title,str) or not title.strip() or len(title)>200:raise ValueError('DSH 会话标题无效')
@@ -278,6 +335,7 @@ class TaskRegistry:
             elif kind=='prompt':
                 text=payload.get('text','').strip()
                 if text:
+                    meta.pop('endReason',None)
                     meta.pop('latestDisplayPrompt',None)
                     meta.get('presenter',{}).pop('displayRequestRevision',None)
                     meta['latestPrompt']=text;meta['promptRevision']=meta.get('promptRevision',0)+1
@@ -289,6 +347,7 @@ class TaskRegistry:
                 meta['latestDisplayPrompt']=text;meta['displayPromptRevision']=meta.get('displayPromptRevision',0)+1
                 presentation=dict(meta.get('presentation',{}));presentation.pop('deliveryRequirements',None);meta['presentation']=presentation;meta['presentationVersion']=meta.get('presentationVersion',0)+1
                 meta['presenter']={'state':'queued','message':'等待更新展示'}
+                record_render(meta)
                 if meta['status'] in {'completed','failed','stopped','interrupted'}:
                     meta['presenter']['displayRequestRevision']=meta['displayPromptRevision']
             elif kind=='failure':
@@ -305,8 +364,10 @@ class TaskRegistry:
                     progress=current_progress(meta)
                     if reason!='completed' or progress['summary'].startswith(('正在','等待','准备')) or any(s.get('status')=='active' for s in progress['stages']):
                         presentation=dict(meta.get('presentation',{}));presentation['progress']={'summary':'本轮处理结束，正在整理展示' if reason=='completed' else '任务已停止' if reason=='aborted' else '本轮执行失败','stages':[]};meta['presentation']=presentation;meta['presentationVersion']=meta.get('presentationVersion',0)+1
-            from process_monitor import process_event
+            from process_monitor import process_event,TERMINAL
             process_event(meta,payload)
+            if previous_status not in TERMINAL and meta['status'] in TERMINAL:
+                self.process_monitor.final_scans.add(ident)
             self._save(job);self._emit(job,'state',self.public(job))
         return self.snapshot(ident)
     def _import(self,job,missing_ok=False):
@@ -419,7 +480,7 @@ class TaskRegistry:
                     config['ui'],_=clean_document(config['ui'])
                 requirements=requested_delivery(latest_request(meta))
                 if requirements:config['deliveryRequirements']={**config.get('deliveryRequirements',{}),**requirements}
-                try:validate_delivery(config,{key:{'task':v['bundle']['task'] if 'bundle' in v else v['task']} for key,v in views.items()},preferred,meta.get('presentation',{}),work,study)
+                try:validate_delivery(config,{key:{'task':v.get('bundle',v)['task'],'caseRoot':v.get('bundle',v).get('caseRoot')} for key,v in views.items()},preferred,meta.get('presentation',{}),work,study)
                 except ValueError as error:presentation_error='显示配置未应用：'+str(error);config={}
                 presentation=dict(meta.get('presentation',{}));signatures=meta.setdefault('manifestPresentationSignatures',{})
                 from agent_panel import parameter_state
@@ -459,6 +520,10 @@ class TaskRegistry:
         cache_key=(str(path),stamp.st_mtime_ns,stamp.st_size)
         if cache_key in self.view_cache:self.view_cache.move_to_end(cache_key);return self.view_cache[cache_key]
         bundle=validate_bundle(read_json(path));inside(job['workspace'],bundle['caseRoot'])
+        # The stamp covers the complete viewer file. Older indices predate
+        # derived frame/patch metadata and can be upgraded from that same file.
+        for key in ('savedTimes','boundaryPatches'):
+            if key in bundle['task'] and key not in row['task']:row['task'][key]=bundle['task'][key]
         if bundle['task']!=row['task']:raise ValueError('模型已更新，请等待交付重新登记')
         self.view_cache[cache_key]=bundle
         while len(self.view_cache)>3 or sum(k[2] for k in self.view_cache)>MAX_JSON:self.view_cache.popitem(last=False)
@@ -472,7 +537,7 @@ class TaskRegistry:
             return copy.deepcopy(value)
     def progress(self,ident):
         with self.lock:
-            meta=self._job(ident)['meta'];return {'rows':copy.deepcopy([row for row in meta.get('progressHistory',[]) if row.get('source')=='process-observer']),'complete':meta.get('progressHistoryComplete',False) and all(row.get('source')=='process-observer' for row in meta.get('progressHistory',[]))}
+            return execution_history(self._job(ident)['meta'])
     def events(self,ident):
         with self.lock:return copy.deepcopy(self._job(ident)['meta'].get('events',[]))
     def file(self,ident,path):

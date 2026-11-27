@@ -14,7 +14,7 @@ ROOT=Path(__file__).resolve().parents[2]
 sys.path[:0]=[str(ROOT/'lib'),str(ROOT/'frontend')]
 from mandifuel_verify import verify_case
 from mandifuel_verify.case import Case,Sources
-from mandifuel_verify.checks import lame,sphere_release
+from mandifuel_verify.checks import lame,sphere_release,stable_id
 from mandifuel_verify.inputs import Unavailable
 from registry import TaskRegistry
 
@@ -110,6 +110,25 @@ class EvidenceTests(unittest.TestCase):
         self.assertEqual(self.check(r,'cesium.balance')['status'],'verified');self.assertEqual(self.check(r,'cesium.initial')['status'],'verified')
         self.assertAlmostEqual(next(q['value'] for q in r['claims'] if q['key']=='cesium.release_fraction'),.6)
         self.assertEqual(self.check(r,'cesium.analytic')['status'],'not_applicable')
+    def test_tiny_native_release_is_not_replaced_by_subtraction_noise(self):
+        self.cesium()
+        volumes = Case(self.case).geometry['volumes']
+        initial = math.fsum(volumes)
+        field(self.case/'1/Cs','Cs','scalar',(0,-3,0,0,1,0,0),[1-1e-8]*len(volumes),{})
+        def evaluate(reported):
+            self.receipt(extra=f'Fission products transport:\nInitial Cs amount: {initial}\nProduction of Cs: 0\nReleased Cs amount: {initial*1e-34}\nRemained Cs amount: {initial}\nFraction of Cs release: {reported}\n')
+            return verify_case(self.case,checks=['cesium'])
+        report=evaluate(1e-34)
+        claims={c['key']:c['value'] for c in report['claims']}
+        self.assertEqual(claims['cesium.release_fraction'],1e-34)
+        self.assertTrue(math.isclose(claims['cesium.inventory_depletion'],1e-8,rel_tol=1e-6))
+        deficit=next(c for c in report['claims'] if c['key']=='cesium.inventory_depletion')
+        self.assertEqual(deficit['id'],stable_id(deficit['caseRoot'],'cesium.release_fraction'))
+        self.assertEqual(len({c['id'] for c in report['claims']}),len(report['claims']))
+        self.assertEqual(self.check(report,'cesium.native_fraction')['status'],'verified')
+        corrupted=evaluate(1e-20)
+        self.assertEqual(self.check(corrupted,'cesium.balance')['status'],'verified')
+        self.assertEqual(self.check(corrupted,'cesium.native_fraction')['status'],'failed')
     def test_wrong_time_log_and_missing_source_never_get_invented(self):
         self.cesium();p=self.case/'log.offbeat';p.write_text(p.read_text().replace('Time = 1','Time = 2'))
         self.assertEqual(self.check(verify_case(self.case,checks=['cesium']),'cesium')['status'],'not_verified')

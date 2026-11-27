@@ -24,7 +24,16 @@ def validate_observation(state):
         nodes=state['nodes']
         if not isinstance(nodes,list) or len(nodes)>64:raise ValueError('组件观察数量无效')
         for node in nodes:
-            if not isinstance(node,dict) or set(node)-{'id','type','visible','rect','activeTab','table','chart','inViewport','coveredBy'} or not text(node.get('id'),100) or not text(node.get('type'),40) or type(node.get('visible')) is not bool or not rect(node.get('rect')):raise ValueError('组件观察无效')
+            if not isinstance(node,dict) or set(node)-{'id','type','visible','rect','activeTab','table','chart','probe','inViewport','coveredBy'} or not text(node.get('id'),100) or not text(node.get('type'),40) or type(node.get('visible')) is not bool or not rect(node.get('rect')):raise ValueError('组件观察无效')
+            if 'probe' in node:
+                record=node['probe']
+                strings={'view','field','unit','timeUnit','valueUnit'}
+                numbers={'time','value','targetRadius','sampleRadius','sampleX','sampleY','sampleZ'}
+                if (not isinstance(record,dict) or set(record)!=strings|numbers|{'cell'}
+                    or not all(text(record[k],120) for k in strings)
+                    or not all(type(record[k]) in (int,float) and math.isfinite(record[k]) for k in numbers)
+                    or type(record['cell']) is not int or record['cell']<0):
+                    raise ValueError('测点回执缺少有效采样记录')
             if 'inViewport' in node and type(node['inViewport']) is not bool:raise ValueError('视口可见性观察无效')
             if 'coveredBy' in node and (not isinstance(node['coveredBy'],list) or len(node['coveredBy'])>3 or not all(text(v,100) for v in node['coveredBy'])):raise ValueError('窗口遮挡观察无效')
             if 'activeTab' in node and not text(node['activeTab'],100):raise ValueError('当前页签观察无效')
@@ -52,4 +61,15 @@ def validate_observation(state):
         if not isinstance(value,dict) or set(value)!={'visible','ready','kind','view','field'} or type(value['visible']) is not bool or type(value['ready']) is not bool or value['kind'] not in {'pending','mesh','fields'} or any(v is not None and not text(v,100) for v in [value['view'],value['field']]):raise ValueError('物理场窗口观察无效')
     if 'display' in state:
         value=state['display']
-        if not isinstance(value,dict) or set(value)-{'mesh','extrema','cut','cutAngle','cameraView','aspectMode','displayMode','sliceAxis','slicePosition','compare','compareField','scale','colorMin','colorMax','appearance','fieldMapping'} or len(json.dumps(value))>5000:raise ValueError('前端实际显示状态无效')
+        if not isinstance(value,dict) or set(value)-{'mesh','extrema','cut','cutAngle','cameraView','aspectMode','displayMode','sliceAxis','slicePosition','compare','compareField','scale','colorMin','colorMax','appearance','fieldMapping','boundarySamples'} or len(json.dumps(value))>5000:raise ValueError('前端实际显示状态无效')
+
+        if 'boundarySamples' in value:
+            samples=value['boundarySamples']
+            if not isinstance(samples,list) or len(samples)>12:raise ValueError('边界面回执数量无效')
+            for sample in samples:
+                if (not isinstance(sample,dict) or set(sample)!={'patch','field','value','unit','face','centre'}
+                    or not all(text(sample[k],100) for k in ('patch','field','unit'))
+                    or type(sample['face']) is not int or sample['face']<0
+                    or type(sample['value']) not in (float,int) or not math.isfinite(sample['value'])
+                    or not isinstance(sample['centre'],list) or len(sample['centre'])!=3 or not all(numeric(v) for v in sample['centre'])):
+                    raise ValueError('边界回执需要有效的面号、中心及场值')

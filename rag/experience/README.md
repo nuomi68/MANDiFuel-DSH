@@ -1,16 +1,16 @@
 # OFFBEAT 算例与审核经验检索
 
-从项目根目录运行。Web 工作台和 headless 使用同一套检索入口，经验索引随插件分发。
+Web 和 headless 的计算助手使用宿主工具 `mandifuel_retrieve`。在项目根目录可直接验证相同的检索实现。经验索引随插件分发。
 
 ```bash
-python3 -I -B rag/experience/dual_query.py --query '球壳内外恒压 hollow spherical shell internal external pressure' --labels-json '{"geometry":["1D_spherical"],"driving_condition":["constant_pressure"]}' --case-limit 5 --experience-limit 3 --compact
+python3 -I -B rag/experience/dual_query.py --query '空心球壳内外恒压下的径向位移和环向应力' --case-limit 5 --experience-limit 3 --compact
 python3 -I -B rag/experience/experience_rag.py query --query '冷态直径与间隙 GapCold' --purpose solve --limit 3
 python3 -I -B rag/experience/experience_rag.py query --query 'fuelRodGap gapGas 初始化失败' --purpose troubleshoot --arm skill --task-status incomplete --review-status troubleshooting_only
 ```
 
 联合查询分别返回 `retrievers.case_rag` 和 `retrievers.experience_rag`，每侧有自己的 `status`、`output` 或错误信息。一侧出错时，整体状态为 `partial`，成功一侧的结果仍可读取。算例候选位于 `case_rag.output.candidates`，经验命中位于 `experience_rag.output.results`。英文工程关键词有助于检索算例卡。只需算例卡的调用者可继续使用 `rag/query.py`。
 
-无指定源的计算任务由主助手按 `rag/index/vocabulary.json` 选取题目支持的标签，在同一次联合查询里传入。要检查分面是否实际参与，查看算例侧的 `query_mapping.mapped_labels`、`fusion.weights` 和候选的 `matched_labels`、`score_components`。有标签时按归一化 BM25 的 60% 和分面得分的 40% 排序，显式命中完整算例路径另计加分。未传标签时分面权重为零。任务检索离线运行，描述向量不参与此处打分。经验卡使用独立的 BM25 排序。
+算例库默认使用描述向量与九分面融合。查看 `query_mapping.mapped_labels`、`fusion.weights`、`provider_telemetry` 和候选的 `score_components` 可核对实际排序依据。离线复现使用 `--case-mode local`，提供英文关键词和可选的 `--labels-json`；此时有显式标签按 BM25 60% 与分面 40% 排序，无标签按 BM25 排序。
 
 经验库采用本地 BM25，先按短条目检索，再返回父卡背景与相邻条目。每个命中包括 `score`、`child`、`parent_context` 和 `adjacent_children`。查询支持 `--query-file`，文本上限为 8,000 个字符。可用 `--source-run`、`--arm`、`--task-status` 和 `--review-status` 筛选经验来源，用 `--adjacent 0|1|2` 控制邻近范围。两个库的分数只在各自的候选列表内有意义。
 

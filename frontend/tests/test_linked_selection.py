@@ -36,7 +36,7 @@ class LinkedSelectionTests(unittest.TestCase):
   with tempfile.TemporaryDirectory() as directory:
    work=Path(directory);(work/'history.json').write_text(json.dumps({'columns':['view','time','value'],'rows':[{'view':'a','time':10,'value':.5}]}))
    source={'kind':'dataset','dataset':'h','selection':{'viewColumn':'view','timeColumn':'time','timeUnit':'s'},'filter':[{'column':'view','op':'eq','context':'view'}]}
-   ui=validate_ui(document(source));views={'a':{'task':{'timeUnit':'s'}}};validate_ui_delivery(ui,views,'a',[],work)
+   ui=validate_ui(document(source));views={'a':{'task':{'timeUnit':'s','savedTimes':[10]}}};validate_ui_delivery(ui,views,'a',[],work)
    with self.assertRaisesRegex(ValueError,'单位'):validate_ui_delivery(ui,{'a':{'task':{'timeUnit':'d'}}},'a',[],work)
    with self.assertRaisesRegex(ValueError,'视图'):validate_ui_delivery(ui,{},None,[],work)
    source['selection']['timeColumn']='missing'

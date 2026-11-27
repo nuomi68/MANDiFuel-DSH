@@ -5,7 +5,7 @@ import sys
 import tempfile
 import unittest
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
-from adaptive_ui import validate_ui,validate_ui_delivery,ui_parameters,load_dataset
+from adaptive_ui import validate_ui,validate_ui_delivery,ui_parameters,load_dataset,link_case_rows
 from presentation import validate_presentation,validate_delivery
 from registry import TaskRegistry
 
@@ -15,6 +15,25 @@ def plot(ident='plot',field='T'):
 def document(root=None,**kwargs):return {'version':1,'mode':'replace','root':root or plot(),**kwargs}
 
 class AdaptiveUITests(unittest.TestCase):
+    def test_case_identity_uses_unique_completed_execution_origins(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            root=Path(tmp)
+            table={'columns':[{'id':'point_id'}],'rows':[{'point_id':p} for p in ('a','b','c')]}
+            history=[];views=[]
+            for name,point,status in [('first','a','completed'),('failed','b','failed'),('second','c','completed'),('third','c','completed')]:
+                case=root/name;case.mkdir()
+                origin='/archived/'+name
+                (case/'.mandifuel-execution.json').write_text(json.dumps({'status':status,'result_root':origin}))
+                views.append({'id':'view-'+name,'kind':'results','caseRoot':name})
+                history.append({'point':{'id':point},'status':status,'result_root':origin})
+            hist=root/'history.json';hist.write_text(json.dumps(history))
+            default={'file':'results.csv'}
+            self.assertEqual(link_case_rows(root,default,table,views)['caseIdentity']['views'],{'a':'view-first'})
+            hist.write_text('{')
+            self.assertIs(link_case_rows(root,default,table,views),table)
+            with self.assertRaisesRegex(ValueError,'研究历史'):
+                link_case_rows(root,{**default,'caseIdentity':{'column':'point_id','history':'history.json'}},table,views)
+
     def test_generated_controls_default_to_settings_and_only_allow_declared_placement(self):
         root={'id':'operations','type':'controls','title':'任意操作组','ids':['mesh']}
         self.assertEqual(validate_ui(document(root))['root'],root)

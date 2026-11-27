@@ -3,11 +3,61 @@ from pathlib import Path
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 sys.path.insert(0,str(Path(__file__).resolve().parents[1]))
 from registry import TaskRegistry,validate_bundle
 
 
 class RegistryTests(unittest.TestCase):
+    def test_render_lane_records_real_operations_separately_from_science(self):
+        before=self.finish()['task']
+        self.assertIsNone(before['renderProgress']['current'])
+        for operation in ['检查结果数据','检查结果数据','提交界面调整']:
+            self.registry.set_presenter(self.ident,{'state':'running','message':operation,'operation':operation})
+        self.registry.set_presenter(self.ident,{'state':'waiting','message':'等待页面确认'})
+        self.registry.set_presenter(self.ident,{'state':'idle','operator':{'confirmed':True}})
+        task=self.registry.snapshot(self.ident)['task']
+        self.assertEqual(task['progress'],before['progress'])
+        self.assertEqual(task['progressVersion'],before['progressVersion'])
+        self.assertEqual(task['status'],'completed')
+        rows=self.registry.progress(self.ident)['rows']
+        self.assertEqual(len(rows),task['progressCount'])
+        self.assertEqual([r['summary'] for r in rows if r['source']=='ui-renderer'],['检查结果数据','提交界面调整','等待浏览器确认','浏览器已确认展示'])
+
+    def test_calculator_switch_deduplicates_and_revokes_old_publication(self):
+        from calculator_api import build,get
+        def submit(action,nonce,**extra):
+            return build(self.registry,self.ident,{'requestId':nonce*32,'action':action,'request':'线功率','definition':{},**extra})
+        self.assertEqual(get(self.registry,self.ident,{'case':['case']})['build'],{'state':'off'})
+        with patch('calculator_api.Application.capabilities',return_value={}) as inspect,patch('calculator_api.Application.create') as create:
+            self.assertEqual(submit('schedule','a')['state'],'waiting')
+            self.assertEqual(submit('claim','a')['state'],'waiting')
+            inspect.assert_not_called()
+            self.assertEqual(submit('cancel','a')['state'],'off')
+            self.handoff();self.finish()
+            self.assertEqual(submit('claim','a')['state'],'off')
+            self.assertEqual(submit('schedule','b')['state'],'waiting')
+            self.assertTrue(submit('claim','b')['claimed'])
+            self.assertNotIn('claimed',submit('claim','b'))
+            self.assertEqual(submit('publish','a')['requestId'],'b'*32)
+            create.assert_not_called()
+            with self.assertRaisesRegex(ValueError,'profile'):
+                submit('publish','b',definition={'outputs':[{'id':'profile','kind':'profile'}]})
+            self.assertEqual(submit('publish','b')['state'],'ready')
+            create.assert_called_once()
+
+    def test_timeline_interleaves_render_and_science_events_across_restart(self):
+        self.registry.native_event(self.ident,{'kind':'status','status':'running'})
+        self.registry.set_presenter(self.ident,{'state':'running','operation':'检查页面布局'})
+        self.finish()
+        self.registry.set_presenter(self.ident,{'state':'idle','operator':{'confirmed':True}})
+        rows=self.registry.progress(self.ident)['rows']
+        sources=[r['source'] for r in rows]
+        self.assertIn('process-observer',sources[sources.index('ui-renderer')+1:])
+        self.assertEqual(sources[-1],'ui-renderer')
+        self.assertEqual([r['timestamp'] for r in rows],sorted(r['timestamp'] for r in rows))
+        self.registry.close();self.registry=TaskRegistry(Path(self.temp.name)/'tasks')
+        self.assertEqual(self.registry.progress(self.ident)['rows'],rows)
     def setUp(self):
         self.temp=tempfile.TemporaryDirectory();self.registry=TaskRegistry(Path(self.temp.name)/'tasks');self.prepared=self.registry.prepare('原生任务\n求温度');self.ident=self.prepared['task']['id'];self.work=Path(self.prepared['workspace']);self.registry.bind(self.ident,'native-session-1')
     def tearDown(self):self.registry.close();self.temp.cleanup()

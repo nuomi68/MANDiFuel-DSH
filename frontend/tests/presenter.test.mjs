@@ -235,7 +235,7 @@ test('the private operator receives the current rendered page before planning an
  }}};
  const call=async path=>path.endsWith('/observe')?{...facts('data','completed'),dataRevision:'data',task:{status:'completed',latestRequest:'调整布局'}}:path.includes('/frontend')?structuredClone(page):{};
  const p=mountPresenter(ctx,call,async()=> 'task');
- try{p.request('task');await until(()=>finished);assert.deepEqual(captured.currentPage,page);assert.equal(captured.requestKind,'display-edit');assert.deepEqual([...definitions.keys()].sort(),['ui_apply','ui_inspect','ui_read_skill','ui_wait_for_render']);}
+ try{p.request('task');await until(()=>finished);assert.deepEqual(captured.currentPage,page);assert.equal(captured.requestKind,'display-edit');assert.deepEqual([...definitions.keys()].sort(),['ui_apply','ui_calculator','ui_inspect','ui_read_skill','ui_wait_for_render']);}
  finally{for(const dispose of disposers)await dispose();}
 });
 

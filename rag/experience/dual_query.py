@@ -49,16 +49,18 @@ def query_both(
     task_status: str | None = None, review_status: str | None = None,
     source_run: str | None = None, adjacent: int = 1,
     include_case_examples: bool = False, case_library_root: Path | None = None,
-    labels_json: str | None = None, timeout: int = 30,
+    labels_json: str | None = None, timeout: int = 250, case_mode: str | None = None,
 ) -> dict:
     if not isinstance(request, str) or not request.strip() or "\x00" in request or len(request) > 8000:
         raise ValueError("Query must contain 1–8000 characters without NUL")
-    if not 1 <= case_limit <= 20 or not 1 <= experience_limit <= 20 or not 1 <= timeout <= 120:
-        raise ValueError("Limits must be 1–20 and timeout 1–120 seconds")
+    if not 1 <= case_limit <= 20 or not 1 <= experience_limit <= 20 or not 1 <= timeout <= 600:
+        raise ValueError("Limits must be 1–20 and timeout 1–600 seconds")
     original = Path(case_query) if case_query else default_case_query()
     # The case CLI is invoked unchanged; no scores or corpus are merged.
     case_cmd = [sys.executable, "-B", str(original), f"--query={request}",
                 "--limit", str(case_limit), "--compact"]
+    if case_mode is not None:
+        case_cmd.extend(("--mode", case_mode))
     if case_library_root:
         case_cmd.extend(("--case-library-root", str(case_library_root)))
     if labels_json:
@@ -79,6 +81,10 @@ def query_both(
         experience_future = pool.submit(run_json, experience_cmd, timeout)
         case_result = case_future.result()
         experience_result = experience_future.result()
+    return dual_result(case_result, experience_result)
+
+
+def dual_result(case_result: dict, experience_result: dict) -> dict:
     success_count = sum(x["status"] == "ok" for x in (case_result, experience_result))
     return {
         "status": "ok" if success_count == 2 else ("partial" if success_count == 1 else "error"),
@@ -99,6 +105,7 @@ def main(argv: list[str] | None = None) -> int:
     src.add_argument("--query-file", type=Path)
     parser.add_argument("--case-query", type=Path, help="Existing case RAG query.py path")
     parser.add_argument("--case-library-root", type=Path)
+    parser.add_argument("--case-mode", choices=("local","semantic"))
     parser.add_argument("--labels-json")
     parser.add_argument("--case-limit", type=int, default=5)
     parser.add_argument("--experience-limit", type=int, default=5)
@@ -109,7 +116,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--source-run")
     parser.add_argument("--adjacent", type=int, choices=(0, 1, 2), default=1)
     parser.add_argument("--include-case-examples", action="store_true")
-    parser.add_argument("--timeout", type=int, default=30)
+    parser.add_argument("--timeout", type=int, default=250)
     parser.add_argument("--compact", action="store_true")
     args = parser.parse_args(argv)
     try:
@@ -121,7 +128,7 @@ def main(argv: list[str] | None = None) -> int:
             source_run=args.source_run, adjacent=args.adjacent,
             include_case_examples=args.include_case_examples,
             case_library_root=args.case_library_root, labels_json=args.labels_json,
-            timeout=args.timeout,
+            timeout=args.timeout, case_mode=args.case_mode,
         )
     except (OSError, ValueError) as exc:
         print(json.dumps({"status": "error", "interface": SCHEMA, "message": str(exc)},

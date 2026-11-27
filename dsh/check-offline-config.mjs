@@ -29,6 +29,9 @@ export function verifyOfflineRows(document, expectedAdapter) {
     if(required.disabled===true || required.name!==new URL(file,import.meta.url).pathname)
       throw new Error(`MANDiFuel configuration: required project boundary ${id} is not active`);
   }
+  const retrieval=row('mandifuel-retrieval');
+  if (retrieval.disabled===true || retrieval.name!==new URL('./mandifuel-retrieval.mjs',import.meta.url).pathname)
+    throw new Error('MANDiFuel configuration: retrieval host must be active');
   const expectedPersona=readFileSync(new URL('./run-assistant-persona.md',import.meta.url),'utf8');
   if (row('system-prompt').config?.persona!==expectedPersona)
     throw new Error('MANDiFuel configuration: run-assistant persona must be active');
@@ -45,5 +48,5 @@ if (process.argv[1] && import.meta.url===pathToFileURL(process.argv[1]).href) {
   });
   if (document.errors.length) throw new Error('MANDiFuel offline configuration: cannot parse native dump');
   verifyOfflineRows(document.toJS(),process.argv[3]);
-  console.log('MANDiFuel offline configuration: PASS (persona; offline subprocess; project filesystem and policy active)');
+  console.log('MANDiFuel offline configuration: PASS (persona, retrieval host, offline subprocess and project policy active)');
 }

@@ -22,6 +22,10 @@ class TimeUnitTests(unittest.TestCase):
         self.check_unit('functions { example { userTime {type days;} } }','s')
         self.check_unit('functions { example {userTime {type seconds;} } } userTime {type days;}','d')
 
+    def test_inline_sampling_set_dictionaries_keep_top_level_time_scope(self):
+        self.check_unit('userTime {type seconds;} functions {profile {sets (line {type uniform; start (0 0 0);});}}','s')
+        self.check_unit('userTime {type seconds;} functions {profile {sets (line {type uniform; );}}',None)
+
     def test_top_level_include_cannot_be_assumed_irrelevant(self):
         self.check_unit('#include "control.inc"\nendTime 10;',None)
         self.check_unit('userTime {type days;} #include "override.inc"\n',None)

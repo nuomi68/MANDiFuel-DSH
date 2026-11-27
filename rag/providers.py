@@ -139,13 +139,17 @@ class OpenAICompatibleClient:
             raise ProviderError(
                 "embedding provider returned an unexpected record count"
             )
-        ordered = sorted(records, key=lambda item: int(item.get("index", 0)))
+        if any(not isinstance(row, dict) or type(row.get("index", 0)) is not int for row in records):
+            raise ProviderError("embedding provider returned an invalid record index")
+        ordered = sorted(records, key=lambda row: row.get("index", 0))
+        if [row.get("index", 0) for row in ordered] != list(range(len(texts))):
+            raise ProviderError("embedding provider returned inconsistent record indices")
         vectors: list[list[float]] = []
         for record in ordered:
             embedding = record.get("embedding") if isinstance(record, dict) else None
-            if not isinstance(embedding, list):
+            if not isinstance(embedding, list) or any(type(value) not in (int, float) for value in embedding):
                 raise ProviderError("embedding provider returned an invalid vector")
-            vector = [float(value) for value in embedding]
+            vector = embedding
             if self.dimension is not None and len(vector) != self.dimension:
                 raise ProviderError(
                     f"embedding dimension mismatch: expected {self.dimension}, got {len(vector)}"

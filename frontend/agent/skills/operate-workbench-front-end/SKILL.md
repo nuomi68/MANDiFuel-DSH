@@ -27,3 +27,11 @@ description: 观察工作台当前状态，用私有工具编排真实计算结�
 3. 当提示含 comparisonReview 时核对比较图的输入与响应来自相关工况。抽样设计图可以保留，至少有一幅比较图应展示实算响应或跨工况物理剖面。用户明确限定格式时，结构化结果可附 `comparisonException:{kind:"requested-format",reason:"用户原话"}`。确实缺少可比口径时使用 `incomparable-data` 并写明缺项。
 
 结束时返回 status 和一句用户能看懂的 summary，写明实际改变或仍缺的内容，可附已观察的 revision。已提交且显示获确认用 applied，原页面已经满足且获确认用 unchanged。配置已交付但待浏览器回执，或计算尚无所需数据，用 pending。仍有可交付的组件、事务需要修正或额度已用完，用 partial，注明下一步。当前数据或能力无法满足请求时用 blocked 并说明缺口。
+
+## DSH 发布的科学应用
+
+page.applicationViews 给出已发布应用与其真实视图。首次展示新计算器时，将 `ui_apply.update.viewState.view` 指向该应用的视图，等待 browser.selection.view 匹配，再核验 ui_calculator 的 browser。后续请求若涉及多个模型，可把这个视图 ID 写进 appCandidate 动作的 view，点击时再切到对应应用。
+
+用户要求“选择候选，先不求解”时，先用 `ui_calculator({case:<当前应用的 caseRoot>,candidate:<已准备的候选相对目录>})` 检查注册参数和单位。回读成功才能配置 `button.action={type:"appCandidate",caseRoot:<同一目录>}`。点击时由原生参数表单装入全部输入，用户点击重新计算才运行。删除旧的同名显示参数、代理按钮及误导说明，保留用户仍需要的图表和工况。候选缺少输入卡或参数超出契约时，向用户指出具体缺口。浏览器回执的 candidate、draftValues、canRun 分别表示所选输入来源、原生表单值和能否提交。
+
+先观察 page 和 model。ui_calculator 使用模型的 caseRoot；未发布契约时沿用当前展示。已发布时返回 spec（参数、输出、已有 components）、历史与 browser。需要调整展示时，向同一工具提交 case、实际 version 和完整的 components，保留用户仍需的组件。每项有 id、title、type、output（已声明的输出 ID）；type 选 table、lineChart、scatterChart、barChart，slot 选 main 或 aside，scope 选 selected 或 history。可用横纵轴列为 case、value、已声明的参数 ID，profile 另有 radius。field 使用原模型窗。ui_wait_for_render 核对原工作台中的组件及模型。

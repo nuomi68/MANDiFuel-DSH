@@ -7,7 +7,7 @@ class ProcessMonitorTests(unittest.TestCase):
     def test_running_event_before_prompt_cannot_leave_progress_at_preparing(self):
         from process_monitor import process_event,process_progress
         meta={'status':'running'};process_event(meta,{'kind':'status','status':'running'});process_event(meta,{'kind':'prompt'});process_event(meta,{'kind':'tool','action':'正在提取结果'})
-        self.assertNotIn('awaitingStart',meta['processState']);self.assertIn('提取',process_progress(meta)['summary'])
+        self.assertNotIn('awaitingStart',meta['processState']);self.assertNotIn('提取',process_progress(meta)['summary'])
         meta['processState']['reporting']={'total':7,'solved':7,'collected':5,'failed':0};self.assertIn('5/7',process_progress(meta)['summary'])
         legacy={'status':'completed','promptRevision':1,'processState':{'awaitingStart':True,'summary':'正在准备新请求'}};self.assertIn('结束',process_progress(legacy)['summary'])
     def test_solver_log_updates_without_ui_agent_and_never_writes_case_files(self):

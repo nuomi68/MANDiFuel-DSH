@@ -133,7 +133,14 @@ export function mountPresenter(ctx,call,resolveTask,{timeoutMs=300000,maxWorkers
    const role=readFrontendRole();
    const parent=await (state.ownerPromise??=ctx.agents.create({sessionId:'session-'+randomUUID(),meta:{origin:'subagent',cwd:process.env.MANDIFUEL_PRESENTER_WORKSPACE||process.cwd()},agentOptions,setup:agentCtx=>{agentCtx.systemPrompt.section({name:'mandifuel:presentation-isolated',order:0,text:role,complete:true});}}).catch(error=>{state.ownerPromise=null;throw error;}));
    if(superseded())return;
-   const session=toolMode?{closed:false,request,cancel:()=>controller.abort(new Error('新的用户请求已替代当前前端操作'))}:null;state.toolSession=session;
+   let activityTail=Promise.resolve(),lastActivity;
+   const reportActivity=message=>{
+    if(lastActivity===message)return activityTail;
+    lastActivity=message;
+    activityTail=activityTail.then(()=>{if(!controller.signal.aborted&&!closed&&!session.closed)return publishState(id,{state:'running',message,operation:message});});
+    return activityTail;
+   };
+   const session=toolMode?{closed:false,request,reportActivity,cancel:()=>controller.abort(new Error('新的用户请求已替代当前前端操作'))}:null;state.toolSession=session;
    if(toolMode)owners.set(String(parent.agent.id),state);
    const prompt=toolMode?{request,requestKind:facts.task.displayOnly||state.displayRequest?'display-edit':'results',calculationRequest:facts.task.request,trigger:facts.stage,comparisonReview:comparisonReview(facts),skill:SKILL,currentPage:await call(`/api/tasks/${id}/frontend?target=page`),validationFeedback:state.feedback||null}:{...facts,validationFeedback:state.feedback||null,rejectedUpdate:state.rejectedUpdate||null};
    if(prompt.comparisonReview){
@@ -148,7 +155,7 @@ export function mountPresenter(ctx,call,resolveTask,{timeoutMs=300000,maxWorkers
    }
    if(superseded())return;
    const run=await ctx.subagents.start('spawn',{label:'前端操作',parent:parent.agent,signal:controller.signal,persona:role,toolFilter:{allow:[]},outputSchema:toolMode?AGENT_RESULT_SCHEMA:SCHEMA,prompt:[{type:'text',text:'读取前端技能并操作当前任务的授权插槽。\n'+JSON.stringify(prompt)}]});state.run=run;
-   await publishState(id,{state:'running',sessionId:String(run.id),message:'正在整理界面'});
+   if(!toolMode)await publishState(id,{state:'running',sessionId:String(run.id),message:'正在整理界面'});
    let timer;const result=await Promise.race([run.result,new Promise((_,reject)=>{timer=setTimeout(()=>{controller.abort();reject(new Error('展示生成超时，将在后台有限重试；计算任务继续运行'));},timeoutMs);})]).finally(()=>clearTimeout(timer));
    if(superseded())return;
    if(toolMode){
@@ -159,6 +166,12 @@ export function mountPresenter(ctx,call,resolveTask,{timeoutMs=300000,maxWorkers
     const status=result.structured.status;
     const summary=String(result.structured.summary||'').slice(0,500);
     state.operator={skill:SKILL.name,toolCalls:session.toolCalls||0,mutations:session.mutations||0,confirmed:false};
+    if(session.appMutation&&!published&&!session.applyError&&['applied','pending','unchanged'].includes(status)){
+     state.settled=latest.dataRevision===facts.dataRevision;state.settledDataRevision=facts.dataRevision;
+     state.triggeredByFiles=false;state.displayRequest=false;state.revision=latest.revision;state.feedback=null;
+     state.operator.confirmed=!!session.appConfirmed;
+     await publishState(id,{state:session.appConfirmed?'idle':'warning',message:session.appConfirmed?'应用组件已在工作台显示':'组件已保存，等待工作台显示回执'});return;
+    }
     if(session.applyError||status==='partial'||status==='applied'&&!published){
      throw new Error([summary,session.applyError||'本轮尚未完成提交','保留已生效的内容，先提交一个缺失组件，再继续。'].filter(Boolean).join('。'));
     }

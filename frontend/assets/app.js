@@ -1,3 +1,4 @@
+import {SimulationApp} from './simulation-app.js';
 import {readbackSections,receiptFor,caseParameterSections} from './model-parameters.js';
 import {EvidenceBrowser} from './evidence-browser.js';
 import {ModelViewer} from './model-viewer.js';
@@ -69,6 +70,15 @@ function syncParameterValues(flush=false){clearTimeout(parameterSyncTimer);const
 
 let tasks=[],task=null,fields=null,viewer=null,compareViewer=null,interval=null,loadToken=0,drawerView=null,drawerToken=0,toastTimer=null;
 const fieldCache=new Map();
+const application=new SimulationApp({token:()=>dsh?.token,observation:()=>({ready:!!adaptive?.ready,field:!!fields&&fields.kind!=='mesh'&&loadedVersion===modelLoadKey()&&els['viewer-error'].hidden}),onUpdate:()=>{
+ syncAdaptiveUI();
+ if(els.drawer.open&&drawerView==='parameters')void renderParameters();
+ if(task&&fields&&loadedVersion!==modelLoadKey())void loadCurrentFields().catch(e=>showError(e.message));
+},onSelection:async()=>{
+ if(!task)return;
+ if(els.drawer.open&&drawerView==='parameters')void renderParameters();
+ try{await loadCurrentFields();syncAdaptiveUI();}catch(error){showError(error.message);}
+}});
 function syncAdaptiveChrome(){
  if(!adaptive?.active)return;
  els['export-button'].disabled=!adaptive.ready;els['export-field'].disabled=!adaptive.ready;els['export-history'].hidden=true;els['export-image-label'].textContent='展示面板截图';els['export-field-label'].textContent='面板数据';
@@ -78,9 +88,16 @@ function syncAdaptiveUI(){
  if(!adaptive)return;
  const wasActive=adaptive.active;
  const selectedTask=task,selectedView=activeView(),selectedFields=fields,selectedModel=model,currentVersion=loadedVersion;
- adaptive.update(selectedTask?.presentation?.ui||null,{
+ application.bind(selectedTask,selectedView);
+ syncBuildOption();
+ if(els.drawer.open&&drawerView==='calculator')renderCalculator();
+ adaptive.update(application.compose(selectedTask?.presentation?.ui||null),{
   taskId:selectedTask?.id||null,uiRevision:selectedTask?.presentation?.uiRevision||0,deliveryVersion:selectedTask?.deliveryVersion||0,
-  dataKey:JSON.stringify([currentVersion,selectedTask?.study?.version,selectedTask?.deliveryVersion,evidenceBrowser?.data?.revision,state.panel,state.field,state.frame,state.view,state.run]),
+  modelReady:!!selectedTask&&!!selectedFields&&!!selectedModel&&currentVersion===modelLoadKey(),
+  savedFieldsReady:!!selectedFields?.frames?.length,
+  viewIndex:selectedTask?.views?.map(v=>[v.id,v.kind,v.caseRoot,v.version]),
+  getAppTable:source=>application.table(source),selectAppRun:id=>application.select(id),
+  dataKey:JSON.stringify([application.spec?.version,application.history.length,application.selected,currentVersion,selectedTask?.study?.version,selectedTask?.deliveryVersion,evidenceBrowser?.data?.revision,state.panel,state.field,state.frame,state.view,state.run]),
   state:{...state},parameters:{...state.parameters},bounds:model?programContext():{},time:frame()?.time,timeUnit:model?.timeUnit,
   interactions:selectedTask?.presentation?.interactions||[],interactionRevision:selectedTask?.presentation?.interactionRevision||0,
   modelHidden:selectedTask?.modelExpected===false,
@@ -92,6 +109,7 @@ function syncAdaptiveUI(){
   hasStudy:!!selectedTask?.study,
   getDataset:id=>api(`/api/tasks/${selectedTask.id}/ui-data?dataset=${encodeURIComponent(id)}&revision=${selectedTask.presentation?.uiRevision||0}`),
   getViewData:async id=>{
+   if(!id&&application.fieldRun&&currentVersion===modelLoadKey())return {data:selectedFields,meta:selectedModel};
    const view=id?selectedTask?.views?.find(v=>v.id===id):selectedView;if(!view)throw new Error('当前面板数据源尚无模型交付');
    const key=`${selectedTask.id}:${view.version||selectedTask.modelVersion||selectedTask.resultVersion||0}:${view.id}`;
    const data=currentVersion===key&&selectedFields?selectedFields:await cached(fieldCache,selectedTask.id,`fields?view=${encodeURIComponent(view.id)}`,key);
@@ -107,17 +125,35 @@ function syncAdaptiveUI(){
 async function applyUIAction(action){
  if(!task)throw new Error('请先选择任务');
  const ident=task.id;
+ if(action.type==='appCandidate'){
+  if(action.view&&action.view!==state.view){
+   const intent=++selectionIntent;await applyUIAction({type:'view',intent,state:{view:action.view}});
+   if(task?.id!==ident||intent!==selectionIntent||state.view!==action.view)return;
+  }
+  openDrawer('parameters');await application.loadCandidate(action.caseRoot);return;
+ }
  if(action.type==='selection'){
   const pick=action.selection,target=task.views?.find(v=>v.id===pick.view);
   if(!target)throw new Error('联动目标视图已失效');
   if(pick.time!==undefined&&(!Number.isFinite(pick.time)||pick.timeUnit!==target.task.timeUnit))throw new Error('联动时间单位与物理场不一致');
-  const intent=++selectionIntent;stop();await applyUIAction({type:'view',intent,state:{view:pick.view,...pick.time!==undefined?{time:pick.time}:{}}});
+  const intent=++selectionIntent;
+  if(pick.time!==undefined){
+   const key=`${ident}:${target.version||task.modelVersion||task.resultVersion||0}:${target.id}`;
+   const data=loadedVersion===key&&fields?fields:await cached(fieldCache,ident,`fields?view=${encodeURIComponent(target.id)}`,key);
+   if(intent!==selectionIntent||task?.id!==ident)return;
+   if(!data.frames?.some(f=>f.time===pick.time))throw new Error('该工况没有完全匹配的保存帧');
+  }
+  stop();await applyUIAction({type:'view',intent,exactTime:true,state:{view:pick.view,...pick.time!==undefined?{time:pick.time}:{}}});
   if(task?.id!==ident||intent!==selectionIntent)return;
   state.pickedPoint=pick.position?{position:pick.position,view:state.view,time:frame()?.time,timeUnit:model.timeUnit,field:state.field}:null;
   syncAdaptiveUI();frontendObserver?.schedule();return;
  }
  if(action.type==='parameter'){
   const control=task.presentation?.controls?.find(c=>c.id===action.id&&c.parameter);if(!control)throw new Error('按钮引用的参数已不存在');
+  if(application.spec?.parameters.some(p=>p.label===control.label||p.id===control.id||p.binding===control.id)){
+   application.blockDraft('此按钮只绑定了显示参数，请载入有输入卡的候选，或核对后使用自定义工况');
+   openDrawer('parameters');throw new Error(application.saved.blocked);
+  }
   state.parameters[action.id]=action.value;refresh();syncParameterValues(true);return;
  }
  if(action.type!=='view')throw new Error('未注册的界面动作');
@@ -137,7 +173,7 @@ async function applyUIAction(action){
  if(!current())return;
  if(!fields||!model)throw new Error('当前任务尚无模型结果');
  for(const key of Object.keys(next))if(viewOptionBound(key))throw new Error('该选项由参数联动控制，请更新对应参数：'+key);
- if(next.time!==undefined){if(!fields.frames?.length)throw new Error('当前没有保存的时间帧');state.frame=nearestFrame(fields.frames,next.time);}
+ if(next.time!==undefined){if(!fields.frames?.length)throw new Error('当前没有保存的时间帧');const index=action.exactTime?fields.frames.findIndex(f=>f.time===next.time):nearestFrame(fields.frames,next.time);if(index<0)throw new Error('模型更新后缺少请求的保存帧');state.frame=index;}
  const camera={};for(const[key,value]of Object.entries(next)){
   if(['zoom','yaw','tilt'].includes(key))camera[key]=value;
   else if(key==='revolve')state.rotation.enabled=value;
@@ -191,7 +227,7 @@ function activeRun(){return studyData?.runs.find(r=>r.id===state.run);}
 function currentViews(){const all=task?.views||[];if(!task?.study)return all;const ids=activeRun()?.viewIds||[];return all.filter(v=>ids.includes(v.id));}
 function activeView(){const views=currentViews();return views.find(v=>v.id===state.view)||views.find(v=>v.id===(activeRun()?.defaultView||task?.defaultView))||views[0];}
 function modelVersion(){return activeView()?.version||task?.modelVersion||task?.resultVersion||0;}
-function modelLoadKey(){return `${task.id}:${modelVersion()}:${activeView()?.id||''}`;}
+function modelLoadKey(){return `${task.id}:${modelVersion()}:${activeView()?.id||''}`+(application.fieldRun?':app:'+application.fieldRun:'');}
 function syncStudyChrome(){els['model-content'].hidden=false;const isStudy=!!task?.study;els['study-delivery-error'].hidden=!isStudy||!task.importError;els['study-delivery-error'].textContent=task?.importError||'';els['study-navigation'].hidden=!isStudy;if(!isStudy){els['study-overview'].hidden=true;els['study-model-context'].hidden=true;els['model-content'].hidden=false;}else if(studyData)studyPanel.setSelection(state.run,state.panel);els['export-button'].disabled=isStudy&&state.panel==='overview'?!studyData:!fields;els['export-image-label'].textContent=isStudy&&state.panel==='overview'?'分析图表':'模型截图';els['export-field-label'].textContent=isStudy&&state.panel==='overview'?'参数组数据':'当前场数据';els['export-field'].disabled=isStudy&&state.panel==='overview'?!studyData:!fields||fields.kind==='mesh';els['export-history'].hidden=isStudy&&state.panel==='overview'||!fields?.frames?.some(f=>Number.isFinite(f.release));updateStudyTime();syncAdaptiveUI();}
 async function loadStudy(){if(!task?.study){studyData=null;studyKey=null;syncStudyChrome();return;}const ident=task.id,key=`${ident}:${task.study.version}`;if(studyKey===key)return;const data=await cached(studyCache,ident,'study',key);if(task?.id!==ident||key!==`${task.id}:${task.study.version}`||studyKey===key)return;studyData=data;studyKey=key;if(!data.runs.some(r=>r.id===state.run))state.run=data.defaultRun||data.runs.find(r=>r.viewIds.length)?.id||data.runs[0]?.id||null;if(!['overview','model'].includes(state.panel))state.panel='overview';const view=activeView();state.view=view?.id||null;studyPanel.setData(ident,data,state.run,state.panel);syncStudyChrome();remember();}
 async function syncTaskContent(){await loadStudy();await loadCurrentFields();syncStudyChrome();}
@@ -221,7 +257,15 @@ function frame(){return fields?.frames?.[state.frame];}
 function timeText(){return frame()?`${clock(frame().time)} ${model?.timeUnit||'s'}`:'稳态';}
 function mergeTask(meta){if(meta.draft)return;const i=tasks.findIndex(t=>t.id===meta.id);if(i<0)tasks.unshift(meta);else tasks[i]={...tasks[i],...meta};if(task?.id===meta.id){const directive=meta.presentation?.viewState||{},selectionKey=JSON.stringify([meta.id,meta.presentation?.viewStateRevision||0,directive]);if(directive.view&&selectionKey!==selectedViewDirectiveKey&&meta.views?.some(v=>v.id===directive.view)){selectedViewDirectiveKey=selectionKey;state.view=directive.view;overrides.set(`${meta.id}:viewPinned`,true);}if(!meta.study&&meta.defaultView&&meta.defaultView!==task.defaultView&&!overrides.has(`${meta.id}:viewPinned`))state.view=meta.defaultView;if(!meta.study&&!task.resultReady&&meta.resultReady){const current=(meta.views||[]).find(v=>v.id===state.view);if(current?.kind==='mesh')state.view=(meta.views||[]).find(v=>v.kind==='results'&&v.caseRoot===current.caseRoot)?.id||meta.defaultView;}task={...task,...meta};}taskMenu();updateHeading();applyPresentation();}
 function updateHeading(){evidenceBrowser?.setTask(task);presentationActivity?.update(task);document.title=(task?.title||'OFFBEAT')+' · 计算工作台';execution?.setTask(task);delivery?.setTask(task);els['task-title'].textContent=task?.title||'新任务';els['process-button'].disabled=!task;els['task-picker'].disabled=!tasks.length;
- const progress=task?.progress,summary=progress?.summary||'';els['task-progress'].hidden=!summary;els['progress-summary'].textContent=summary;els['task-progress'].dataset.state=task?.status||'';els['task-progress'].title='计算流程与子过程，由执行事件及求解日志更新';els['progress-stages'].innerHTML=(progress?.stages||[]).map(s=>`<span class="progress-stage" data-state="${escape(s.status)}">${escape(s.label)}</span>`).join('');
+ const summary=task?.progress?.summary||'';
+ els['task-progress'].hidden=!summary;
+ els['task-progress'].dataset.state=task?.status||'';
+ if(els['progress-summary'].textContent!==summary)els['progress-summary'].textContent=summary;
+ const step=task?.renderProgress?.current;
+ els['render-progress'].hidden=!step;
+ els['render-progress'].dataset.state=step?.state||'';
+ if(els['render-step'].textContent!==(step?.label||''))els['render-step'].textContent=step?.label||'';
+ syncBuildOption();
 }
 function showDraft(){studyData=null;studyKey=null;syncStudyChrome();loadToken++;stop();task=null;model=null;presentationKey=null;studyData=null;syncStudyChrome();state.task=null;state.view=null;state.field=null;state.compareField=null;state.pickedPoint=null;if(els.drawer.open)els.drawer.close();emptyModel();updateHeading();taskMenu();els['viewer-error'].hidden=true;els['loading-state'].hidden=true;els.workspace.setAttribute('aria-busy','false');remember();}
 function rangeKey(){return `${task.id}:${state.view}:${state.field}`;}
@@ -243,8 +287,11 @@ async function loadCurrentFields(){
  if(task?.study&&state.panel==='model'&&!activeView()){emptyModel();return;}
  if(!task?.modelReady&&!task?.resultReady||!activeView())return;const targetTime=pendingStudyTime&&pendingStudyTime.task===task.id&&pendingStudyTime.run===state.run?pendingStudyTime:frame()&&model?{time:frame().time,unit:model.timeUnit||'s'}:null;const ident=task.id,view=activeView();state.view=view?.id||null;applyPresentation();const version=modelLoadKey();if(loadedVersion===version)return;
  const followLatest=(task.status==='running'||activeRun()?.status==='running')&&!pendingStudyTime&&(!fields||fields.kind==='mesh'||loadedVersion?.endsWith(':'+state.view)&&state.frame===fields.frames?.length-1);
- const data=await cached(fieldCache,ident,'fields'+(state.view?`?view=${encodeURIComponent(state.view)}`:''),version);if(task?.id!==ident||version!==modelLoadKey()||loadedVersion===version)return;
- const nextModel=displayModel(),rotation=await rotationData(data,nextModel,version);if(task?.id!==ident||version!==modelLoadKey())return;
+ const fieldRun=application.fieldRun;
+ const appField=fieldRun?await application.artifact(fieldRun,'field'):null;
+ if(fieldRun&&!appField?.data?.frames?.length)throw Error('所选复算工况缺少已保存的物理场');
+ const data=appField?.data||await cached(fieldCache,ident,'fields'+(state.view?`?view=${encodeURIComponent(state.view)}`:''),version);if(task?.id!==ident||version!==modelLoadKey()||loadedVersion===version)return;
+ const nextModel=appField?{...appField.task,id:task.id}:displayModel(),rotation=appField?null:await rotationData(data,nextModel,version);if(task?.id!==ident||version!==modelLoadKey())return;
  stop();if(fields?.kind==='mesh'&&data.kind!=='mesh')viewDirectiveKey=null;fields=data;model=nextModel;rotationSource=rotation;loadedVersion=version;const geometryOnly=data.kind==='mesh',rotationKey=task.id+':'+state.view;if(state.rotation?.key!==rotationKey)state.rotation={key:rotationKey,enabled:!!model.reconstruction,angle:model.reconstruction?.angle||270};state.rotation.angle=clamp(Number(state.rotation.angle)||270,1,360);
  if(!geometryOnly){if(!model.fields.some(x=>x.id===state.field))state.field=model.fields[0].id;state.frame=followLatest?data.frames.length-1:targetTime?(targetTime.unit===(model.timeUnit||'s')?nearestFrame(data.frames,targetTime.time):0):clamp(Number.isInteger(state.frame)?state.frame:0,0,data.frames.length-1);pendingStudyTime=null;}
  els['field-select'].innerHTML=geometryOnly?'<option>网格预览</option>':model.fields.map(f=>`<option value="${escape(f.id)}">${escape(f.label)}</option>`).join('');if(!geometryOnly)els['field-select'].value=state.field;
@@ -269,7 +316,7 @@ function refresh(){if(!task||!fields||!viewer||!model)return;if(state.pickedPoin
  els['model-stage'].classList.toggle('comparing',comparing);for(const id of ['compare-canvas','compare-picker','compare-legend'])els[id].hidden=!comparing;
  const mesh=model.shape==='mesh'?renderedMesh():null,revolved=!!mesh?.reconstruction,geometry=displayGeometry(),displayedModel={...model,geometry,reconstruction:mesh?.reconstruction};
  const mode=state.cameraView==='auto'?(revolved?'3d':model.shape==='mesh'&&state.displayMode==='slice'?{x:'yz',y:'xz',z:'xy'}[state.sliceAxis]:mesh?.preferredView||model.preferredView||'3d'):state.cameraView;
- els['model-stage'].style.background=renderStyle().background;const render=(v,id)=>{v.setDisplayProgram(currentProgram(),state.parameters);v.setStyle(renderStyle(id));v.cut=state.cut&&!revolved&&(model.shape!=='mesh'||model.dimensionality!==1);v.mesh=state.mesh;v.cutAngle=state.cutAngle;v.axialScale=state.axialScale;v.displayMode=model.shape==='mesh'&&model.supportsSlice!==false?state.displayMode:'surface';v.sliceAxis=state.sliceAxis;v.slicePosition=state.slicePosition;v.aspectMode=state.aspectMode;if(v.cameraPresetRevision!==programOptions.cameraPresetRevision){v.camera.zoom=1;v.setView(mode,true);v.cameraPresetRevision=programOptions.cameraPresetRevision;}else v.setView(mode);v.setProgramCamera(programOptions);const key=`${task.id}:${state.view}:${modelVersion()}:${revolved?state.rotation.angle:'flat'}`;if(geometryOnly)v.setMeshPreview(displayedModel,mesh,key);else if(model.shape==='mesh')v.setNativeModel(displayedModel,mesh,values(id),range(id),`${key}:${frame().mesh}`);else v.setModel(model,sampler(fields.r,values(id)),range(id),key);v.setAnnotations(!geometryOnly&&state.extrema,!geometryOnly?values(id):[],model.fields?.find(f=>f.id===id)?.unit||'',fields.r,state.extremaMode);v.setSceneAnnotations(geometryOnly?null:currentProgram(),state.parameters,geometryOnly?{}:frame()?.fields||fields,model.fields||[],id,{mesh:fields.meshes?.[frame()?.mesh],view:state.view});};
+ els['model-stage'].style.background=renderStyle().background;const render=(v,id)=>{v.setDisplayProgram(currentProgram(),state.parameters);v.setStyle(renderStyle(id));v.cut=state.cut&&!revolved&&(model.shape!=='mesh'||model.dimensionality!==1);v.mesh=state.mesh;v.cutAngle=state.cutAngle;v.axialScale=state.axialScale;v.displayMode=model.shape==='mesh'&&model.supportsSlice!==false?state.displayMode:'surface';v.sliceAxis=state.sliceAxis;v.slicePosition=state.slicePosition;v.aspectMode=state.aspectMode;if(v.cameraPresetRevision!==programOptions.cameraPresetRevision){v.camera.zoom=1;v.setView(mode,true);v.cameraPresetRevision=programOptions.cameraPresetRevision;}else v.setView(mode);v.setProgramCamera(programOptions);const key=`${task.id}:${state.view}:${modelVersion()}:${revolved?state.rotation.angle:'flat'}`;if(geometryOnly)v.setMeshPreview(displayedModel,mesh,key);else if(model.shape==='mesh')v.setNativeModel(displayedModel,mesh,values(id),range(id),`${key}:${frame().mesh}`);else v.setModel(model,sampler(fields.r,values(id)),range(id),key);v.setAnnotations(!geometryOnly&&state.extrema,!geometryOnly?values(id):[],model.fields?.find(f=>f.id===id)?.unit||'',fields.r,state.extremaMode);v.setSceneAnnotations(geometryOnly?null:currentProgram(),state.parameters,geometryOnly?{}:frame()?.fields||fields,model.fields||[],id,{mesh:fields.meshes?.[frame()?.mesh],view:state.view,boundarySamples:frame()?.boundarySamples});};
  try{render(viewer,state.field);if(comparing){render(compareViewer,state.compareField);compareViewer.camera={...viewer.camera};compareViewer.draw();}else compareViewer?.clear();els['viewer-error'].hidden=true;}catch(error){showError(error.message);return;}
  els['cut-button'].disabled=model.shape==='mesh'&&state.displayMode==='slice';els['cut-button'].setAttribute('aria-pressed',String(state.cut));syncViewerShortcuts();
  if(geometryOnly){drawAxis();syncViewerState();syncAdaptiveUI();return;}
@@ -286,18 +333,67 @@ function play(){if(!task||!fields?.frames||fields.frames.length<=1)return;if(int
 
 function openDrawer(view){
  if(!task&&view!=='tasks')return;stop();closeMenus();drawerView=view;els.drawer.dataset.view=view;drawerToken++;els['drawer-content'].removeAttribute('aria-busy');
- const inspecting=['settings','parameters'].includes(view);
- els['drawer-title'].textContent={tasks:'计算任务',settings:'显示设置',parameters:'模型参数',runs:'参数组'}[view];els['drawer-content'].replaceChildren();
+ const inspecting=['settings','parameters','calculator'].includes(view);
+ els['drawer-title'].textContent={tasks:'计算任务',settings:'显示设置',parameters:'模型参数',calculator:'计算器',runs:'参数组'}[view];els['drawer-content'].replaceChildren();
  if(els.drawer.open&&els.drawer.matches(':modal')===inspecting)els.drawer.close();
  if(!els.drawer.open){if(inspecting)els.drawer.show();else els.drawer.showModal();}
- if(view==='runs')studyPanel.renderRuns(els['drawer-content'],studyPanel.pendingBinIds);if(view==='tasks')renderTasks();if(view==='settings')renderSettings();if(view==='parameters')renderParameters();
+ if(view==='runs')studyPanel.renderRuns(els['drawer-content'],studyPanel.pendingBinIds);if(view==='tasks')renderTasks();if(view==='settings')renderSettings();if(view==='parameters')renderParameters();if(view==='calculator')renderCalculator();
  syncDrawerTriggers();
 }
-function syncDrawerTriggers(){for(const view of ['settings','parameters'])els[view+'-button'].setAttribute('aria-expanded',String(els.drawer.open&&drawerView===view));}
+function syncDrawerTriggers(){for(const view of ['settings','parameters','calculator'])els[view+'-button'].setAttribute('aria-expanded',String(els.drawer.open&&drawerView===view));}
+const buildChanges=new Set();
+function buildTask(){return task||(dsh?.defaultTask?.draft?dsh.defaultTask:null);}
+function syncBuildOption(){
+ const selected=buildTask(),plan=selected?.calculatorRequest||{},pending=['waiting','building'].includes(plan.state);
+ const existing=!!(task&&application.taskId===task.id&&application.spec);
+ const sameCase=existing&&(!plan.case||plan.case===application.root);
+ const control=els['build-switch'];
+ // Keep the existing application reachable from the same toolbar position.
+ els['build-option'].hidden=existing&&!pending;
+ const bound=!!(task&&application.key&&application.taskId===task.id);
+ const readyPlan=plan.state==='ready'&&task?.views?.some(v=>v.id===plan.view);
+ els['calculator-button'].hidden=!existing&&!readyPlan&&(!bound||selected?.status!=='completed');
+ els['calculator-button'].textContent=existing||readyPlan?'打开计算器':'构建要求';
+ control.checked=pending;
+ control.disabled=!selected||!dsh?.token||buildChanges.has(selected.id)||(!pending&&['failed','stopped','interrupted'].includes(selected.status));
+ const note=plan.state==='waiting'?(selected.status==='completed'?'等待可用的保存工况':'计算完成后生成'):plan.state==='building'?'正在生成':plan.state==='error'&&!sameCase?plan.message:'';
+ if(els['build-status'].textContent!==note)els['build-status'].textContent=note;
+ els['build-status'].hidden=!note;
+}
+async function setCalculatorEnabled(enabled){
+ const selected=buildTask();if(!selected||!dsh?.token||buildChanges.has(selected.id))return;
+ const id=selected.id,plan=selected.calculatorRequest||{},bound=application.key&&application.taskId===id;
+ const requestId=enabled?crypto.randomUUID().replaceAll('-',''):plan.requestId;
+ buildChanges.add(id);syncBuildOption();
+ try{
+  const response=await fetch(BASE+'/api/tasks/'+encodeURIComponent(id)+'/build-calculator',{method:'POST',headers:{'Content-Type':'application/json','X-Workbench-Token':dsh.token},
+   body:JSON.stringify({enabled,requestId,view:enabled&&bound&&selected.status==='completed'?application.viewId:null,
+    request:(bound&&application.saved?.buildText?.trim())||'根据原任务选择主要可复算输入，保留相关物理场、曲线与结果。'})});
+  const data=await response.json();if(!response.ok)throw Error(data.error||'无法更新生成设置');
+  // SSE and this acknowledgement can arrive in either order.
+  const fresh=await api('/api/tasks/'+encodeURIComponent(id));dsh.receiveSnapshot(fresh);
+ }catch(error){notify(error.message);}
+ finally{buildChanges.delete(id);syncBuildOption();if(els.drawer.open&&drawerView==='calculator')renderCalculator();}
+}
+els['build-switch'].addEventListener('change',e=>void setCalculatorEnabled(e.target.checked));
+els['calculator-button'].addEventListener('click',async()=>{
+ const plan=task?.calculatorRequest,id=task?.id;
+ if(!application.spec&&plan?.state==='ready'&&plan.view!==activeView()?.id){
+  try{await applyUIAction({type:'view',state:{view:plan.view}});}catch(error){notify(error.message);return;}
+ }
+ if(task?.id===id)toggleDrawer('calculator');
+});
+function renderCalculator(){
+ const host=els['drawer-content'];
+ if(application.spec){application.mount(host);return;}
+ if(!application.key){host.textContent='请选择已保存的工况';return;}
+ application.mountBuilder(host,task?.calculatorRequest,buildChanges.has(task?.id),setCalculatorEnabled);
+}
 function toggleDrawer(view){if(els.drawer.open&&drawerView===view)els.drawer.close();else openDrawer(view);}
 function renderTasks(){els['drawer-content'].innerHTML=`<p class="drawer-note">${tasks.length} 个任务</p>`+tasks.map(t=>`<button class="task-card ${task.id===t.id?'current':''}" data-select-task="${t.id}"><span class="task-card-icon">${icon(t.shape==='rod'?'rod':'sphere')}</span><span><strong>${escape(t.title)}</strong><small>${statusLabel[t.status]||'已完成'}${t.cells?' · '+t.cells+' 单元':''}</small></span>${task.id===t.id?icon('check'):''}</button>`).join('');}
 const receiptCache=new Map();
 async function renderParameters(){
+ if(application.spec){++drawerToken;application.mount(els['drawer-content']);return;}
  const view=activeView(),root=view?.caseRoot,ident=task.id,token=++drawerToken;
  const assigned=caseParameterSections(task.presentation?.parameters,root),r=activeRun();
  const receipt=currentReceipt(),key=receipt&&JSON.stringify([ident,receipt.path,receipt.modifiedNs,receipt.bytes]);
@@ -442,16 +538,16 @@ async function verifySelection(id,request){
  const current=()=>task?.id===id&&task.presentation?.uiRevision===request.uiRevision;
  const read=()=>{
   const mapping=JSON.parse(els['model-canvas'].dataset.fieldMapping||'null'),field=els['field-select'].value;
-  return {ready:current()&&loadedVersion===modelLoadKey()&&!!fields?.frames?.length&&adaptive.ready&&els['viewer-error'].hidden&&field===state.field&&mapping?.vertices>0,view:state.view,run:state.run,field,time:frame()?.time,timeUnit:model?.timeUnit,range:mapping?.sampledRange};
+  return {ready:task?.id===id&&loadedVersion===modelLoadKey()&&!!fields?.frames?.length&&adaptive.ready&&els['viewer-error'].hidden&&field===state.field&&mapping?.vertices>0,view:state.view,run:state.run,field,time:frame()?.time,timeUnit:model?.timeUnit,range:mapping?.sampledRange};
  };
  let result={status:'unavailable'};
  if(current()&&!interval){
   checkingSelection=true;
-  const picked=state.pickedPoint,camera={...viewer.camera},panel=state.panel,compareField=state.compareField;
+  const originalView=state.view,originalDirective=task.presentation?.viewStateRevision,picked=state.pickedPoint,camera={...viewer.camera},panel=state.panel,compareField=state.compareField;
   const tips=[...adaptive.nodes.values()].filter(e=>e.interaction).map(e=>[e,e.interaction.pinned]);
   const pinKey=id+':viewPinned',pinned=overrides.get(pinKey);
   try{
-   result=await checkLinkedSelection({current,read,restore:async (before,active)=>{
+   result=await checkLinkedSelection({current,read,canRestore:()=>task?.id===id&&task.presentation?.viewStateRevision===originalDirective&&task.views?.some(v=>v.id===originalView),restore:async (before,active)=>{
     if(before.run&&before.run!==state.run)await selectStudyRun(before.run);
     if(!active())return;
     await applyUIAction({type:'view',state:{view:before.view,time:before.time}});
@@ -468,7 +564,7 @@ async function verifySelection(id,request){
  }
  await fetch(BASE+'/api/tasks/'+id+'/selection-check-result',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json','X-Workbench-Token':dsh.token},body:JSON.stringify({nonce:request.nonce,browserId,result})}).catch(()=>{});
 }
-async function loadTasks(){tasks=(await api('/api/tasks')).filter(t=>!t.draft);if(tasks.length)await showTask(tasks.some(t=>t.id===state.task)?state.task:tasks[0].id);else await dsh.newTask();}
+async function loadTasks(){const list=await api('/api/tasks');tasks=list.filter(t=>!t.draft);if(!state.task&&list.some(t=>t.draft&&t.id===sessionStorage.getItem('workbench-draft')))return dsh.newTask();if(tasks.length)await showTask(tasks.some(t=>t.id===state.task)?state.task:tasks[0].id);else await dsh.newTask();}
 async function init(){try{
  evidenceBrowser=new EvidenceBrowser({button:els['evidence-button'],dialog:els['evidence-dialog'],onData:()=>syncAdaptiveUI()});
  presentationActivity=new PresentationActivity(els['presentation-skeletons'],els['presentation-issue']);
@@ -479,7 +575,7 @@ async function init(){try{
  execution=new ExecutionProcess({button:els['process-button'],panel:els['execution-process'],workspace:els.workspace,statusLabel});
  viewer=new ModelViewer(els['model-canvas'],{onCameraChange:()=>{if(compareViewer&&state.compare){compareViewer.camera={...viewer.camera};compareViewer.draw();}drawAxis();syncViewerState();},onError:showError});
  compareViewer=new ModelViewer(els['compare-canvas'],{onCameraChange:()=>{viewer.camera={...compareViewer.camera};viewer.draw();drawAxis();syncViewerState();},onError:showError});
- dsh=new NativeHarness({onSelectionCheck:verifySelection,onError:notify,getTasks:()=>tasks,onDraft:showDraft,selectTask:showTask,onReconnect:loadTasks,onMeta:meta=>{mergeTask(meta);if(task?.id===meta.id)syncTaskContent().catch(e=>showError(e.message));},onResult:()=>syncTaskContent().catch(e=>showError(e.message))});
+ dsh=new NativeHarness({onSelectionCheck:verifySelection,onError:notify,getTasks:()=>tasks,onDraft:showDraft,selectTask:showTask,onReconnect:loadTasks,onMeta:meta=>{if(meta.draft){syncBuildOption();return;}mergeTask(meta);if(task?.id===meta.id)syncTaskContent().catch(e=>showError(e.message));},onResult:()=>syncTaskContent().catch(e=>showError(e.message))});
  emptyModel();await dsh.init();await loadTasks();
  }catch(error){els['loading-state'].hidden=true;els.workspace.setAttribute('aria-busy','false');showError(error.message);}}
 init();

@@ -39,7 +39,7 @@ mandifuel_prepare_agent_environment() {
         MANDIFUEL_OPENFOAM_BASHRC MANDIFUEL_OFFBEAT_BIN MANDIFUEL_BASE_PYTHON
         MANDIFUEL_DSH MANDIFUEL_NODE MANDIFUEL_CASE_LIBRARY_ROOT
         MANDIFUEL_PROJECT_ROOT MANDIFUEL_DEFAULT_WORKDIR MANDIFUEL_RUNS_ROOT
-        MANDIFUEL_RAG_MAPPING_BASE_URL MANDIFUEL_RAG_MAPPING_MODEL
+        MANDIFUEL_RAG_MODE MANDIFUEL_RAG_MAPPING_BASE_URL MANDIFUEL_RAG_MAPPING_MODEL
         MANDIFUEL_RAG_MAPPING_API_KEY_ENV MANDIFUEL_RAG_EMBEDDING_BASE_URL
         MANDIFUEL_RAG_EMBEDDING_MODEL MANDIFUEL_RAG_EMBEDDING_DIMENSION
         MANDIFUEL_RAG_EMBEDDING_API_KEY_ENV MANDIFUEL_RAG_CACHE_DIR
@@ -78,6 +78,7 @@ mandifuel_prepare_agent_environment() {
     export MANDIFUEL_PROJECT_ROOT MANDIFUEL_DEFAULT_WORKDIR MANDIFUEL_RUNS_ROOT
     openfoam_bashrc="${MANDIFUEL_OPENFOAM_BASHRC:-}"
     base_python="${MANDIFUEL_BASE_PYTHON:-}"
+    MANDIFUEL_RAG_MODE="${MANDIFUEL_RAG_MODE:-semantic}"
     MANDIFUEL_RAG_MAPPING_BASE_URL="${MANDIFUEL_RAG_MAPPING_BASE_URL:-https://api.deepseek.com}"
     MANDIFUEL_RAG_MAPPING_MODEL="${MANDIFUEL_RAG_MAPPING_MODEL:-deepseek-chat}"
     MANDIFUEL_RAG_MAPPING_API_KEY_ENV="${MANDIFUEL_RAG_MAPPING_API_KEY_ENV:-DEEPSEEK_API_KEY}"
@@ -104,7 +105,8 @@ mandifuel_prepare_agent_environment() {
         printf '%s\n' "MANDiFuel startup: case-library root is invalid." >&2
         return 69
     fi
-    if [[ ! "$MANDIFUEL_RAG_MAPPING_API_KEY_ENV" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ||
+    if [[ ( "$MANDIFUEL_RAG_MODE" != semantic && "$MANDIFUEL_RAG_MODE" != local ) ||
+          ! "$MANDIFUEL_RAG_MAPPING_API_KEY_ENV" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ||
           ! "$MANDIFUEL_RAG_EMBEDDING_API_KEY_ENV" =~ ^[A-Za-z_][A-Za-z0-9_]*$ ||
           ! "$MANDIFUEL_RAG_EMBEDDING_DIMENSION" =~ ^[1-9][0-9]*$ ||
           ! "$MANDIFUEL_RAG_TIMEOUT_SECONDS" =~ ^[1-9][0-9]*([.][0-9]+)?$ ||
@@ -159,12 +161,12 @@ mandifuel_prepare_agent_environment() {
     done
 
     export MANDIFUEL_CASE_LIBRARY_ROOT
-    export MANDIFUEL_RAG_MAPPING_BASE_URL MANDIFUEL_RAG_MAPPING_MODEL
+    export MANDIFUEL_RAG_MODE MANDIFUEL_RAG_MAPPING_BASE_URL MANDIFUEL_RAG_MAPPING_MODEL
     export MANDIFUEL_RAG_MAPPING_API_KEY_ENV MANDIFUEL_RAG_EMBEDDING_BASE_URL
     export MANDIFUEL_RAG_EMBEDDING_MODEL MANDIFUEL_RAG_EMBEDDING_DIMENSION
     export MANDIFUEL_RAG_EMBEDDING_API_KEY_ENV MANDIFUEL_RAG_CACHE_DIR
     export MANDIFUEL_RAG_TIMEOUT_SECONDS
-    # Retrieval is local for ordinary tasks; model API networking belongs to DSH.
+    # Solver shells stay offline. The registered host retrieval tool owns its model calls.
     export MANDIFUEL_TASK_OFFLINE=1
 
     # Give the model the paths already resolved here. Ordinary calculation
@@ -178,7 +180,7 @@ mandifuel_prepare_agent_environment() {
         "RAG index: 137 case cards, dual index verified" \
         "Task network: offline (native web tools disabled; subprocess seccomp)" \
         "Task write boundary: $MANDIFUEL_PROJECT_ROOT${MANDIFUEL_RUNS_ROOT:+ + $MANDIFUEL_RUNS_ROOT} (Landlock)" \
-        "RAG retrieval: local lexical/taxonomy ranking; no external provider calls" \
+        "RAG retrieval: mandifuel_retrieve ($MANDIFUEL_RAG_MODE), independent local experience index" \
         "OFFBEAT: $(command -v offbeat)" \
         "Task python3: $(command -v python3)" \
         "Case library: ${MANDIFUEL_CASE_LIBRARY_ROOT:-not configured}" \

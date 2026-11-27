@@ -4,6 +4,7 @@ import {caseTabs} from '../assets/ui-placement.js';
 const object=(properties={},required=[])=>({type:'object',properties,required,additionalProperties:false});
 export const TOOL_SCHEMAS={
  ui_read_skill:object({resource:{type:'string'}}),
+ ui_calculator:object({case:{type:'string'},candidate:{type:'string'},components:{type:'array',items:{type:'object'}},version:{type:'integer'}},['case']),
  ui_inspect:object({target:{type:'string',enum:['page','main','aside','settings','model','data','capabilities','evidence']},node:{type:'string'}},['target']),
  ui_apply:object({expectedRevision:{type:'string'},operations:{type:'array',items:{type:'object'}},datasets:{type:'object'},update:{type:'object'}},['expectedRevision']),
  ui_wait_for_render:object({timeoutMs:{type:'integer'},verifySelection:{type:'boolean'}}),
@@ -52,7 +53,7 @@ export function attachFrontendTools(agent,{id,call,current,session}){
  const revisions=new Set();let calls=0,mutations=0,skillLoaded=false;
  session.toolsAttached=true;
  for(const [name,parameters]of Object.entries(TOOL_SCHEMAS))agent.ctx.tools.register({
-  name,description:descriptions[name],parameters,
+  name,description:name==='ui_calculator'?'Inspect the DSH-published app by caseRoot, or pass candidate to verify a prepared case before binding an appCandidate button. Read actual browser draftValues, candidate and canRun. Compose main/aside views from declared output IDs and the current version.':descriptions[name],parameters,
   output:{schema:{type:'object'},render:(_args,value)=>[{type:'text',text:JSON.stringify(value)}]},
   async execute(args,exec){
    if(exec.agent!==agent||!current()||session.closed||exec.signal.aborted)throw new Error('前端操作会话已失效');
@@ -62,6 +63,10 @@ export function attachFrontendTools(agent,{id,call,current,session}){
     throw new Error(message);
    }
    session.toolCalls=calls;
+   const target={page:'页面布局',main:'主栏',aside:'侧栏',settings:'显示设置',model:'物理场',data:'结果数据',capabilities:'可用组件',evidence:'核查证据'}[args.target];
+   const activity={ui_read_skill:'读取展示规范',ui_inspect:'检查'+(target||'页面'),ui_apply:'提交界面调整',ui_wait_for_render:'核对浏览器渲染回执',ui_calculator:args.components?'更新计算器结果组件':'读取计算器契约'};
+   if(session.reportActivity)await session.reportActivity(activity[name]);
+   if(!current()||session.closed||exec.signal.aborted)throw new Error('前端操作会话已失效');
    if(name==='ui_read_skill'){
     const value=readSkill(args.resource);if(value.resource==='SKILL.md'){skillLoaded=true;session.skillLoaded=true;}return value;
    }
@@ -81,12 +86,41 @@ export function attachFrontendTools(agent,{id,call,current,session}){
      value=await call(`/api/tasks/${id}/frontend`,{...args,...session.request!==undefined?{expectedRequest:session.request}:{}},exec.signal);
     }
     catch(error){session.applyError=String(error.message||error);throw error;}
-    if(changesSelectionBinding(args.update?.ui?.root)||changesSelectionBinding(args.update?.ui?.aside)||args.operations?.some(op=>['main','aside'].includes(op.slot)&&changesSelectionBinding(op.props||op.value))){session.checkSelection=true;delete session.selectionCheck;}
+    if(Object.values(args.datasets||args.update?.ui?.datasets||{}).some(d=>d?.quantity==='csInventory'||d?.caseIdentity)||changesSelectionBinding(args.update?.ui?.root)||changesSelectionBinding(args.update?.ui?.aside)||args.operations?.some(op=>['main','aside'].includes(op.slot)&&changesSelectionBinding(op.props||op.value))){session.checkSelection=true;delete session.selectionCheck;}
     revisions.add(value.revision);session.lastPublished=value;session.mutations=(session.mutations||0)+1;session.applyError=null;session.confirmed=false;return value;
+   }
+   if(name==='ui_calculator'){
+    if(!skillLoaded||!session.pageObserved)throw new Error('先读取前端技能并观察当前页面');
+    const path='/api/tasks/'+id+'/calculator',query='?inspect=1&case='+encodeURIComponent(args.case);
+    if(args.candidate){
+     if(args.components)throw new Error('候选回读与组件修改须分别提交');
+     return await call(path+query+'&candidate='+encodeURIComponent(args.candidate),undefined,exec.signal);
+    }
+    if(args.components){
+     if(session.appCase!==args.case||session.appVersion!==args.version)throw new Error('先读取当前应用的契约版本');
+     if(++mutations>8)throw new Error('本轮修改超过 8 次');
+     await call(path,{action:'components',case:args.case,components:args.components,version:args.version,...session.request!==undefined?{expectedRequest:session.request}:{}},exec.signal);
+     session.appMutation=true;session.appConfirmed=false;session.mutations=(session.mutations||0)+1;
+    }
+    const value=await call(path+query,undefined,exec.signal);
+    if(!value.spec)return {available:false,reason:'DSH 尚未为此工况发布应用契约'};
+    session.appCase=args.case;session.appVersion=value.spec.version;session.appQuery=path+query;
+    return value;
    }
    const timeout=args.timeoutMs??8000;
    if(!Number.isInteger(timeout)||timeout<0||timeout>10000)throw new Error('等待时间必须为 0–10000 毫秒');
    const deadline=Date.now()+timeout,expected=session.lastPublished;
+   if(session.appMutation&&!expected){
+    let receipt;
+    do{
+     receipt=(await call(session.appQuery,undefined,exec.signal)).browser;
+     if(receipt.version===session.appVersion&&receipt.ready)break;
+     if(Date.now()>=deadline)break;
+     await sleep(250,exec.signal);
+    }while(current());
+    session.appConfirmed=receipt.version===session.appVersion&&receipt.ready;
+    return {status:session.appConfirmed?'confirmed':'pending',browser:receipt};
+   }
    if(args.verifySelection){
     session.requireSelection=true;session.checkSelection=true;
     if(['busy','offline','unavailable','unconfirmed'].includes(session.selectionCheck?.status))delete session.selectionCheck;
@@ -99,7 +133,7 @@ export function attachFrontendTools(agent,{id,call,current,session}){
     if(status==='confirmed')await verifyRenderedSelection(session,page,call,id,exec.signal);
     if(status==='confirmed'&&session.selectionCheck?.status==='failed')status='error';
     else if(status==='confirmed'&&!selectionConfirmed(session))status='selection-unconfirmed';
-    if(status!=='pending'||Date.now()>=deadline){revisions.add(page.revision);session.confirmed=status==='confirmed';session.renderStatus=status;return{status,revision:page.revision,presentationVersion:page.presentationVersion,browser,viewer:page.viewer||{},selectionCheck:session.selectionCheck};}
+    if(status!=='pending'||Date.now()>=deadline){revisions.add(page.revision);session.confirmed=status==='confirmed';session.renderStatus=status;return{status,revision:page.revision,presentationVersion:page.presentationVersion,browser,viewer:page.viewer||{},...session.selectionCheck?{selectionCheck:session.selectionCheck}:{}};}
     await sleep(250,exec.signal);
    }while(current());
    throw new Error('前端操作会话已结束');

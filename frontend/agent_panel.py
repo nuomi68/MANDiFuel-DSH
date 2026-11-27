@@ -15,7 +15,7 @@ ARITY={name:(1,1) for name in ['abs','sin','cos','tan','sqrt','exp','log']}
 ARITY.update(pow=(2,2),clamp=(3,3),mix=(3,3),select=(3,3),min=(1,16),max=(1,16))
 STYLE_TARGETS={'scaleX','scaleY','scaleZ','opacity','palette','reversePalette','wireColor','background'}
 OPTION_SPECS={'cameraView':{'auto','3d','xy','xz','yz'},'aspectMode':{'physical','fit'},'displayMode':{'surface','slice'},'sliceAxis':{'x','y','z'},'scale':{'fixed','frame'},'extremaMode':{'both','max','min'},'mesh':'bool','cut':'bool','compare':'bool','extrema':'bool','cutAngle':(0,180),'slicePosition':(0,1),'zoom':(.5,20),'yaw':(-3600,3600),'tilt':(-89,89),'time':'number','field':'field','compareField':'field','revolve':'bool','revolveAngle':(1,360)}
-LANGUAGE={'version':1,'parameters':'p.<agent-defined-id>','coordinates':'source model coordinates; display only','context':sorted(CONTEXT),'functions':sorted(FUNCTIONS),'operators':['+','-','*','/','%','**','<','<=','>','>=','==','!='],'vertex':'three expressions for x, y, z','styleTargets':sorted(STYLE_TARGETS),'optionTargets':list(OPTION_SPECS),'fieldBindings':['palette','reversePalette','range'],'annotations':['point','probe','line','arrow','circle'],'probeSampling':'nearest stored cell; axisymmetric views use meridional distance'}
+LANGUAGE={'version':1,'parameters':'p.<agent-defined-id>','coordinates':'source model coordinates; display only','context':sorted(CONTEXT),'functions':sorted(FUNCTIONS),'operators':['+','-','*','/','%','**','<','<=','>','>=','==','!='],'vertex':'three expressions for x, y, z','styleTargets':sorted(STYLE_TARGETS),'optionTargets':list(OPTION_SPECS),'fieldBindings':['palette','reversePalette','range'],'annotations':['point','probe','boundaryProbe','line','arrow','circle'],'boundaryProbe':'patch and field from exported shell boundaryPatches; position and value are supplied by the actual saved boundary face','probeSampling':'nearest stored cell; axisymmetric views use meridional distance'}
 
 
 def finite(value):return isinstance(value,(int,float)) and not isinstance(value,bool) and math.isfinite(value)
@@ -153,8 +153,13 @@ def validate_program(program):
         if not isinstance(program['annotations'],list) or not 1<=len(program['annotations'])<=12:raise ValueError('标注列表无效')
         rows=[];seen=set()
         for annotation in program['annotations']:
-            if not isinstance(annotation,dict) or set(annotation)-{'id','type','label','position','end','text','color','visible','field','radius','axis','views'}:raise ValueError('标注定义无效')
-            if not identifier(annotation.get('id')) or annotation['id'] in seen or annotation.get('type') not in {'point','probe','line','arrow','circle'}:raise ValueError('标注 ID 或类型无效')
+            if not isinstance(annotation,dict) or set(annotation)-{'id','type','label','position','end','text','color','visible','field','radius','axis','views','patch'}:raise ValueError('标注定义无效')
+            if not identifier(annotation.get('id')) or annotation['id'] in seen or annotation.get('type') not in {'point','probe','line','arrow','circle','boundaryProbe'}:raise ValueError('标注 ID 或类型无效')
+            if annotation['type']=='boundaryProbe':
+                if not isinstance(annotation.get('patch'),str) or not re.fullmatch(r'[A-Za-z0-9_.-]{1,100}',annotation['patch']) or any(k in annotation for k in ('position','text','end')):
+                    raise ValueError('边界测点仅接受实际 patch 名称，位置与值由原始边界提供')
+            elif 'patch' in annotation:
+                raise ValueError('仅边界测点可指定 patch')
             if 'views' in annotation and (not isinstance(annotation['views'],list) or not 1<=len(annotation['views'])<=20 or not all(isinstance(v,str) and 0<len(v)<=100 for v in annotation['views'])):raise ValueError('标注视图范围无效')
             if annotation['type']=='circle':
                 expression_parameters(annotation.get('radius'))
@@ -162,7 +167,7 @@ def validate_program(program):
             elif 'radius' in annotation or 'axis' in annotation:raise ValueError('半径和平面只适用于 circle 导引')
             seen.add(annotation['id'])
             if 'label' in annotation and (not isinstance(annotation['label'],str) or len(annotation['label'])>100):raise ValueError('标注名称无效')
-            for key in ['position',*(['end'] if annotation['type'] in {'line','arrow'} else [])]:
+            for key in ([] if annotation['type']=='boundaryProbe' else ['position',*(['end'] if annotation['type'] in {'line','arrow'} else [])]):
                 if not isinstance(annotation.get(key),list) or len(annotation[key])!=3:raise ValueError('标注位置需要三个坐标表达式')
                 for expression in annotation[key]:expression_parameters(expression)
             annotation=dict(annotation)
@@ -188,7 +193,7 @@ def program_expressions(program):
     for style in program.get('fields',{}).values():
         for key,value in style.items():expressions.extend(value if key=='range' else [value])
     for annotation in program.get('annotations',[]):
-        expressions.extend(annotation['position']);expressions.extend(annotation.get('end',[]))
+        expressions.extend(annotation.get('position',[]));expressions.extend(annotation.get('end',[]))
         expressions.extend(annotation[key] for key in ['text','color','visible','radius'] if key in annotation)
     return expressions
 
@@ -283,7 +288,7 @@ def check_program_values(program,values,bounds=None):
             if 'palette' in evaluated and evaluated['palette'] not in {'coolwarm','viridis','inferno','gray','rainbow'}:raise ValueError('字段命名色带无效')
             if 'reversePalette' in evaluated and not isinstance(evaluated['reversePalette'],bool):raise ValueError('字段色带反转需要布尔值')
         for annotation in program.get('annotations',[]):
-            for key in ['position',*(['end'] if 'end' in annotation else [])]:
+            for key in [k for k in ('position','end') if k in annotation]:
                 for source in annotation[key]:
                     value=evaluate(ast.parse(source,mode='eval'),dict(zip('xyz',positions[-1])))
                     if not finite(value) or abs(value)>1e12:raise ValueError('标注坐标无效')

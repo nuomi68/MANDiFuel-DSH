@@ -66,14 +66,14 @@ print('local ok')''')
 
     def test_local_query_never_calls_http(self):
         with patch('urllib.request.urlopen', side_effect=AssertionError('HTTP must not be called')):
-            data=query('oxidation cladding interface temperature', limit=3)
+            data=query('oxidation cladding interface temperature', limit=3, mode='local')
         self.assertEqual(len(data['candidates']),3)
         self.assertFalse(data['fusion']['embedding_used'])
 
     def test_invalid_labels_and_no_lexical_hit(self):
         with self.assertRaises(QueryError):
-            query('fuel', labels={'geometry':'invented_shape'})
-        self.assertEqual(query('zzqnomatch987654321')['candidates'], [])
+            query('fuel', mode='local', labels={'geometry':'invented_shape'})
+        self.assertEqual(query('zzqnomatch987654321', mode='local')['candidates'], [])
 
     def test_maintenance_http_rejected_before_request(self):
         client=OpenAICompatibleClient(base_url='https://example.invalid',model='not-used',api_key='fake')

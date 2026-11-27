@@ -276,3 +276,22 @@ h1{font-size:20px;font-weight:600;letter-spacing:-.01em;color:var(--ink)}
 .native-connection button{
   border:1px solid var(--line);border-radius:7px;color:var(--ink-2);
 }
+
+/* Separate observer lanes share the task heading. */
+.task-progress.render-progress{margin-top:3px}
+.render-progress .progress-mark{background:var(--faint)}
+.render-progress[data-state=running] .progress-mark{background:var(--accent)}
+.render-progress[data-state=error] #render-step{color:#ad392c}
+.header-build{display:flex;align-items:center;gap:6px;flex-wrap:wrap;min-width:0}
+.header-build .build-option{padding:7px 8px}
+@media(max-width:900px){.workspace-heading{flex-wrap:wrap}.workspace-actions{flex-wrap:wrap}.header-build .text-button{width:auto}}
+.build-option{display:inline-flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;white-space:nowrap}
+.build-option input{appearance:none;width:29px;height:17px;border:1px solid var(--line-2);border-radius:20px;background:var(--soft-2);margin:0;cursor:pointer}
+.build-option input::before{content:'';display:block;width:11px;height:11px;margin:2px;border-radius:50%;background:var(--muted)}
+.build-option input:checked{background:var(--accent);border-color:var(--accent)}
+.build-option input:checked::before{transform:translateX(12px);background:white}
+.build-option input:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.build-option input:disabled{opacity:.5}
+#build-status{font-size:12px;color:var(--muted);max-width:36ch;overflow-wrap:anywhere}
+.result-actions{flex-wrap:wrap}
+.execution-source{font-size:10px;color:var(--muted)}

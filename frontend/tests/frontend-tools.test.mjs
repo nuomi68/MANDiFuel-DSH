@@ -9,6 +9,12 @@ function setup(){
  attachFrontendTools(agent,{id:'bound-task',session,current:()=>!session.closed,call:async(path,body)=>{assert(path.startsWith('/api/tasks/bound-task/frontend'));if(body){commits++;assert.equal(body.expectedRequest,'调整显示');return{revision:'r2',presentationVersion:2,uiRevision:1,viewStateRevision:0};}return structuredClone(page);}});
  return{session,page,agent,tools,commits:()=>commits,call:(name,args={},caller=agent)=>tools.get(name).execute(args,{agent:caller,signal})};
 }
+test('only calls from the bound UI operator announce tool activity',async()=>{
+ const h=setup(),steps=[];h.session.reportActivity=async label=>steps.push(label);
+ await assert.rejects(h.call('ui_inspect',{target:'data'},{}));
+ await h.call('ui_read_skill');await h.call('ui_inspect',{target:'page'});await h.call('ui_inspect',{target:'data'});
+ assert.deepEqual(steps,['读取展示规范','检查页面布局','检查结果数据']);
+});
 test('private tools require skill and actual observation, and reject foreign callers and unknown resources',async()=>{
  const h=setup();await assert.rejects(h.call('ui_apply',{expectedRevision:'r1',update:{}}),/SKILL/);
  await assert.rejects(h.call('ui_read_skill',{resource:'../../secrets'}),/未注册/);

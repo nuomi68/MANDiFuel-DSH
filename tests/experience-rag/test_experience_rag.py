@@ -223,7 +223,7 @@ class ExperienceRetrievalTests(unittest.TestCase):
             shutil.copyfile(ROOT / "experience_rag.py", tmp_path / "experience_rag.py")
             proc = subprocess.run(
                 [sys.executable, "-I", "-B", str(tmp_path / "dual_query.py"),
-                 "--case-query", str(case_query), "--query", "hollow spherical shell pressure", "--compact"],
+                 "--case-query", str(case_query), "--case-mode", "local", "--query", "hollow spherical shell pressure", "--compact"],
                 capture_output=True, text=True, encoding="utf-8", check=True,
             )
             result = json.loads(proc.stdout)
@@ -240,7 +240,7 @@ class ExperienceRetrievalTests(unittest.TestCase):
                                                          encoding="utf-8")
             proc = subprocess.run(
                 [sys.executable, "-I", "-B", str(tmp_path / "dual_query.py"),
-                 "--case-query", str(case_query), "--query", "hollow spherical shell pressure",
+                 "--case-query", str(case_query), "--case-mode", "local", "--query", "hollow spherical shell pressure",
                  "--timeout", "1", "--compact"],
                 capture_output=True, text=True, encoding="utf-8", check=True, timeout=10,
             )
@@ -253,10 +253,10 @@ class ExperienceRetrievalTests(unittest.TestCase):
         case_query = ROOT.parent / "query.py"
         request = "hollow spherical shell pressure"
         direct = subprocess.run(
-            [sys.executable, "-B", str(case_query), "--query", request, "--limit", "5", "--compact"],
+            [sys.executable, "-B", str(case_query), "--mode", "local", "--query", request, "--limit", "5", "--compact"],
             capture_output=True, text=True, encoding="utf-8", check=True,
         )
-        result = dual_query.query_both(request, case_query=case_query)
+        result = dual_query.query_both(request, case_query=case_query, case_mode="local")
         self.assertEqual(result["status"], "ok")
         case = result["retrievers"]["case_rag"]["output"]
         self.assertEqual(case, json.loads(direct.stdout))
@@ -267,7 +267,7 @@ class ExperienceRetrievalTests(unittest.TestCase):
     def test_agent_labels_contribute_to_case_scores_in_joint_query(self):
         query = "空心球壳内外恒压 hollow spherical shell pressure"
         labels = {"geometry": ["1D_spherical"], "driving_condition": ["constant_pressure"]}
-        result = dual_query.query_both(query, labels_json=json.dumps(labels))
+        result = dual_query.query_both(query, labels_json=json.dumps(labels), case_mode="local")
         self.assertEqual(result["status"], "ok")
         case = result["retrievers"]["case_rag"]["output"]
         self.assertEqual(case["query_mapping"]["mapped_labels"], labels)

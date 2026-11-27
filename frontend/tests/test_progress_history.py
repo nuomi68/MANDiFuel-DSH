@@ -13,9 +13,38 @@ class ProgressHistoryTests(unittest.TestCase):
         if progress:manifest['presentation']={'progress':{'summary':progress,'stages':[]}}
         atomic(self.work/'delivery/workbench.json',manifest);return manifest
     def test_history_and_heading_share_the_independent_process_source(self):
+        from process_briefs import pending,publish
+        self.registry.bind(self.ident,'science')
         self.event('正在生成网格');self.event('Read OFFBEAT source');self.registry.dashboard.publish(self.ident,{'parameters':[{'title':'几何','items':[]}],'progress':{'summary':'UI 不得覆盖'}});self.event('正在提取温度结果')
+        item=pending(self.registry)[0]
+        self.assertTrue(publish(self.registry,self.ident,{'key':item['key'],'topic':'检查温度场的提取方法'})['accepted'])
         rows=self.registry.progress(self.ident)['rows'];task=self.registry.snapshot(self.ident)['task']
-        self.assertEqual([r['summary'] for r in rows],['等待执行','正在生成网格','正在提取温度结果']);self.assertEqual(rows[-1]['summary'],task['progress']['summary']);self.assertTrue(all(r['source']=='process-observer' for r in rows));self.assertNotIn('progress',task['presentation'])
+        self.assertEqual(rows[-1]['summaryOrigin'],'llm');self.assertNotIn('正在提取温度结果',[r['summary'] for r in rows])
+        self.assertEqual(rows[-1]['summary'],task['progress']['summary']);self.assertTrue(all(r['source']=='process-observer' for r in rows));self.assertNotIn('progress',task['presentation'])
+    def test_summary_window_round_failure_and_terminal_fences(self):
+        from process_briefs import pending,publish
+        self.registry.bind(self.ident,'science')
+        self.registry.native_event(self.ident,{'kind':'prompt','text':'只检查输入，不运行求解器'})
+        self.registry.native_event(self.ident,{'kind':'status','status':'running'})
+        for n in range(12):self.event('已完成物理求解 '+str(n))
+        old=pending(self.registry)[0]
+        self.assertEqual(len(old['window']['recent']),6)
+        self.registry.native_event(self.ident,{'kind':'tool-end','tool':'bash','failed':True})
+        self.assertIn('报错',self.registry.public(self.job)['progress']['summary'])
+        data={'key':old['key'],'topic':'检查输入条件'}
+        self.assertFalse(publish(self.registry,self.ident,data)['accepted'])
+        current=pending(self.registry)[0]
+        self.assertEqual(current['window']['recent'][-1]['kind'],'tool-error')
+        self.registry.native_event(self.ident,{'kind':'turn','reason':'completed'})
+        self.registry.native_event(self.ident,{'kind':'status','status':'idle'})
+        self.assertFalse(publish(self.registry,self.ident,dict(data,key=current['key']))['accepted'])
+        final=pending(self.registry)[0]
+        self.assertTrue(publish(self.registry,self.ident,dict(data,key=final['key']))['accepted'])
+        self.assertFalse(pending(self.registry))
+        self.assertEqual(self.registry.public(self.job)['progress']['stages'],[])
+        self.registry.native_event(self.ident,{'kind':'prompt','text':'新的要求'})
+        self.assertFalse(publish(self.registry,self.ident,dict(data,key=final['key']))['accepted'])
+        self.assertNotIn('检查输入条件',self.registry.public(self.job)['progress']['summary'])
     def test_subprocess_completion_is_recorded_without_ui_work(self):
         for status in ['running','completed']:self.registry.native_event(self.ident,{'kind':'subprocess','sessionId':'child','label':'材料校核','status':status})
         rows=self.registry.progress(self.ident)['rows'];self.assertEqual(rows[-2]['subprocesses'][0]['status'],'running');self.assertEqual(rows[-1]['subprocesses'][0]['status'],'completed');self.assertEqual(self.job['meta']['status'],'queued')
@@ -29,7 +58,9 @@ class ProgressHistoryTests(unittest.TestCase):
             self.assertEqual(restored.progress(self.ident)['rows'],[]);self.assertFalse(restored.progress(self.ident)['complete']);self.assertNotEqual(restored.snapshot(self.ident)['task']['progress']['summary'],'伪进度')
         finally:restored.close()
     def test_new_computation_resets_progress_but_a_display_request_does_not(self):
-        self.registry.native_event(self.ident,{'kind':'prompt','text':'开始计算'});self.event('正在生成网格');before=self.registry.progress(self.ident);self.registry.native_event(self.ident,{'kind':'display-prompt','text':'修改颜色'});self.assertEqual(self.registry.progress(self.ident),before)
+        self.registry.native_event(self.ident,{'kind':'prompt','text':'开始计算'});self.event('正在生成网格');before=self.registry.progress(self.ident);self.registry.native_event(self.ident,{'kind':'display-prompt','text':'修改颜色'});after=self.registry.progress(self.ident)
+        self.assertEqual([r for r in after['rows'] if r['source']=='process-observer'],before['rows'])
+        self.assertEqual(after['rows'][-1]['source'],'ui-renderer')
         self.registry.native_event(self.ident,{'kind':'prompt','text':'新的计算'});row=self.registry.progress(self.ident)['rows'][-1];self.assertEqual(row['summary'],'正在准备新请求');self.assertEqual(row['round'],2)
     def test_export_registration_cannot_change_workflow_progress(self):
         self.files('旧清单进度');self.event('正在提取物理场');before=self.registry.snapshot(self.ident)['task']['progress'];self.registry.dashboard.publish(self.ident,{'defaultView':'main','progress':{'summary':'UI 改写进度'}});self.assertEqual(self.registry.snapshot(self.ident)['task']['progress'],before)

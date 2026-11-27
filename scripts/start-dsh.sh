@@ -80,6 +80,7 @@ project_sandbox_json="$(python3 -P -B -c 'import json, sys; print(json.dumps(sys
 root_args=(--project-root "$MANDIFUEL_PROJECT_ROOT")
 if [[ -n "$MANDIFUEL_RUNS_ROOT" ]]; then root_args+=(--runs-root "$MANDIFUEL_RUNS_ROOT"); fi
 (cd -- "$MANDIFUEL_DEFAULT_WORKDIR"; "$MANDIFUEL_TASK_PYTHON" -I -B "$plugin_root/dsh/offline-exec.py" "${root_args[@]}" -- true)
+retrieval_json="$(python3 -P -B -c 'import json, sys; print(json.dumps(sys.argv[1]))' "$plugin_root/dsh/mandifuel-retrieval.mjs")"
 adapter_json="$(python3 -P -B -c 'import json, sys; print(json.dumps(sys.argv[1]))' "$adapter_path")"
 
 {
@@ -104,6 +105,8 @@ adapter_json="$(python3 -P -B -c 'import json, sys; print(json.dumps(sys.argv[1]
     printf '      name: %s\n' "$project_fs_json"
     printf '%s\n' '    - id: mandifuel-offline-subprocess'
     printf '      name: %s\n' "$offline_adapter_json"
+    printf '%s\n' '    - id: mandifuel-retrieval'
+    printf '      name: %s\n' "$retrieval_json"
     printf '%s\n' '    - id: mandifuel-shell-environment'
     printf '      name: %s\n' "$adapter_json"
 } >"$runtime_patch"

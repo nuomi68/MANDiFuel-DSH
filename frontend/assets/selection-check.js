@@ -1,6 +1,6 @@
 // The operator exercises one rendered control. A real user interaction takes
 // precedence over both the check and its restoration.
-export async function checkLinkedSelection({read,restore,current}){
+export async function checkLinkedSelection({read,restore,current,canRestore=current}){
  const before=read(),same=(a,b)=>a.view===b.view&&a.time===b.time&&a.run===b.run;
  if(!before.ready||!current())return {status:'unavailable'};
  const selector='[role=tab][data-select-view],[data-case-switch],[data-chart-point][data-linked-view],[data-chart-point][data-chart-run],tr[data-linked-view],tr[data-chart-run]';
@@ -26,27 +26,34 @@ export async function checkLinkedSelection({read,restore,current}){
  const events=['pointerdown','keydown','wheel','input'];
  for(const type of events)document.addEventListener(type,interrupt,true);
  const active=()=>!interrupted&&current();
- const wait=async matches=>{
+ const mayRestore=()=>!interrupted&&canRestore();
+ const wait=async (matches,valid=active)=>{
   const until=performance.now()+8000;
-  while(active()&&performance.now()<until){
+  while(valid()&&performance.now()<until){
    const s=read();if(s.ready&&matches(s))return s;
    await new Promise(resolve=>setTimeout(resolve,50));
   }
  };
+ const scrollX=window.scrollX,scrollY=window.scrollY;
  let result={status:'failed',component,before:snapshot(before)};
  try{
+  el.scrollIntoView({block:'nearest',inline:'nearest',behavior:'instant'});
+  const box=el.getBoundingClientRect(),x=box.x+box.width/2,y=box.y+box.height/2;
+  const hit=document.elementFromPoint(x,y);
+  if(!hit||!el.contains(hit)&&!(el.dataset.chartPoint&&el.ownerSVGElement?.contains(hit)))return {...result,message:'控件中心被遮挡'};
   attempted=true;
-  el.dispatchEvent(new MouseEvent('click',{bubbles:true}));
+  hit.dispatchEvent(new MouseEvent('click',{bubbles:true,clientX:x,clientY:y,detail:1}));
   const observed=await wait(s=>(!view||view===s.view)&&(!run||run===s.run)&&(time===undefined||s.time===time)&&!same(s,before)&&selected());
   if(observed)result={...result,status:'verified',observed:snapshot(observed)};
  }finally{
   try{
-   if(attempted&&active()){
-    await restore(before,active);
-    const restored=await wait(s=>same(s,before)&&s.field===before.field);
+   if(attempted&&mayRestore()){
+    await restore(before,mayRestore);
+    const restored=await wait(s=>same(s,before)&&s.field===before.field,mayRestore);
     result.restored=!!restored;
     if(!restored)result.status='failed';
    }
+   if(mayRestore())window.scrollTo({left:scrollX,top:scrollY,behavior:'instant'});
    if(!active())result.status='interrupted';
   }finally{for(const type of events)document.removeEventListener(type,interrupt,true);}
  }

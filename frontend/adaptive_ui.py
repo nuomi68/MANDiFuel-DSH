@@ -23,19 +23,20 @@ CATALOG = {
         'heatmapChart': 'source,x,y,value column IDs; palette?,colorRange?:[min,max],showValues?,xLabel?,yLabel?,xAxis/yAxis?,height?,caption?; duplicate grid points rejected, missing cells stay missing',
         'scatterChart': 'same as lineChart',
         'table': 'title,source,columns?:[ID or {id,label?,unit?,format:auto|fixed|scientific,digits:0–12,align:left|center|right}],searchable?,sort:{column,direction:asc|desc},highlight:{column,mode:min|max},pageSize:10–200',
+        'probeSummary': 'source:probeHistory. The renderer describes the requested position, actual sampled centre, cell and value at the displayed saved time. Use instead of manually transcribed measurements.',
         'text': 'text (plain text)', 'controls': 'title, ids:[existing control IDs], placement:settings(default)|inline(only when user requests controls beside results)',
         'image':'file:workspace-relative PNG/JPEG/WebP, alt, caption?; display an existing verified image, never invent scientific results',
-        'button': 'label, action:{type:view,state:{...}} or {type:parameter,id,value}',
+        'button': 'label, action:{type:view,state:{...}}, {type:parameter,id,value} for display only, or {type:appCandidate,caseRoot:workspace relative prepared case,view?:saved application view ID} to load verified executable inputs into the application form',
         'model': 'existing model viewport; at most one, state?:one-shot viewState',
     },
     'sources': {
         'profile': 'field: actual exported field ID or selected; rows x/value from saved cell centres, no CSV required; axis:cell|r|x|y|z (r is cylindrical radius about the reconstruction axis, otherwise z); time:current|saved time, view?:actual view ID; physical coordinate units come from mesh metadata',
         'history': 'field, statistic:min|max|mean, view?',
-        'probeHistory': 'field, position:[three bounded expressions, e.g. p.sampleX], view?; nearest stored cell',
+        'probeHistory': 'field, position:[three bounded expressions in mesh coordinates, e.g. p.sampleX], view?, lengthUnit?:m|mm|µm; rows x,value,cell,distance,targetX/Y/Z,sampleX/Y/Z,targetRadius,sampleRadius. Radii are distances to coordinate origin.',
         'study': 'status:completed(default)|all|queued|running|failed|skipped; best?:objective response ID adds only best.<objective ID>; select:best with best:<objective ID> returns the best feasible run, using its parameter.<id>/response.<id> columns; filter?:[{column,op:eq|ne|lt|lte|gt|gte,value}]; columns record/runId/label/status(localized display)/statusCode(raw code)/iteration/caseRoot plus parameter.<id> and response.<id>; no model required',
-        'dataset': 'dataset: ID declared in document.datasets; runId?:actual column containing real study run IDs enables linked chart/table selection and model navigation; optional rows/columns path mapping reads ordinary JSON records; table file {columns:[{id,label?,unit?}],rows:[objects]}',
+        'dataset': 'A declaration {quantity:csInventory,view:ID} computes a linked inventory table (time,inventory,initial,fraction) on native Cs saved frames. Otherwise use dataset: ID declared in document.datasets. Set datasets[id].caseIdentity={column,history} to link point IDs using terminal history and completed execution receipts. runId?:actual column containing real study run IDs. Optional rows/columns mapping reads ordinary JSON records.',
     },
-    'linkedSelection': 'Any source may declare selection:{view:actual view ID OR viewColumn:column ID,timeColumn?:column ID,timeUnit:s|d,positionColumns?:[X,Y,Z columns in metres]}. Chart points/table rows select the real model and nearest saved frame; profile sources expose time/positionX/positionY/positionZ when linked. filter rules may use context:view|time|run instead of value. The shared current view/time drives filters and selection highlighting. Never mix cases or time units.',
+    'linkedSelection': 'Any source may declare selection:{view:actual view ID OR viewColumn:column ID,timeColumn?:column ID,timeUnit:s|d,positionColumns?:[X,Y,Z columns in metres]}. Chart points/table rows select the real model and the exact saved frame; profile sources expose time/positionX/positionY/positionZ when linked. filter rules may use context:view|time|run instead of value. The shared current view/time drives filters and selection highlighting. Never mix cases or time units.',
     'bindings': 'visible: bounded boolean expression; probe coordinates may reference p.<control ID>',
     'limits': {'nodes': 64, 'depth': 8, 'seriesPerChart': 12, 'datasets': 8, 'rowsPerDataset': 20000, 'bytesPerDataset': 2*1024*1024},
     'codeExecution': False,
@@ -54,7 +55,7 @@ def number(value): return isinstance(value, (int,float)) and not isinstance(valu
 def validate_source(source):
     if not isinstance(source,dict): fail('数据源必须是对象')
     kind=source.get('kind')
-    allowed={'study':{'kind','status','best','select'},'dataset':{'kind','dataset','runId'},'profile':{'kind','view','field','axis','time'},'history':{'kind','view','field','statistic'},'probeHistory':{'kind','view','field','position'}}.get(kind,set())
+    allowed={'study':{'kind','status','best','select'},'dataset':{'kind','dataset','runId'},'profile':{'kind','view','field','axis','time'},'history':{'kind','view','field','statistic'},'probeHistory':{'kind','view','field','position','lengthUnit'}}.get(kind,set())
     allowed|={'filter','selection'}
     filters=source.get('filter',[])
     if not isinstance(filters,list) or len(filters)>8:fail('数据筛选条件无效')
@@ -90,6 +91,7 @@ def validate_source(source):
         if source.get('time','current')!='current' and not number(source['time']): fail('保存时间无效')
     if kind=='history' and source.get('statistic','max') not in {'min','max','mean'}: fail('历史统计量无效')
     if kind=='probeHistory':
+        if 'lengthUnit' in source and source['lengthUnit'] not in ('m','mm','µm'):fail('未知测点长度单位')
         if not isinstance(source.get('position'),list) or len(source['position'])!=3: fail('测点需要三个坐标表达式')
         for expression in source['position']: expression_parameters(expression)
     return result
@@ -104,7 +106,13 @@ def validate_ui(document):
     datasets=document.get('datasets',{})
     if not isinstance(datasets,dict) or len(datasets)>8: fail('最多使用八份数据表')
     for ident,spec in datasets.items():
-        if not identifier(ident) or not isinstance(spec,dict) or set(spec)-{'file','rows','columns'} or 'file' not in spec: fail('数据表声明无效')
+        if identifier(ident) and isinstance(spec,dict) and set(spec)=={'quantity','view'} and spec['quantity']=='csInventory' and isinstance(spec['view'],str) and re.fullmatch(r'[A-Za-z][A-Za-z0-9_-]{0,49}',spec['view']):continue
+        if not identifier(ident) or not isinstance(spec,dict) or set(spec)-{'file','rows','columns','caseIdentity'} or 'file' not in spec: fail('数据表声明无效')
+        if 'caseIdentity' in spec:
+            identity=spec['caseIdentity']
+            if not isinstance(identity,dict) or set(identity)!={'column','history'} or not string(identity['column']):fail('工况身份需要数据列及研究历史文件')
+            history=Path(string(identity['history'],500))
+            if history.is_absolute() or '..' in history.parts or history.suffix!='.json':fail('研究历史必须来自当前工作区')
         path=Path(string(spec['file'],500))
         if path.is_absolute() or '..' in path.parts or path.suffix.lower() not in {'.json','.csv'}: fail('数据表必须是工作区内的 JSON 或 CSV 文件')
         if 'columns' in spec and 'rows' not in spec and path.suffix.lower()=='.csv':spec['rows']='rows'
@@ -150,6 +158,9 @@ def validate_ui(document):
             if node.get('reducer','last') not in {'last','min','max','mean'}:fail('指标归约方式无效')
             for key in ['column','unit']:
                 if key in node:string(node[key])
+        elif kind=='probeSummary':
+            allowed.add('source')
+            if node_source(node.get('source'))['kind']!='probeHistory':fail('测点说明需要绑定测点历程')
         elif kind=='text':allowed.add('text');string(node.get('text'),4000)
         elif kind=='evidence':allowed.add('claims');evidence_ids(node.get('claims'))
         elif kind=='image':
@@ -165,6 +176,10 @@ def validate_ui(document):
             if not isinstance(action,dict):fail('按钮动作无效')
             if action.get('type')=='view' and set(action)=={'type','state'}:validate_view_state(action['state'])
             elif action.get('type')=='parameter' and set(action)=={'type','id','value'} and identifier(action['id']):pass
+            elif action.get('type')=='appCandidate' and set(action) in ({'type','caseRoot'},{'type','caseRoot','view'}):
+                if 'view' in action:string(action['view'])
+                root=Path(string(action['caseRoot'],400))
+                if not action['caseRoot'] or root.is_absolute() or '..' in root.parts:fail('候选必须引用工作区相对算例')
             else:fail('未注册的按钮动作')
         elif kind=='model':
             allowed.add('state');model_count+=1
@@ -198,12 +213,64 @@ def ui_parameters(document):
     return refs
 
 
-def load_dataset(workspace,spec):
+def load_dataset(workspace,spec,views=None):
+    if spec.get('quantity')=='csInventory':
+        from scientific_samples import inventory_rows
+        view=(views or {}).get(spec['view'])
+        if not view:fail('库存数据需要已交付的模型视图')
+        return inventory_rows(workspace,view,spec['view'])
     root=Path(workspace).resolve();path=(root/spec['file']).resolve()
     if not path.is_relative_to(root) or not path.is_file():fail('数据表不在本任务工作区或文件不存在')
     stat=path.stat()
     if stat.st_size>2*1024*1024:fail('单份数据表不能超过 2 MB')
-    return read_dataset(str(path),stat.st_mtime_ns,stat.st_size,json.dumps({k:v for k,v in spec.items() if k!='file'},sort_keys=True))
+    table=read_dataset(str(path),stat.st_mtime_ns,stat.st_size,json.dumps({k:v for k,v in spec.items() if k in {'rows','columns'}},sort_keys=True))
+    if 'caseIdentity' in spec and spec['caseIdentity']['column'] not in {c['id'] for c in table['columns']}:
+        fail('工况身份引用不存在的数据列')
+    return table
+
+
+def link_case_rows(workspace,spec,table,views):
+    """Join terminal point IDs to workspace-owned views using execution origins."""
+    root=Path(workspace).resolve()
+    binding=spec.get('caseIdentity')
+    if binding is None:
+        file=Path(spec['file'])
+        if file.name!='results.csv' or 'point_id' not in {c['id'] for c in table['columns']}:return table
+        binding={'column':'point_id','history':str(file.with_name('history.json'))}
+    def local_json(path,limit):
+        try:
+            resolved=path.resolve()
+            if resolved.is_relative_to(root) and resolved.is_file() and resolved.stat().st_size<=limit:
+                return json.loads(resolved.read_text())
+        except (ValueError,OSError,RuntimeError):
+            return None
+    history=local_json(root/binding['history'],16*1024*1024)
+    if not isinstance(history,list):
+        if 'caseIdentity' in spec:fail('没有可读取的研究历史记录')
+        return table
+    origins={};view_roots={}
+    for view in views:
+        if view.get('kind')!='results' or not view.get('caseRoot'):continue
+        case=(root/view['caseRoot']).resolve()
+        if not case.is_relative_to(root):continue
+        receipt=local_json(case/'.mandifuel-execution.json',256*1024)
+        if not isinstance(receipt,dict) or receipt.get('status')!='completed':continue
+        # An archived absolute path is an opaque join key; never open that path.
+        view_roots[view['id']]=str(case.relative_to(root))
+        names=(str(case),str(case.relative_to(root)),receipt.get('result_root'))
+        for name in names:
+            if isinstance(name,str):origins.setdefault(name,set()).add(view['id'])
+    matches={}
+    for row in history:
+        if not isinstance(row,dict) or not isinstance(row.get('point'),dict):continue
+        key=row['point'].get('id')
+        if not isinstance(key,str) or not isinstance(row.get('result_root'),str) or row.get('status')!='completed':continue
+        targets=origins.get(row['result_root'],set())
+        matches.setdefault(key,set()).update(targets or {None})
+    roots={key:{view_roots[v] for v in found} for key,found in matches.items() if None not in found}
+    return {**table,'caseIdentity':{'column':binding['column'],
+            'roots':{k:next(iter(v)) for k,v in roots.items() if len(v)==1},
+            'views':{k:next(iter(v)) for k,v in matches.items() if len(v)==1 and None not in v}}}
 
 
 @lru_cache(maxsize=8)
@@ -271,6 +338,43 @@ def read_dataset(filename,mtime,size,mapping='{}'):
     return {'columns':clean,'rows':rows,'version':f'{mtime}-{size}'}
 
 
+def exact_dataset_frames(table,source,views,preferred,spec,work=None):
+    binding=source['selection']
+    frames={key:set(v['task'].get('savedTimes',[])) for key,v in views.items()}
+    references={}
+    fields={c.get('path',c['id']):c['id'] for c in spec.get('columns',table['columns'])}
+    fractions=[fields[k] for k in ('fraction_field_own_N0','fraction_field') if k in fields]
+    for row in table['rows']:
+        # A static view filter may select one case of a long-format table.
+        if any(rule['op']=='eq' and 'value' in rule and row.get(rule['column'])!=rule['value'] for rule in source.get('filter',[])):continue
+        key=row.get(binding['viewColumn']) if 'viewColumn' in binding else binding.get('view') or spec.get('view') or preferred
+        if key not in views:fail('数据行缺少唯一的模型视图')
+        time=row.get(binding['timeColumn'])
+        if not number(time) or time not in frames[key]:
+            fail(f'{key} 没有与数据行 {time} 完全对应的保存帧。选择同一次计算的数据；其他时间步的曲线可单独比较。')
+        origin=views[key].get('caseRoot')
+        if spec.get('quantity'):
+            if key!=spec['view']:fail('库存曲线必须联动其原始视图')
+            continue
+        if not origin:continue
+        recorded=row.get('caseRoot',row.get('case_root'))
+        if recorded is not None and (Path(work or '.')/str(recorded)).resolve()!=(Path(work or '.')/origin).resolve():
+            fail('数据行与模型算例目录不一致')
+        if 'viewId' in row and row['viewId']!=key:fail('数据行与模型视图身份不一致')
+        if not (recorded is not None or binding.get('viewColumn') or row.get('viewId')==key or (Path(work or '.')/spec['file']).resolve().is_relative_to((Path(work or '.')/origin).resolve())):
+            fail('跨文件时间联动缺少行级算例身份。使用原始数据中的 viewColumn 或 caseRoot，铯库存可使用 quantity:csInventory。')
+
+        if work is not None and fractions and any(f['id']=='Cs' for f in views[key]['task'].get('fields',[])):
+            from scientific_samples import inventory_rows
+            if key not in references:
+                data=inventory_rows(work,views[key],key)
+                references[key]={r['time']:r['fraction'] for r in data['rows']}
+            for col in fractions:
+                value=row.get(col)
+                if not number(value) or time not in references[key] or not math.isclose(value,references[key][time],rel_tol=5e-6,abs_tol=32*math.ulp(1.0)):
+                    fail('数据行的库存亏损与同一模型的原场积分不一致。请绑定 quantity:csInventory 或分开展示。')
+
+
 def validate_ui_delivery(document,views,preferred,controls,workspace=None,study=None):
     if not document:return
     by_id={c['id']:c for c in controls};params={c['id'] for c in controls if c.get('parameter')}
@@ -280,8 +384,8 @@ def validate_ui_delivery(document,views,preferred,controls,workspace=None,study=
     tables={}
     if workspace is not None:
         for ident,spec in datasets.items():
-            try:tables[ident]=load_dataset(workspace,spec)
-            except ValueError as error:raise ValueError('数据表 '+ident+'（'+spec['file']+'）：'+str(error)) from error
+            try:tables[ident]=load_dataset(workspace,spec,views)
+            except (ValueError,OSError) as error:raise ValueError('数据表 '+ident+'（'+str(spec.get('file') or spec.get('view'))+'）：'+str(error)) from error
     def columns(source):
         if source['kind']=='study':
             return {'record','runId','label','status','statusCode','iteration','caseRoot'}|{'parameter.'+d['id'] for d in study['parameters']}|{'response.'+d['id'] for d in study['responses']}|({'best.'+source['best']} if source.get('best') else set())
@@ -290,7 +394,7 @@ def validate_ui_delivery(document,views,preferred,controls,workspace=None,study=
             spec=datasets.get(source['dataset'],{})
             actual={c['id'] for c in table['columns']} if table else {c['id'] for c in spec['columns']} if 'columns' in spec else None
             return actual|{'runId'} if actual is not None and source.get('runId') else actual
-        return {'x','value'}|({'cell','distance'} if source['kind']=='probeHistory' else {'time','positionX','positionY','positionZ'} if source['kind']=='profile' and source.get('selection') else set())
+        return {'x','value'}|({'cell','distance','targetRadius','sampleRadius','targetX','targetY','targetZ','sampleX','sampleY','sampleZ'} if source['kind']=='probeHistory' else {'time','positionX','positionY','positionZ'} if source['kind']=='profile' and source.get('selection') else set())
     def check_columns(source,refs):
         actual=columns(source)
         if actual is not None and set(refs)-actual:fail('引用不存在的数据列：'+', '.join(sorted(set(refs)-actual))+'；实际列：'+', '.join(sorted(actual)))
@@ -302,6 +406,8 @@ def validate_ui_delivery(document,views,preferred,controls,workspace=None,study=
         for target in set(targets) if binding else []:
             if target not in views:fail('联动选择引用尚未交付的模型视图')
             if 'timeColumn' in binding and views[target]['task'].get('timeUnit')!=binding['timeUnit']:fail('联动时间单位与目标物理场不一致')
+        if binding.get('timeColumn') and source['kind']=='dataset' and source['dataset'] in tables:
+            exact_dataset_frames(tables[source['dataset']],source,views,preferred,datasets[source['dataset']],workspace)
         if source['kind']=='study':
             if not study:fail('研究数据源尚无真实研究记录')
             if source.get('best') and not any(d['id']==source['best'] and d.get('goal') in {'min','max'} for d in study['responses']):fail('最好值需要有实际目标方向的响应')
@@ -319,6 +425,8 @@ def validate_ui_delivery(document,views,preferred,controls,workspace=None,study=
         view=source.get('view',preferred)
         if view not in views:fail('数据源引用尚未交付的模型视图')
         meta=views[view]['task'];fields={f['id'] for f in meta.get('fields',[])}
+        if source['kind']=='profile' and number(source.get('time')) and source['time'] not in meta.get('savedTimes',[]):
+            fail('该剖面没有指定时刻的保存帧')
         if source['field']!='selected' and source['field'] not in fields:fail('数据源引用不存在的物理量：'+source['field'])
         if not fields:fail('网格预览没有结果场可供绘图')
         if source['kind']=='probeHistory' and not meta.get('supportsExtrema'):fail('测点历史需要真实单元中心')
@@ -343,6 +451,12 @@ def validate_ui_delivery(document,views,preferred,controls,workspace=None,study=
                 if action['id'] not in params:fail('按钮引用未定义参数')
                 from agent_panel import validate_parameter
                 validate_parameter({**by_id[action['id']],'default':action['value']})
+            elif action['type']=='appCandidate':
+                if 'view' in action and action['view'] not in views:fail('计算器视图尚未交付')
+                if workspace is not None:
+                    root=Path(workspace).resolve()
+                    candidate=(root/action['caseRoot']).resolve()
+                    if not candidate.is_relative_to(root) or not candidate.is_dir():fail('候选算例目录不存在')
             else:
                 state=action['state'];view=state.get('view',preferred)
                 if view not in views:fail('按钮或模型引用尚未交付的视图')

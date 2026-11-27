@@ -17,6 +17,19 @@ def snapshot(dashboard,ident,target='page',node_id=None):
         observation=copy.deepcopy(m.get('uiState',{}));age=time.time()-m.get('uiObservedAt',0)
         result={'protocol':'mandifuel.frontend/v1','revision':frontend_revision(m),'task':{'id':ident,'title':m['title'],'status':m['status'],'request':latest_request(m)},'presentationVersion':m.get('presentationVersion',0),'uiRevision':p.get('uiRevision',0),'viewStateRevision':p.get('viewStateRevision',0),'interactionRevision':p.get('interactionRevision',0)}
         selected=next((v for v in public['views'] if v['id']==observation.get('selection',{}).get('view')),None) if age<20 else None
+        if target in ('page','model'):
+            from calculator_api import application,observed,published_views
+            result['applicationViews']=published_views(job['workspace'],public['views'])
+            current=selected or next((v for v in public['views'] if v['id']==public.get('defaultView')),None)
+            if target=='model' and node_id:
+                current=next((v for v in public['views'] if v['id']==node_id),None)
+            if current and current.get('caseRoot'):
+                from mandifuel_app.runtime import read
+                app=application(r,ident,current['caseRoot'])
+                if app.spec.is_file():
+                    spec=read(app.spec)
+                    result['application']={k:spec.get(k) for k in ('appId','version','title','baseCase','parameters','outputs','components')}
+                    result['application']['browser']=observed(app)
         result['modelRequirement']={'required':bool(public.get('modelReady')),'kind':('fields' if selected['kind']=='results' else 'mesh') if selected else ('fields' if public.get('resultReady') else 'mesh')}
         result['policy']={'scalarCards':False,'duplicateWindows':False,'progressOwner':'process-observer','physicalFieldWindow':'mesh first, saved fields next; collapse completed tasks without a model'}
         result['progress']=copy.deepcopy(public.get('progress',{}))

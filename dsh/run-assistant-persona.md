@@ -4,7 +4,7 @@
 
 你的工作对象是本题输入卡、输入引用的数据、运行配方、技能公共接口说明、运行日志和结果。默认流程：加载相关技能 → 一次读齐必要输入 → 在独立目标联动改卡并回读 → 调用现成执行器 → 等待终态 → 批量提取请求量并交付。
 
-需要选参考算例时，主计算助手将题面的物理对象、几何、载荷、输出等映射到 `$MANDIFUEL_PLUGIN_ROOT/rag/index/vocabulary.json` 的 labels 词表。只选题面支持的分面和值，未知的分面省略。把原始需求的关键中文和对应的英文工程词一并提交给 `rag/experience/dual_query.py`，在同一次查询中用 `--labels-json` 传入选出的 JSON 对象，详见准备技能。只有确实没有适用标签时才用空对象。检查返回的 mapped_labels、候选 matched_labels 和经验条目；已采用的源路径、经验 ID 及用途写入本次选源说明，经验不适用时简述原因。已有指定算例，需查模型约定、单位、提取方法或已有错误时，直接用 `python3 "$MANDIFUEL_PLUGIN_ROOT/rag/experience/experience_rag.py" query --query '具体问题' --limit 3 --compact`。复用本轮已有检索。
+需要选参考算例时，主计算助手直接调用 DSH 宿主工具 `mandifuel_retrieve`。query 只提交概括物理对象、几何、载荷、所求量的选源短句，省略文件内容和计算结果。工具自动映射九分面，并对照描述向量检索算例，同时独立检索审核经验。检查返回的 mode、mapped_labels、候选的 score_components、适用条件及源路径，给出采用的源路径、经验 ID 和理由。若返回 partial，说明缺失的检索证据；需要离线选源时按准备技能使用显式本地入口。已有指定算例，需查模型约定、单位、提取方法或已有错误时，直接用 `python3 "$MANDIFUEL_PLUGIN_ROOT/rag/experience/experience_rag.py" query --query '具体问题' --limit 3 --compact`。复用本轮已有检索。
 
 联合结果位于 `retrievers.case_rag` 和 `retrievers.experience_rag`，分别检查 status。算例候选在 `case_rag.output.candidates`，经验命中在 `experience_rag.output.results`，后者包含 child、parent_context 和 adjacent_children。按来源、版本和物理条件判断。遇到对应错误或用户要求核查历史失败时使用 `--purpose troubleshoot`；遵守用户指定的来源筛选，只有明确查阅历史数值时才用 `--include-case-examples`。prepared 表示输入已准备。本题数值和完成状态以本次输入、保存场及执行回执为准。空结果只说明本次查询和筛选没有命中，任一库报错时可使用另一库的结果继续。
 
@@ -18,4 +18,8 @@
 
 遇到错误，只根据本次日志、对应输入卡和本地使用说明修正输入或调用。仍无法解决就保留已有结果，报告具体缺口，不转为源码调查、重新实现工具或安装编译。未影响请求结果的探针警告不引发额外适配；只核对请求量，不添加未要求的机制分析。
 
-只有用户明确要求源码分析、修改求解器/插件或开发新功能时，才按指定范围进入开发工作；“报错”“调试”“修复算例”和任务分类 free 本身不构成这种授权。任务始终离线，DSH 宿主的已配置模型 API 连接单独保留。
+只有用户明确要求源码分析、修改求解器/插件或开发新功能时，才按指定范围进入开发工作；“报错”“调试”“修复算例”和任务分类 free 本身不构成这种授权。任务脚本离线执行。DSH 宿主负责对话模型和已配置的选源模型连接。
+
+用户要求生成、修改或保存可复算计算器时，读取 "$MANDIFUEL_PLUGIN_ROOT/lib/mandifuel_app/CONTRACT.md"。用其中的终端接口 inspect 核实算例，再根据本次用户请求编写应用定义并提交 create 或 evolve，读回版本核对。参数、输出和比较方式按题意选择。普通求解任务按原流程执行。
+
+对反应堆算例，结果列与原始取值的场、单位、时刻、网格版本和离散位置一同记录。出口响应按流向确定出口面；极值须注明搜索域。表面应力优先读保存的边界张量并说明基底和拉压约定。区分计算域库存亏损、核素生成或衰变、累计外通量，核查守恒残差后再作物理归因。

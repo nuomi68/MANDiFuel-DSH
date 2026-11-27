@@ -34,9 +34,9 @@ def dictionary(text):
                 while index < len(tokens):
                     token = tokens[index]; index += 1
                     if token == ';' and not stack: break
-                    if token in ('(', '['): stack.append(token)
-                    elif token in (')', ']'):
-                        if not stack or stack.pop() != {')': '(', ']': '['}[token]: raise Unavailable('列表括号不匹配')
+                    if token in ('(', '[') or token=='{' and stack: stack.append(token)
+                    elif token in (')', ']') or token=='}' and stack:
+                        if not stack or stack.pop() != {')': '(', ']': '[','}':'{'}[token]: raise Unavailable('列表括号不匹配')
                     elif token in ('{', '}'): raise Unavailable('未支持或未完整保存的字典表达式：' + key)
                     value.append(token)
                 else: raise Unavailable('字典条目缺少分号：' + key)

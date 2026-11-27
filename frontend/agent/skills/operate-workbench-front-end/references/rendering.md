@@ -6,6 +6,8 @@ rendering.program:{label:显示变换说明,vertex?:[x表达式,y表达式,z表�
 
 program.annotations:[{id,type:"point"|"probe"|"line"|"arrow",label?,position:[x表达式,y表达式,z表达式],end?:[终点三表达式],text?:表达式,color?:表达式,visible?:布尔表达式,field?:实际字段ID|"selected"}]。point 是坐标点/文字标注，line/arrow 可配合坐标与距离表达式用于指示和测量，probe 读取当前保存帧的实际场。用户要求标注点值时，根据模型坐标单位添加必要的坐标输入，在 position 中引用这些参数，使用 probe，默认跟随当前字段；明确请求温度或应力时绑定实际字段。probe 显示最近存储单元的值，不能宣称为精确插值。轴对称重建使用径向-轴向的等效最近单元。标注随字段、时间、相机和显示变换更新，并进入截图。坐标、文字、颜色、可见性都可由自定义参数绑定；不必固定成三个预置坐标控件。
 
+球壳内、外表面读数使用 `boundaryProbe`。例如 `{id:"outerStress",type:"boundaryProbe",patch:"outer",field:"sigma_yy",views:["shell"]}`。先读 model.views 对应的 boundaryPatches，旧视图缺少边界记录时从同一算例重新导出 shell。标签只写边界或分量的名称。半径、面号、单位和当前数值由渲染器按保存帧填写，切换帧时一同更新。通过 model.actualDisplay.boundarySamples 核对实际显示的字段、带符号值、单位、面号和米制面中心；按请求核对环向分量的坐标基底。
+
 可以组合视角、独立色标、透明度、背景、形状显示、切片、变量比较、保存时间、极值、点值和说明标注来满足用户要求。逐字段色标和标注允许分别设置；新增便利参数前先看已有面板，避免重复。只为当前要求添加有实际绑定的参数，不需要一次展示所有基础能力。界面中不要出现“用户定义的”“按需求生成的”等技术性标题；使用“显示缩放”“测点 1”“温度色标”这样的自然名称。无法由当前引擎完成的高级渲染算法须明确说明缺口，而不是生成无效输入框。
 
 检查显示控件是否形成闭环：原生 scale 控件的 custom 模式由宿主提供当前变量上下限输入；若用 program.fields.range 自行绑定色标，就提供相应参数，避免再创建会被该绑定覆盖的原生 scale 控件。不要让两个不同参数同时控制同一选项。只有一个保存帧时 fixed 和 frame 范围相同是正常的，应以实际色标范围核验。ui_inspect(model).actualDisplay.fieldMapping 包含实际映射的顶点数、采样范围、色标范围及剖切状态，字段映射无效会产生 rendererError。

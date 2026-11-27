@@ -104,7 +104,7 @@ def main() -> int:
         tmp_path = Path(tmp)
         marker = tmp_path / "must-not-exist"
         request = f"fuelRodGap; touch {marker}"
-        result = dual_query.query_both(request)
+        result = dual_query.query_both(request, case_mode="local")
         assert result["retrievers"]["case_rag"]["status"] == "ok"
         assert result["retrievers"]["experience_rag"]["status"] == "ok"
         assert not marker.exists(), "Query text was executed as a shell command"

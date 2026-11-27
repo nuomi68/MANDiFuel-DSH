@@ -1,8 +1,8 @@
 # 当前任务检索方式
 
-`query.py` 的 CLI 和公共 `query()` 默认只用本地 BM25 与显式标签，不调用在线映射、翻译或嵌入服务。查询包含与英文卡片对应的工程关键词；可用 `--labels-json` 传入本地词表中的标签。输出 `mode=local`、`network_requests=0`，其分数不能与历史语义融合分数直接比较。
+Web 与终端 DSH 均通过宿主工具 `mandifuel_retrieve` 查询 137 张算例卡。普通 `query.py` CLI 和公共 `query()` 同样默认使用语义融合。映射请求包含短查询与九分面词表，embedding 请求只含检索改写。原始算例和结果留在本机。返回的 `query_mapping`、`fusion`、`provider_telemetry` 和候选的 `score_components` 可用于核对实际参与的检索方式、分面与缓存。模型或索引不可用时算例侧报错，独立的经验检索仍可返回。
 
-137张卡片、九个分面、已有向量与来源哈希继续保留。无匹配时返回空候选，不任意补齐排名。适用性仍由实际物理组成和排除条件判断。下文的在线刷新仅供任务外索引维护，任务离线环境会拒绝 HTTP；普通计算不执行刷新或旧语义查询。
+显式设置 `--mode local` 或 `MANDIFUEL_RAG_MODE=local` 可使用本地 BM25，`--labels-json` 可指定词表标签。任务 shell 受离线执行器约束，直接运行 CLI 时默认使用本地模式。其回执包含 `mode=local` 和 `network_requests=0`。两种模式的分数尺度不同，候选适用性应以实际输入与排除条件核对。下文描述索引的来源与再生成步骤。
 
 # RAG provenance and regeneration
 

@@ -1,6 +1,8 @@
 # MANDiFuel DSH · 燃料性能计算工作台
 
-在浏览器中用中文描述工程问题，DSH 计算助手会准备 OFFBEAT 算例、运行求解器并提取结果。工作台随计算进度展示网格、物理场、曲线和表格。用户可以在同一会话里追问数值来源，或要求调整图表和标注。当前版本为 **0.4.0-alpha.8**。
+MANDiFuel DSH 是基于 DeepSeek Harness 和 OFFBEAT 的核燃料性能计算工作台。用中文描述工程问题，计算助手会选择参考算例、准备并回读输入、运行求解器，在独立工作区保存结果和执行回执。可以在浏览器里与它协作，也可以在终端独立运行相同的计算流程。
+
+例如，研究燃料棒稳态传热时，可以先查看径向温度曲线，再要求标出燃料区最高温度，点开核查记录查看热源积分和外壁散热的单位、取值区域与来源文件。展示助手根据已有保存场和当前页面调整图表、表格与物理场。对于支持的燃料棒模型，还可以开启 **生成计算器**，把一次成功的计算保存为可复算的应用，以后修改线功率或外壁温度即可运行新工况。[基准题库](benchmark/题库总览.md) · [独立数值核查](lib/mandifuel_verify/README.md) · [计算器支持范围](lib/mandifuel_app/CONTRACT.md)
 
 ## 启动 Web 工作台
 
@@ -24,7 +26,7 @@ python3 frontend/server.py
    cp configs/launcher.env.example configs/launcher.env
    ```
 
-2. 编辑 `configs/launcher.env`，填写 DSH、Node.js、Python 3.12、OpenFOAM 环境脚本和 OFFBEAT 可执行文件目录的绝对路径。`MANDIFUEL_CASE_LIBRARY_ROOT` 指向含 `Cases/` 的 OFFBEAT 源码根目录。模型和 API Key 在 DSH 中配置。使用外置数据盘的 `runs` 软链接时，把 `realpath runs` 的输出填入 `MANDIFUEL_RUNS_ROOT`。[配置模板](configs/launcher.env.example)
+2. 编辑 `configs/launcher.env`，填写 DSH、Node.js、Python 3.12、OpenFOAM 环境脚本和 OFFBEAT 可执行文件目录的绝对路径。`MANDIFUEL_CASE_LIBRARY_ROOT` 指向含 `Cases/` 的 OFFBEAT 源码根目录。DSH 对话模型按宿主配置。默认语义选源还需在启动进程环境中设置 `DEEPSEEK_API_KEY` 和 `DASHSCOPE_API_KEY`，也可在模板中指定其他凭据变量名。使用外置数据盘的 `runs` 软链接时，把 `realpath runs` 的输出填入 `MANDIFUEL_RUNS_ROOT`。[配置模板](configs/launcher.env.example)
 3. 检查计算环境，再启动工作台。需要绘图或运行参数优化时，在所配置的 Python 3.12 环境中执行 `python3.12 -m pip install -r requirements-examples.txt`。
 
    ```bash
@@ -38,13 +40,23 @@ python3 frontend/server.py
 2. 打开 **执行过程** 查看进度。工作台观察任务目录，有网格时可先预览模型，有保存场后可选择物理量和时刻。在已关联曲线与物理场的任务中，点击曲线上的数据点会切换到对应工况及最近的保存帧。
 3. 继续在对话里提出显示要求，例如「把温度场改成蓝白红色带，标出当前帧最高温度的位置」。展示助手读取当前页面状态，按已有数据调整视图。打开 **结果核查** 可查看已支持工程量的来源文件、时刻、区域、单位、取数方法和核验状态。在 **交付文件** 中可查看本任务已登记的输入、日志和输出。
 
-每个网页任务有独立工作区，默认位于 `runs/workbench/task-*/workspace/`。计算助手通过五项工程技能完成算例准备、求解、提取和研究任务。独立的展示助手观察文件变化、编排页面。相同的计算流程也可以在终端单独执行。任务子进程离线运行，文件写入边界覆盖项目目录和已登记的 `runs` 目录。[工作台使用说明与项目写入边界](frontend/README.md) · [展示助手角色与接口](frontend/agent/CONTRACT.md) · [独立数值核查](lib/mandifuel_verify/README.md)
+每个网页任务的工作区默认位于 `runs/workbench/task-*/workspace/`。求解子进程离线运行，可写范围为项目目录和已登记的 `runs` 目录。展示助手观察文件变化，根据计算进度和用户的后续要求编排页面。[工作台使用说明](frontend/README.md) · [展示助手角色与接口](frontend/agent/CONTRACT.md)
 
-## 基准题库与本地检索
+## 让 DSH 生成可复算的科学应用
+
+新任务右上角、**DSH** 左侧的 **生成计算器** 开关默认关闭。可在发送任务前开启，也可在计算过程中开启或取消。工作台按任务保存选择，成功计算有可用工况后才启动专用构建会话。已有结果时，也可在 **构建要求** 中指定参数或输出。生成期间可关闭开关取消。原始结果始终可以查看。
+
+标题下显示当前计算和渲染状态。点击 **执行过程**，可按发生时间查看科学计算、UI 操作与浏览器回执。
+
+点击 **打开计算器** 可查看参数和单位。输入与已保存工况相同时，**查看已有结果** 直接载入该工况。改为一组新值，再点击 **重新计算**，运行层会回读新输入并启动 OFFBEAT，无需再次调用大模型。工况下拉框可以切回原始结果。继续在右侧对话中描述新需求可修改同一个应用。
+
+普通复算直接复制归档输入，回读修改后的物理绑定，在独立工况目录执行 OFFBEAT。当前注册了恒物性、恒线功率、固定包壳外壁温度的单轴向截面燃料棒输入族。应用定义及各版本在任务目录的 `applications/<appId>/` 下，执行回执与原始温度场按运行归档。终端可以独立创建、修改和执行同一契约。[契约与终端使用说明](lib/mandifuel_app/CONTRACT.md)
+
+## 基准题库与算例检索
 
 基准题库收录 29 道题，包括 18 道新建模型求解题、1 道接续计算题和 10 道辅助题。点击题号可跳至完整题面，接续计算和已有结果分析题还需准备相应输入。[燃料性能基准题库](benchmark/题库总览.md)
 
-选取参考模型时，助手可以联合查询 **137 张算例卡**和 **34 张经验父卡**。算例检索使用本地 BM25 和显式提供的九分面标签。经验库返回审核过的操作及其适用条件。1024 维描述向量供索引维护使用。运行中遇到输入错误时，助手会保留失败日志，在独立目录修复输入后重试，并按实际终点和保存场核对结果。[算例索引与来源](rag/PROVENANCE.md) · [经验检索](rag/experience/README.md) · [软件能力表](skills/prepare-offbeat-case/references/software-capabilities.md) · [输入恢复流程](skills/execute-offbeat-case/references/input-recovery.md)
+选取参考模型时，助手可以联合查询 **137 张算例卡**和 **34 张经验父卡**。Web 和终端的计算助手通过 `mandifuel_retrieve` 选源。默认由 DeepSeek 将选源短句映射为九分面标签并生成英文检索改写，DashScope 将改写编码为 1024 维向量。本地使用描述相似度（35%）与置信度加权的分面匹配（65%）排序；经验库独立返回审核过的操作及其适用条件。设置 `MANDIFUEL_RAG_MODE=local` 可使用离线 BM25 与显式标签。运行中遇到输入错误时，助手会保留失败日志，在独立目录修复输入后重试，并按实际终点和保存场核对结果。[算例索引与来源](rag/PROVENANCE.md) · [经验检索](rag/experience/README.md) · [软件能力表](skills/prepare-offbeat-case/references/software-capabilities.md) · [输入恢复流程](skills/execute-offbeat-case/references/input-recovery.md)
 
 ## 终端运行与打包
 

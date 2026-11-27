@@ -92,7 +92,7 @@ export class ModelViewer {
   const points=this.native?this.markerPoints:radial?.map(r=>[r,0,0]);
   this.annotations=enabled&&!this.geometryOnly?{markers:extrema(values,points).filter(m=>mode==='both'||m.kind===mode||m.kind==='constant'),unit}:null;this.draw();
  }
- setSceneAnnotations(program,parameters,values,metadata,selected,{mesh=this.sourceMesh,view}={}){const source=!this.native&&mesh?{...mesh,...['sphere','shell'].includes(this.model?.shape)?{samplingGeometry:'spherical'}:{}}:mesh;this.sceneMarkers=program?.annotations?.length?sceneAnnotations(source,program,parameters,values,metadata,selected,view):[];this.draw();}
+ setSceneAnnotations(program,parameters,values,metadata,selected,{mesh=this.sourceMesh,view,boundarySamples}={}){const source=!this.native&&mesh?{...mesh,...['sphere','shell'].includes(this.model?.shape)?{samplingGeometry:'spherical'}:{}}:mesh;this.sceneMarkers=program?.annotations?.length?sceneAnnotations(source,program,parameters,values,metadata,selected,view,boundarySamples):[];this.draw();}
  setProgramCamera(options){
   const camera=Object.fromEntries(['zoom','yaw','tilt'].filter(k=>options[k]!==undefined).map(k=>[k,options[k]])),key=JSON.stringify([camera,options.cameraDirectiveRevision||0]);
   if(key!==this.programCameraKey){this.programCameraKey=key;for(const[k,v]of Object.entries(camera))this.camera[k]=k==='zoom'?v:v*Math.PI/180;this.draw();}
@@ -176,7 +176,7 @@ export class ModelViewer {
    ctx.beginPath();ctx.arc(x,y,4,0,Math.PI*2);ctx.fillStyle=color;ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=1.5;ctx.stroke();ctx.fillStyle='#fffffff0';ctx.fillRect(left,top,width,height);ctx.strokeStyle=color;ctx.lineWidth=.7;ctx.strokeRect(left,top,width,height);ctx.fillStyle=color;ctx.save();ctx.beginPath();ctx.rect(left+3,top,width-6,height);ctx.clip();ctx.fillText(label,left+8,top+height/2);ctx.restore();
   }
   overlay.dataset.markers=JSON.stringify(markers);overlay.setAttribute('aria-label',(this.annotations?.markers?.length?'当前帧全域极值。':'')+'当前保存帧标注。'+descriptions.join('；'));
-  ctx.fillStyle='#617897';ctx.font='10px "Workbench CJK",system-ui';const note=this.annotations?.markers?.length?'当前帧全域 · 单元中心透视标记':markers.some(m=>m.kind==='probe')?'点值取最近存储单元':'坐标标注';ctx.fillText(note,10,h-10);
+  ctx.fillStyle='#617897';ctx.font='10px "Workbench CJK",system-ui';const note=this.annotations?.markers?.length?'当前帧全域 · 单元中心透视标记':markers.some(m=>m.kind==='probe')?'点值取最近存储单元':markers.some(m=>m.kind==='boundaryProbe')?'边界面中心 · 保存边界场值':'坐标标注';ctx.fillText(note,10,h-10);
  }
 
  projectAxis(v){const {yaw,tilt}=this.camera;const x=v[0]*Math.cos(yaw)-v[1]*Math.sin(yaw),y=v[0]*Math.sin(yaw)+v[1]*Math.cos(yaw);return[x,v[2]*Math.cos(tilt)-y*Math.sin(tilt)];}

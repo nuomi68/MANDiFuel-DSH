@@ -38,8 +38,12 @@ text:{text}、controls:{ids}、button:{label,action:{type:view,state}}、model:{
 
 ## 图、表与物理场共享选择
 
+普通结果表若以研究点 ID 标识工况，在 document.datasets 的文件声明中添加 `"caseIdentity":{"column":"实际点ID列","history":"相对路径/history.json"}`。使用同一数据源构建表格和多工况图，浏览器根据已完成历史与执行回执选择已保存场。标准 results.csv 的 point_id 会自动匹配同目录 history.json。歧义或缺失的行保留为普通数据行。实际点击后核对模型和高亮是否指向同一算例。
+
+最近单元测点使用 `source.kind="probeHistory"`。position 表示目标网格坐标，选填 lengthUnit 指定显示长度单位。用目标距坐标原点 targetRadius、实际中心 sampleRadius、中心坐标 sampleX/Y/Z 和 cell 展示采样位置；value 是该帧的实存单元值。将同一 source 绑定给 probeSummary，文字随采样位置和保存帧刷新。替换旧的手填测点说明与含推算中心位置的标题，保留无关组件。用 page.browser.nodes 的 probe 复核非默认帧。
+
 数据源可声明 `selection:{view:"真实视图ID"}` 或 `selection:{viewColumn:"保存视图ID的列"}`。
-时间曲线加 `timeColumn:"时间列",timeUnit:"s"`（也可 d，必须与目标一致）；点击数据点/表格行会切换模型与最近真实保存帧。不要把数组行号当时间，不混用另一次计算的曲线。
+时间曲线加 `timeColumn:"时间列",timeUnit:"s"`（也可 d，必须与目标一致）；点击数据点/表格行会切换模型与时间完全相同的保存帧。不要把数组行号当时间，不混用另一次计算的曲线。
 需要随当前视图、时刻更新的表格用 `filter:[{column:"view_id",op:"eq",context:"view"},{column:"t_s",op:"eq",context:"time"}]`。
 各序列绑定真实视图后，当前结构和时刻会高亮；结构 selector 可用已有 view 控件或有明确目标的按钮，禁止为联动重新求解。
 
@@ -54,3 +58,8 @@ text:{text}、controls:{ids}、button:{label,action:{type:view,state}}、model:{
 曲线联动的当前时刻交给原生保存帧选择，不要再用固定 program.options.time 覆盖点击选择。结构选择用实际 view 控件/按钮；数据绑定应与所用视图完全同源。
 
 数据观察采用分层读取：`ui_inspect(target="data")` 返回简短索引；再用 `ui_inspect(target="data",node="postprocessing/example/history.json")` 读取该文件的真实列名、单位、类别和样本。需要未导出场的分量时用 node="case:实际caseRoot"。不要因为索引省略了样本就声称数据缺失或要求用户另行确认；先打开指定条目。工具结果不可用时不要尝试终端/文件工具或扩大权限。
+
+反应堆结果联动使用同一算例、离散版本、保存时刻和物理定义。对固定网格铯迁移，导出含 Cs 的视图并按需要指定 time=all。声明数据集 `{"quantity":"csInventory","view":"实际视图ID"}`，使用 time 和 fraction 列；各行已绑定原始视图与帧。inventory、initial 为实际计算域的 mol，fraction 是 (N₀−ΣCᵢVᵢ)/N₀。将其解释为释放分数前须核实源项、衰变、外通量或求解器记账。两项库存接近时，要注明相减的精度限制。对于微量外释，单独展示原生外释记录并注明归一化分母。细化步长或网格的曲线可作为显式离散对照。
+球壳表面测量使用已导出 shell 视图的 boundaryPatches，例如 `{"id":"outerStress","type":"boundaryProbe","patch":"outer","field":"sigma_yy","views":["shell"]}`。先核实坐标基底；有符号张量分量、等效应力、单元极值和边界面值各有各的定义。缺少唯一面值时说明采样缺口。钠冷通道区分出口截面、全壁极值和冷却剂体温，按实际流向及面中心位置核对。自动验收只使用 ui_wait_for_render 的 verifySelection，用户的选择由浏览器保存和恢复。
+
+更新旧视图时，若原曲线引用了其他离散版本，可在同一笔 ui_apply 中提交 Cs 的 exports、相应 quantity 数据集及曲线和表的 source 修改。细化计算有独立研究意义时保留为单独的对照。

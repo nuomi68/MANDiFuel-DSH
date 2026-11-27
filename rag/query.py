@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""默认仅用本地卡片进行词项与标签检索，不调用映射或嵌入服务。"""
+"""OFFBEAT case retrieval by local lexical search or semantic facet/vector fusion."""
 
 from __future__ import annotations
 
@@ -50,6 +50,7 @@ ROOT = Path(__file__).resolve().parent
 DEFAULT_INDEX = ROOT / "index"
 DEFAULT_CORPUS = ROOT / "data" / "offbeat_case_cards_compact_138.json"
 MAX_QUERY_CHARS = 16_000
+MAX_SEMANTIC_QUERY_CHARS = 1200
 CONFIDENCE_THRESHOLD = 0.5
 EMBEDDING_WEIGHT = 0.35
 TAXONOMY_WEIGHT = 0.65
@@ -219,13 +220,13 @@ def _validate_mapping(
             confidence = float(raw_confidence.get(facet, 0.0))
         except (TypeError, ValueError):
             confidence = 0.0
-        result["confidence"][facet] = max(0.0, min(confidence, 1.0))
+        result["confidence"][facet] = max(0.0, min(confidence, 1.0)) if math.isfinite(confidence) else 0.0
 
     try:
         overall = float(raw.get("overall_confidence", 0.0))
     except (TypeError, ValueError):
         overall = 0.0
-    result["overall_confidence"] = max(0.0, min(overall, 1.0))
+    result["overall_confidence"] = max(0.0, min(overall, 1.0)) if math.isfinite(overall) else 0.0
 
     language = str(raw.get("query_language") or "").strip().lower()
     result["query_language"] = (
@@ -236,9 +237,12 @@ def _validate_mapping(
         else "en"
     )
     translated = raw.get("translated_query_for_embedding")
-    translated_text = str(translated).strip() if translated else None
+    translated_text = translated.strip() if isinstance(translated, str) else None
     rewrite = raw.get("query_rewrite_for_embedding") or translated_text
-    rewrite_text = str(rewrite).strip() if rewrite else query_text
+    if (not isinstance(rewrite, str) or not rewrite.strip() or len(rewrite) > MAX_SEMANTIC_QUERY_CHARS
+            or "\x00" in rewrite or _contains_cjk(rewrite)):
+        raise QueryError("mapping provider must return a short English retrieval rewrite")
+    rewrite_text = rewrite.strip()
     result["translated_query_for_embedding"] = translated_text or (
         rewrite_text
         if _contains_cjk(query_text) and rewrite_text != query_text
@@ -369,14 +373,14 @@ def _embed_query(
             cached.get("embedding"), list
         ):
             raise QueryError("cached query embedding is invalid")
-        return [float(value) for value in cached["embedding"]], telemetry
+        return _validated_query_vector(cached["embedding"], provider.dimension), telemetry
 
     telemetry["source"] = "realtime_provider_request"
     telemetry["provider_request_performed"] = True
     vectors = provider.embed_texts([text])
     if len(vectors) != 1:
         raise ProviderError("embedding provider returned an unexpected record count")
-    embedding = [float(value) for value in vectors[0]]
+    embedding = _validated_query_vector(vectors[0], provider.dimension)
     cache.set(
         namespace,
         key,
@@ -387,6 +391,14 @@ def _embed_query(
         },
     )
     return embedding, telemetry
+
+
+def _validated_query_vector(vector: Any, dimension: int | None) -> list[float]:
+    if (not isinstance(vector, list) or len(vector) != dimension
+            or any(type(x) not in (float, int) or not math.isfinite(x) for x in vector)
+            or not any(vector)):
+        raise QueryError("query embedding must be a finite nonzero vector matching the index dimension")
+    return vector
 
 
 def _validate_index(
@@ -711,7 +723,13 @@ def _default_clients(
     return mapping, embedding
 
 
-def _semantic_query_for_index_maintenance(
+def default_mode() -> str:
+    if os.environ.get("MANDIFUEL_TASK_OFFLINE") == "1" or os.environ.get("DSH_MANDIFUEL_TASK_OFFLINE") == "1":
+        return "local"
+    return os.environ.get("MANDIFUEL_RAG_MODE", "semantic")
+
+
+def semantic_query(
     engineering_request: str,
     *,
     limit: int = 5,
@@ -721,19 +739,20 @@ def _semantic_query_for_index_maintenance(
     case_library_root: Path | None = None,
     mapping_provider: MappingProvider | None = None,
     embedding_provider: EmbeddingProvider | None = None,
+    labels: dict[str, Any] | None = None,
     include_ablation_rankings: bool = False,
 ) -> dict[str, Any]:
-    """Legacy semantic retrieval retained for index maintenance, not task routing."""
+    """Rank case descriptions with matching query vectors and mapped taxonomy facets."""
     if os.environ.get("MANDIFUEL_TASK_OFFLINE") == "1" or os.environ.get("DSH_MANDIFUEL_TASK_OFFLINE") == "1":
-        raise QueryError("task retrieval is offline; use query() with local cards")
+        raise QueryError("task subprocess is offline; use the DSH mandifuel_retrieve tool for semantic search")
     if (
         not isinstance(engineering_request, str)
         or not engineering_request.strip()
         or "\x00" in engineering_request
-        or len(engineering_request) > MAX_QUERY_CHARS
+        or len(engineering_request) > MAX_SEMANTIC_QUERY_CHARS
     ):
         raise QueryError(
-            f"query must contain 1 to {MAX_QUERY_CHARS} characters without NUL"
+            f"query must contain 1 to {MAX_SEMANTIC_QUERY_CHARS} characters without NUL"
         )
     if not 1 <= limit <= 20:
         raise QueryError("limit must be between 1 and 20")
@@ -743,6 +762,7 @@ def _semantic_query_for_index_maintenance(
     facets, cards, vocabulary, taxonomy, descriptions, manifest = _validate_index(
         index_path, corpus
     )
+    selected = _explicit_labels(labels, vocabulary)
     embedding_contract = manifest["embedding"]
     default_mapping, default_embedding = _default_clients(
         embedding_model=str(embedding_contract["model"]),
@@ -765,17 +785,17 @@ def _semantic_query_for_index_maintenance(
         facets=facets,
         cache=cache,
     )
-    embedding_query = str(
-        mapping.get("query_rewrite_for_embedding") or engineering_request
-    )
+    if selected:
+        # Never persist caller overrides into the shared provider mapping cache.
+        mapping = {**mapping, "mapped_labels": {**mapping["mapped_labels"], **selected},
+                   "confidence": {**mapping["confidence"], **dict.fromkeys(selected, 1.0)},
+                   "explicit_labels": selected}
+    embedding_query = mapping["query_rewrite_for_embedding"]
     query_embedding, embedding_trace = _embed_query(
         embedding_query,
         provider=embedder,
         cache=cache,
     )
-    if len(query_embedding) != int(embedding_contract["dimension"]):
-        raise QueryError("query embedding dimension does not match the bundled index")
-
     embedding_scores = _embedding_scores(descriptions, query_embedding)
     taxonomy_scores, matched_labels = _taxonomy_scores(taxonomy, mapping)
     final_scores = {
@@ -853,6 +873,7 @@ def _semantic_query_for_index_maintenance(
     result = {
         "status": "ok",
         "interface": "mandifuel-rag-query.v2",
+        "mode": "semantic",
         "engineering_request": engineering_request,
         "embedding_query": embedding_query,
         "query_mapping": mapping,
@@ -860,11 +881,14 @@ def _semantic_query_for_index_maintenance(
         "corpus_card_count": len(cards),
         "fusion": {
             "strategy": "fixed_taxonomy_heavy_with_mapped_geometry_coverage",
+            "embedding_used": True,
+            "weights": {"embedding": EMBEDDING_WEIGHT, "taxonomy": TAXONOMY_WEIGHT},
             "embedding_weight": EMBEDDING_WEIGHT,
             "taxonomy_weight": TAXONOMY_WEIGHT,
             "coverage": coverage,
         },
         "provider_telemetry": {
+            "network_requests": sum(int(t["provider_request_performed"]) for t in (mapping_trace, embedding_trace)),
             "mapping": mapping_trace,
             "embedding": embedding_trace,
             "cache": cache.summary(),
@@ -894,25 +918,7 @@ def _semantic_query_for_index_maintenance(
 
 
 
-def query(
-    engineering_request: str, *, limit: int = 5,
-    index_dir: Path = DEFAULT_INDEX, corpus_path: Path = DEFAULT_CORPUS,
-    case_library_root: Path | None = None, labels: dict[str, Any] | None = None,
-    cache_dir: Path | None = None,
-) -> dict[str, Any]:
-    """Local BM25 + explicit taxonomy labels; no network, caches or query vectors.
-
-    English case terms can accompany a Chinese engineering request. Optional
-    labels must be existing vocabulary values; they are ranking hints rather
-    than a suitability assertion. cache_dir is accepted for CLI compatibility.
-    """
-    if (not isinstance(engineering_request, str) or not engineering_request.strip()
-            or "\x00" in engineering_request or len(engineering_request) > MAX_QUERY_CHARS):
-        raise QueryError(f"query must contain 1 to {MAX_QUERY_CHARS} characters without NUL")
-    if not 1 <= limit <= 20:
-        raise QueryError("limit must be between 1 and 20")
-    index_path = index_dir.resolve()
-    facets, cards, vocabulary, _, _, manifest = _validate_index(index_path, corpus_path.resolve())
+def _explicit_labels(labels: dict | None, vocabulary: dict[str, list[str]]) -> dict[str, list[str]]:
     if labels is not None and not isinstance(labels, dict):
         raise QueryError("labels must be an object keyed by taxonomy facet")
     selected = {}
@@ -922,6 +928,33 @@ def query(
             raise QueryError(f"unknown taxonomy label or facet: {facet}")
         if values:
             selected[facet] = list(dict.fromkeys(values))
+    return selected
+
+
+def query(
+    engineering_request: str, *, limit: int = 5,
+    index_dir: Path = DEFAULT_INDEX, corpus_path: Path = DEFAULT_CORPUS,
+    case_library_root: Path | None = None, labels: dict[str, Any] | None = None,
+    cache_dir: Path | None = None,
+    mode: str | None = None,
+) -> dict[str, Any]:
+    """Search the bundled cards using the requested retrieval method."""
+    if mode is None:
+        mode = default_mode()
+    if mode == "semantic":
+        return semantic_query(engineering_request, limit=limit, index_dir=index_dir,
+                              corpus_path=corpus_path, case_library_root=case_library_root,
+                              labels=labels, cache_dir=cache_dir)
+    if mode != "local":
+        raise QueryError(f"unknown case retrieval mode: {mode}")
+    if (not isinstance(engineering_request, str) or not engineering_request.strip()
+            or "\x00" in engineering_request or len(engineering_request) > MAX_QUERY_CHARS):
+        raise QueryError(f"query must contain 1 to {MAX_QUERY_CHARS} characters without NUL")
+    if not 1 <= limit <= 20:
+        raise QueryError("limit must be between 1 and 20")
+    index_path = index_dir.resolve()
+    facets, cards, vocabulary, _, _, manifest = _validate_index(index_path, corpus_path.resolve())
+    selected = _explicit_labels(labels, vocabulary)
 
     stop = {"the", "a", "an", "of", "for", "and", "or", "to", "in", "with", "case", "offbeat"}
     def tokens(text):
@@ -1009,7 +1042,8 @@ def _parser() -> argparse.ArgumentParser:
             else None
         ),
     )
-    parser.add_argument("--labels-json", help="Optional existing taxonomy labels as a JSON object; local only")
+    parser.add_argument("--labels-json", help="Optional explicit labels for selected taxonomy facets")
+    parser.add_argument("--mode", choices=("local", "semantic"), help="Default: semantic outside offline task subprocesses")
     parser.add_argument("--compact", action="store_true")
     return parser
 
@@ -1030,6 +1064,7 @@ def main() -> int:
             cache_dir=args.cache_dir,
             case_library_root=args.case_library_root,
             labels=json.loads(args.labels_json) if args.labels_json else None,
+            mode=args.mode,
         )
     except (OSError, QueryError, ProviderError, ValueError) as exc:
         print(

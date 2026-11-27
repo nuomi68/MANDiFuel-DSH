@@ -117,6 +117,11 @@ def export_case(case, output, *, title='OFFBEAT 结果', selectors=None, time='l
         if any(t not in times for t in requested):raise ValueError('所选时刻缺少请求字段，请保留原字段语义并选择共同保存时刻')
         times=sorted(set(requested),key=float)
     if not times:raise ValueError('请求字段没有共同保存时刻，请分别导出对应视图')
+    cs_source=None
+    if any(key=='Cs' for key,_,_ in choices):
+        from scientific_samples import inventory_signature
+        try:cs_source=inventory_signature(case,times)[0]
+        except (ValueError,OSError):pass  # A concentration field can still be displayed independently.
     meshes={};frames=[];bounds={key:[math.inf,-math.inf] for key,_,_ in choices};radial=None;count=None
     for t in times:
         cache={};parsed={}
@@ -174,6 +179,9 @@ def export_case(case, output, *, title='OFFBEAT 结果', selectors=None, time='l
             if 'samples' not in meshes:
                 centres=[list(coords[i]) for i in order]
                 meshes['samples']={'points':centres,'cellCenters':centres,'cellIds':order,**({'samplingGeometry':'spherical'} if shape in {'sphere','shell'} else {})}
+        if shape=='shell':
+            from scientific_samples import shell_boundary_samples
+            frame['boundarySamples']=shell_boundary_samples(case,t,choices)
         if radial is None:radial=r
         elif shape not in {'mesh','revolve'} and any(abs(a-b)>max(radius*1e-8,1e-14) for a,b in zip(radial,r,strict=True)):raise ValueError('移动网格需要按原始网格导出 --shape mesh')
         for key,vs in values.items():
@@ -190,6 +198,9 @@ def export_case(case, output, *, title='OFFBEAT 结果', selectors=None, time='l
         variables[-1].update(field_labels.get(variables[-1]['selector'],{}))
     native=shape in {'mesh','revolve'};geometry=f'轴对称旋转重建（{sweep_angle:g}°）' if shape=='revolve' else '原始网格' if native else '对称重建'
     meta={'title':title,'shape':'mesh' if native else shape,'geometry':geometry,'cells':count,'radius':radius or max(1,max(radial)),'innerRadius':inner_radius,'length':length,'radialUnit':'' if native else 'm', 'profileAxis':'cell' if native else 'radius','timeUnit':time_unit,'fields':variables,'parameters':[['结果时间',', '.join(times)],['计算单元',str(count)],['显示几何',geometry]],'supportsExtrema':True}
+    if cs_source is not None:
+        if inventory_signature(case,times)[0]!=cs_source:raise ValueError('导出期间铯场、初态或网格版本已变化')
+        meta['csInventorySource']=cs_source
     if native:
         first_mesh=next(iter(meshes.values()));meta['dimensionality']=first_mesh['dimensionality'];meta['preferredView']=first_mesh['preferredView'];meta['supportsSlice']=shape=='mesh'
         meta['coordinateBounds']={'min':[min(p[i] for p in first_mesh['points']) for i in range(3)],'max':[max(p[i] for p in first_mesh['points']) for i in range(3)],'unit':'m','time':frames[0]['time']}

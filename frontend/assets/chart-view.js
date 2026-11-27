@@ -70,7 +70,12 @@ export function chartSVG(node,series,theme={},viewportWidth=720,runtime={}){
  if(!xs.length)throw new Error('图表中没有有效的数值点，请检查坐标列');
  if(prepared.some(s=>s.mark==='bar')&&node.yAxis?.scale!=='log')ys.push(0);
  for(const[i,ref]of(node.references||[]).entries()){(ref.axis==='x'?xs:ys).push(...(ref.value!==undefined?[ref.value]:[ref.from,ref.to]));entries.push({label:ref.label||'',color:ref.color||'#64748b',dash:ref.dash||'dash',band:ref.value===undefined,key:'ref:'+i,hidden:runtime.hidden?.has('ref:'+i)});}
- const spec=(key)=>({...node[key+'Axis'],...(runtime.viewport?.[key]?{min:runtime.viewport[key][0],max:runtime.viewport[key][1]}:{})}),ax=axis(xs,spec('x'),categories),ay=axis(ys,spec('y')),px=v=>left+ax.fraction(v)*(right-left),py=v=>bottom-ay.fraction(v)*(bottom-top),clip=`plot-${String(node.id||'chart').replace(/[^A-Za-z0-9_-]/g,'')}`;
+ const spec=(key)=>({...node[key+'Axis'],...(runtime.viewport?.[key]?{min:runtime.viewport[key][0],max:runtime.viewport[key][1]}:{})});
+ const xSpec=spec('x');
+ if(categories.length&&prepared.some(s=>s.mark==='bar')){
+  xSpec.min??=-.5;xSpec.max??=categories.length-.5;
+ }
+ const ax=axis(xs,xSpec,categories),ay=axis(ys,spec('y')),px=v=>left+ax.fraction(v)*(right-left),py=v=>bottom-ay.fraction(v)*(bottom-top),clip=`plot-${String(node.id||'chart').replace(/[^A-Za-z0-9_-]/g,'')}`;
  let body=`<defs><clipPath id="${clip}"><rect x="${left}" y="${top}" width="${right-left}" height="${bottom-top}"/></clipPath></defs>`;
  const xTicks=ax.ticks.filter((_,i)=>i%Math.max(1,Math.ceil(ax.ticks.length/(width<420?4:8)))===0);
  for(const tick of ay.ticks){const y=py(tick.value);if(node.yAxis?.grid!==false)body+=`<path d="M${left} ${y}H${right}" stroke="${escape(grid)}"/>`;body+=text(left-8,y+4,tick.label,'end');}
@@ -80,15 +85,21 @@ export function chartSVG(node,series,theme={},viewportWidth=720,runtime={}){
   if(ref.value!==undefined)body+=`<path d="${vertical?'M'+pos(ref.value)+' '+top+'V'+bottom:'M'+left+' '+pos(ref.value)+'H'+right}" stroke="${escape(c)}" stroke-width="1.5" stroke-dasharray="${dash(ref.dash||'dash')}" fill="none"><title>${escape(ref.label||format(ref.value))}</title></path>`;
   else{const a=pos(ref.from),b=pos(ref.to);body+=`<rect x="${vertical?Math.min(a,b):left}" y="${vertical?top:Math.min(a,b)}" width="${vertical?Math.abs(b-a):right-left}" height="${vertical?bottom-top:Math.abs(b-a)}" fill="${escape(c)}" opacity="${ref.opacity??.13}"><title>${escape(ref.label||'容差带')}: ${ref.from}–${ref.to}</title></rect>`;}
  }
+ const barsAt=new Map();
+ for(const s of prepared.filter(s=>!s.hidden&&s.mark==='bar')){
+  for(const x of new Set(s.points.filter(Boolean).map(p=>p.plotX))){if(!barsAt.has(x))barsAt.set(x,[]);barsAt.get(x).push(s);}
+ }
+ const groupWidth=Math.min(72,(right-left)/Math.max(1,categories.length||barsAt.size)*.65);
  for(const s of prepared){
   if(s.hidden)continue;
   const points=s.order==='x'?s.points.filter(Boolean).slice().sort((a,b)=>a.plotX-b.plotX):s.points;
   if(s.mark==='line'){let previous=null,path='';for(const p of points){if(!p){previous=null;continue;}const x=px(p.plotX),y=py(p.y);path+=previous?(s.step?`H${x}V${y}`:`L${x} ${y}`):`M${x} ${y}`;previous=p;}body+=`<path ${s.table.rows[0]?.selection?`data-linked-series="true" data-linked-view="${escape(s.table.rows[0].selection.view)}" `:""}d="${path}" fill="none" stroke="${escape(s.color)}" stroke-width="${s.width||2}" stroke-dasharray="${dash(s.dash)}" opacity="${s.opacity??1}"><title>${escape(s.label)}</title></path>`;}
-  const barSeries=prepared.filter(entry=>entry.mark==='bar'),barCount=Math.max(1,barSeries.length),barWidth=Math.max(2,Math.min(72,(right-left)/Math.max(1,points.filter(Boolean).length)*.65)/barCount),barOffset=(barSeries.indexOf(s)-(barCount-1)/2)*barWidth;
-  for(const p of points){if(!p)continue;const x=px(p.plotX),y=py(p.y),meta=p.row.runId?` data-chart-run="${escape(p.row.runId)}" role="button"`:'',label=`${s.label}: ${p.x}, ${format(p.y)}${p.xlo!==undefined?' ['+p.xlo+', '+p.xhi+']':''}${p.ylo!==undefined?' ['+p.ylo+', '+p.yhi+']':''}`;
+  for(const p of points){if(!p)continue;
+   const group=s.mark==='bar'?barsAt.get(p.plotX):null,barWidth=group?groupWidth/group.length:0;
+   const x=px(p.plotX)+(group?(group.indexOf(s)-(group.length-1)/2)*barWidth:0),y=py(p.y),meta=p.row.runId?` data-chart-run="${escape(p.row.runId)}" role="button"`:'',label=`${s.label}: ${p.x}, ${format(p.y)}${p.xlo!==undefined?' ['+p.xlo+', '+p.xhi+']':''}${p.ylo!==undefined?' ['+p.ylo+', '+p.yhi+']':''}`;
    body+=`<g opacity="${s.opacity??1}" data-chart-point="${s.seriesIndex}:${p.rowIndex}" data-point-x="${x}" data-point-y="${y}" tabindex="0" aria-label="${escape(label)}"${meta}${p.row.selection?` data-linked-view="${escape(p.row.selection.view)}"${p.row.selection.time!==undefined?` data-linked-time="${p.row.selection.time}"`:''}${p.row.selection.position?` data-linked-position="${escape(JSON.stringify(p.row.selection.position))}"`:''} role="button"`:''}><title>${escape(label)}</title>`;
    body+=`<circle cx="${x}" cy="${y}" r="11" fill="transparent" stroke="none"/><circle class="chart-selection-ring" cx="${x}" cy="${y}" r="8" fill="none" stroke="${escape(theme.accent||'#4f46e5')}" stroke-width="2"/>`;
-   if(s.mark==='bar'){const base=py(node.yAxis?.scale==='log'?ay.low:0);body+=`<rect x="${x+barOffset-barWidth/2}" y="${Math.min(y,base)}" width="${barWidth}" height="${Math.max(1,Math.abs(y-base))}" fill="${escape(s.color)}"/>`;}
+   if(s.mark==='bar'){const base=py(Math.min(ay.high,Math.max(ay.low,0)));body+=`<rect x="${x-barWidth/2}" y="${Math.min(y,base)}" width="${barWidth}" height="${Math.max(1,Math.abs(y-base))}" fill="${escape(s.color)}"/>`;}
    if(s.mark==='interval'){
     if(p.xlo!==undefined){const a=px(p.xlo),b=px(p.xhi);body+=`<path d="M${a} ${y}H${b}" fill="none" stroke="transparent" stroke-width="16"/><path d="M${a} ${y}H${b}M${a} ${y-5}V${y+5}M${b} ${y-5}V${y+5}" fill="none" stroke="${escape(s.color)}" stroke-width="${s.width||2}"/>`;}
     if(p.ylo!==undefined){const a=py(p.ylo),b=py(p.yhi);body+=`<path d="M${x} ${a}V${b}" fill="none" stroke="transparent" stroke-width="16"/><path d="M${x} ${a}V${b}M${x-5} ${a}H${x+5}M${x-5} ${b}H${x+5}" fill="none" stroke="${escape(s.color)}" stroke-width="${s.width||2}"/>`;}

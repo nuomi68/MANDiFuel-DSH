@@ -35,12 +35,12 @@ class Report:
     def __init__(self, case):
         self.case = case; self.claims = []; self.checks = []
 
-    def claim(self, key, title, value, unit, operation, *, selection=None, samples=None, note=''):
+    def claim(self, key, title, value, unit, operation, *, selection=None, samples=None, note='', citation_key=None):
         try:
             control=self.case.inputs('system/controlDict')
             time_unit={'seconds':'s','days':'d'}.get(word(control,'userTime','type')) if 'userTime' in control else 's'
         except Unavailable:time_unit=None
-        item = {'id':stable_id(self.case.relative,key), 'key':key, 'title':title, 'value':value, 'unit':unit,
+        item = {'id':stable_id(self.case.relative,citation_key or key), 'key':key, 'title':title, 'value':value, 'unit':unit,
                 'status':'computed', 'caseRoot':self.case.relative, 'time':self.case.time,'timeUnit':time_unit,
                 'definition':{'operation':operation, 'selection':selection or '整个计算网格', 'unit':unit},
                 'sources':[], 'checks':[], 'note':note}
@@ -262,10 +262,33 @@ def sphere_release(tau):
     return 1-6/math.pi**2*math.fsum(math.exp(-n*n*math.pi**2*tau)/(n*n) for n in range(1,501))
 
 
+def initial_cs_inventory(c):
+    if any(not p.startswith('constant/') for k,p in c.geometry['binding'].items() if k in {'points','faces','owner','neighbour'}):
+        raise Unavailable('移动网格的初始体积需要单独读取，当前未独立复算初始库存')
+    if c.has('0/Cs'):
+        initial = c.field('Cs',time='0',dimensions=CONCENTRATION,kind='scalar')
+        initial_values = [row[0] for row in initial]
+    else:
+        materials = get(c.inputs('constant/solverDict'),'materials'); initial_values = [None]*len(c.geometry['volumes'])
+        for zone,ids in c.geometry['zones'].items():
+            if not ids: continue
+            matching = [v for key,v in materials.items() if not key.startswith('_') and re.fullmatch(key,zone)]
+            if len(matching)!=1: raise Unavailable('初始浓度材料映射不唯一')
+            concentration = scalar(matching[0],'initialCsConcentration')
+            for i in ids:
+                if initial_values[i] is not None: raise Unavailable('初始库存材料区域重叠')
+                initial_values[i] = concentration
+        if any(v is None for v in initial_values): raise Unavailable('初始浓度未明确覆盖全部材料区')
+    if any(v < 0 or not math.isfinite(v) for v in initial_values):
+        raise Unavailable('初始浓度应为有限非负数')
+    amount = math.fsum(a*v for a,v in zip(initial_values,c.geometry['volumes'],strict=True))
+    return amount, initial_values
+
+
 def cesium(c, r):
     if not c.has(f'{c.time}/Cs'): raise NotApplicable('当前没有铯浓度保存场')
     values = c.field('Cs', dimensions=CONCENTRATION, kind='scalar')
-    inventory = math.fsum(row[0]*v for row,v in zip(values,c.geometry['volumes']))
+    inventory = math.fsum(row[0]*v for row,v in zip(values,c.geometry['volumes'],strict=True))
     current = r.claim('cesium.inventory', '当前计算域铯库存', inventory, 'mol', 'Σ Cs_cell V_cell',
                       selection='所有材料区的真实单元与保存时刻绑定体积',
                       note='库存采用体积积分；未将核芯库存下降当作多层结构的对外释放。')
@@ -276,20 +299,33 @@ def cesium(c, r):
         matches = re.findall(re.escape(label)+r':\s*([0-9.eE+\-]+)', block)
         if not matches: raise Unavailable('当前时刻日志缺少 '+label)
         native[key] = float(matches[-1])
+    if not all(math.isfinite(value) for value in native.values()):
+        raise Unavailable('原生日志的铯记账量必须是有限数值')
     source = c.field('sourceCs', dimensions=(0,-3,-1,0,1,0,0), kind='scalar')
     if any(row[0] != 0 for row in source) or native['production'] != 0:
         raise NotApplicable('非零生成源需要完整累计源项，本版不把瞬时源当作累计生产量')
     n0 = native['initial']
     if not n0>0: raise Unavailable('初始库存不是正数，释放分数未定义')
-    fraction = 1-inventory/n0
-    release = r.claim('cesium.release_fraction', '原场库存法计算的对外释放分数', fraction, '1', 'F = 1 − Σ(Cs V) / N0_native',
-                       note='N0 来自相同时刻原生日志；初始库存的独立复算另列核查，未声称独立通量积分。')
+    fraction = (n0-inventory)/n0
+    # Existing dashboards cite the former inventory-based claim by its opaque
+    # ID. Keep those citations attached to the original sampling operation.
+    deficit = r.claim('cesium.inventory_depletion', '相对原生日志初始库存的原场库存亏损', fraction, '1', '(N0_native − Σ Cs V) / N0_native', citation_key='cesium.release_fraction',
+                      note='相近库存相减会放大保存精度的影响。此量用于全域库存核对。')
+    release = r.claim('cesium.release_fraction', '原生日志累计外释分数', native['fraction'], '1', '读取当前保存时刻最后一组 Fraction of Cs release',
+                      selection={'file':log_path,'time':c.time}, citation_key='cesium.native_release_fraction', note='按原生日志累计外释量与初始库存之比复核。')
     released = r.claim('cesium.native_released', '原生日志累计外释量', native['released'], 'mol', '读取精确匹配保存时刻的最后一组 Fission products transport 记录',
                         selection={'file':log_path,'time':c.time}, note='这是求解器记录值，不是本核查程序独立积分的边界通量。')
+    expected = native['released']/n0
+    # Each of the three native quantities can have been rounded for logging.
+    # A floor measured against total inventory would accept spurious tiny releases.
+    ratio_ok = 0 <= native['fraction'] <= 1 and math.isclose(native['fraction'],expected,rel_tol=2e-5,abs_tol=0)
+    r.check('cesium.native_fraction','原生外释分数与累计外释量之比','verified' if ratio_ok else 'failed',
+            metric={'reportedFraction':native['fraction'],'releasedOverInitial':expected},tolerance={'relative':2e-5,'absolute':0},
+            formula='F_log 与 N_released_log / N0_log 按两者量级核对',scope='同一保存时刻的零源原生日志记账，一致性不能确认未记录通量的准确性。',related=[release,released])
     scale=n0/max(math.fsum(c.geometry['volumes']),1e-300)
     minimum=min(row[0] for row in values)
     bounds=minimum>=-scale*1e-7 and -1e-7<=fraction<=1+1e-7
-    r.check('cesium.bounds','零源库存与释放分数的数值范围','verified' if bounds else 'failed',metric={'minimumCs_mol_m3':minimum,'fraction':fraction},tolerance={'relativeInitialConcentration':1e-7,'fractionSlack':1e-7},scope='允许声明范围内的微小舍入噪声；超出范围不以库存相消掩盖',related=[current,release])
+    r.check('cesium.bounds','零源浓度与库存亏损的数值范围','verified' if bounds else 'failed',metric={'minimumCs_mol_m3':minimum,'fraction':fraction},tolerance={'relativeInitialConcentration':1e-7,'fractionSlack':1e-7},scope='允许声明范围内的微小舍入噪声；超出范围不以库存相消掩盖',related=[current,deficit])
     residual = abs(inventory+native['released']-n0)/n0
     agreement = max(abs(inventory-native['remained'])/n0,abs(fraction-native['fraction']))
     r.check('cesium.balance','原场库存与原生日志外释量核对','verified' if max(residual,agreement)<=.005 else 'failed',
@@ -297,27 +333,11 @@ def cesium(c, r):
             tolerance={'relativeInventoryReleaseResidual':.005,'maxNormalizedLogDifference':.005},
             formula='|Σ Cs V + N_released_native − N0_native| / N0_native；同时核对日志剩余量及释放分数',
             scope='零源、当前保存帧的原场/原生日志一致性；不等同于独立累计边界通量积分',
-            assumptions=['最新 sourceCs 全域为零','原生日志累计 Production of Cs = 0','计算域范围不换算'],related=[current,release,released])
+            assumptions=['最新 sourceCs 全域为零','原生日志累计 Production of Cs = 0','计算域范围不换算'],related=[current,deficit,released])
     # Establish the initial inventory from a real initial field or explicit
     # per-zone initial values; never silently assume unprovided regions are zero.
     try:
-        if any(not p.startswith('constant/') for k,p in c.geometry['binding'].items() if k in {'points','faces','owner','neighbour'}):
-            raise Unavailable('移动网格的初始体积需要单独读取，当前未独立复算初始库存')
-        if c.has('0/Cs'):
-            initial = c.field('Cs',time='0',dimensions=CONCENTRATION,kind='scalar')
-            initial_values = [row[0] for row in initial]
-        else:
-            materials = get(c.inputs('constant/solverDict'),'materials'); initial_values = [None]*len(values)
-            for zone,ids in c.geometry['zones'].items():
-                if not ids: continue
-                matching = [v for key,v in materials.items() if not key.startswith('_') and re.fullmatch(key,zone)]
-                if len(matching)!=1: raise Unavailable('初始浓度材料映射不唯一')
-                concentration = scalar(matching[0],'initialCsConcentration')
-                for i in ids:
-                    if initial_values[i] is not None: raise Unavailable('初始库存材料区域重叠')
-                    initial_values[i] = concentration
-            if any(v is None for v in initial_values): raise Unavailable('初始浓度未明确覆盖全部材料区')
-        initial_inventory = math.fsum(a*v for a,v in zip(initial_values,c.geometry['volumes']))
+        initial_inventory, initial_values = initial_cs_inventory(c)
         initial_error = abs(initial_inventory-n0)/n0
         r.check('cesium.initial','初始库存独立复算','verified' if initial_error<=.005 else 'failed',metric={'inputInventory_mol':initial_inventory,'nativeInventory_mol':n0,'relativeDifference':initial_error},tolerance={'relativeDifference':.005},formula='Σ C_initial,cell V_cell 对照原生日志 N0',scope='固定初始网格',related=[release])
     except (Unavailable,OSError,ValueError) as error:
@@ -358,9 +378,9 @@ def cesium(c, r):
                 metric={'fieldFraction':fraction,'analyticFraction':reference,'absoluteDifference':difference,'radius_m':radius,'D_m2_s':diff[0]},
                 tolerance={'absoluteDifference':.005},formula='F(t)=1−6/π² Σ[n=1..∞] exp(−n²π²Dt/R²)/n²',
                 scope='仅此保存时刻的整域释放分数；不代替全历史或网格收敛验证',
-                assumptions=['裸球、球心包含在网格内','均匀初值、恒定均匀 D、零生成源','外表面 Cs=0','模型时间按明确单位转换为秒'],related=[release])
-    except NotApplicable as error: r.check('cesium.analytic','裸球恒定扩散系数解析对照','not_applicable',reason=str(error),related=[release])
-    except (Unavailable,OSError,ValueError,IndexError) as error: r.check('cesium.analytic','裸球恒定扩散系数解析对照','not_verified',reason=str(error),related=[release])
+                assumptions=['裸球、球心包含在网格内','均匀初值、恒定均匀 D、零生成源','外表面 Cs=0','模型时间按明确单位转换为秒'],related=[deficit])
+    except NotApplicable as error: r.check('cesium.analytic','裸球恒定扩散系数解析对照','not_applicable',reason=str(error),related=[deficit])
+    except (Unavailable,OSError,ValueError,IndexError) as error: r.check('cesium.analytic','裸球恒定扩散系数解析对照','not_verified',reason=str(error),related=[deficit])
 
 
 CHECKS = {'execution':execution,'heat':heat,'sphere':sphere,'cesium':cesium}

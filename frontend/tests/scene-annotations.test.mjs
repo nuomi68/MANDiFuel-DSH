@@ -21,3 +21,12 @@ test('point, line, arrow, text, color and visibility compose without special par
  assert.deepEqual(sceneAnnotations(mesh,p,{endX:2,tint:'#123456',show:false}),[]);
  const marker=sceneAnnotations(mesh,p,{endX:2,tint:'#123456',show:true})[0];assert.deepEqual(marker.end,[2,0,0]);assert.equal(marker.color,'#123456');assert.match(marker.text,/2/);
 });
+test('shell surface marker uses the signed saved face value and its centre',()=>{
+ const program=compileProgram({annotations:[{id:'surface',type:'boundaryProbe',patch:'outer',field:'sigma',label:'外表面 310 µm'}]});
+ const source={face:99,point:[.0003,0,0],radius:.0003,fields:{sigma:-158505000}};
+ const render=samples=>sceneAnnotations(mesh,program,{}, {sigma:[-186322000,-158225000]},meta,'sigma','shell',samples);
+ const marker=render({outer:source})[0];
+ assert.equal(marker.value,-158505000);assert.equal(marker.sourceFace,99);assert.deepEqual(marker.sourcePoint,source.point);
+ assert.doesNotMatch(marker.text,/310/);
+ assert.match(marker.text,/-158\.505 MPa/);assert.throws(()=>render({}),/边界面/);
+});

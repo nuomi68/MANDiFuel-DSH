@@ -1,6 +1,6 @@
 import {renderParameterPanel} from './parameter-panel.js';
 import {compileExpression} from './render-program.js';
-import {resolveSource} from './data-sources.js';
+import {resolveSource,probeRecord,probeDescription} from './data-sources.js';
 import {chartSVG,CHART_TYPES,escape,format,tableCSV,tableColumns,tableRows,formatCell,chartDataTable} from './chart-view.js';
 import {hasWorkspaceContent,settingsControlGroups,uiInScope,caseTabs} from './ui-placement.js';
 import {ChartInteraction} from './chart-interaction.js';
@@ -8,6 +8,14 @@ import {evidenceLink,evidenceLabels,evidenceGroups,evidenceNumber} from './evide
 
 const containers=new Set(['row','column','grid','tabs']);
 const element=(tag,className,text)=>{const e=document.createElement(tag);if(className)e.className=className;if(text!==undefined)e.textContent=text;return e;};
+function reconcile(parent,children){
+ const wanted=new Set(children);
+ for(const child of [...parent.children])if(!wanted.has(child))child.remove();
+ children.forEach((child,index)=>{const current=parent.children[index];if(current!==child)parent.insertBefore(child,current||null);});
+}
+function scientificNote(table,columns){
+ return !table.scientificNoteColumns||table.scientificNoteColumns.some(k=>columns.includes(k))?table.scientificNote:null;
+}
 function download(blob,name){const a=document.createElement('a'),url=URL.createObjectURL(blob);a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 async function svgImage(svg){const url=URL.createObjectURL(new Blob([svg],{type:'image/svg+xml;charset=utf-8'}));try{const image=new Image();image.src=url;await image.decode();return image;}finally{URL.revokeObjectURL(url);}}
 async function paintSVG(context,svg,x,y,width,height){
@@ -40,17 +48,32 @@ export class AdaptiveUI{
   this.context=context;const key=JSON.stringify([context.taskId,context.uiRevision,document||null]);
   if(key!==this.key){
    this.previousStates=new Map(sameTask?[...this.nodes].map(([id,e])=>[id,{type:e.node.type,modelDirective:e.modelDirective,page:e.page,query:e.query,sort:e.sort,declaredSort:JSON.stringify(e.node.sort),activeTab:e.activeTab,dataIdentity:e.dataIdentity,viewport:e.interaction?.viewport,hidden:e.interaction?[...e.interaction.hidden]:[]}]):[]);
-   this.key=key;this.dataKey=null;this.generation++;this.resizeObserver.disconnect();this.restoreModel();this.nodes.clear();this.host.replaceChildren();this.aside.replaceChildren();this.document=document;this.host.hidden=!document||!hasWorkspaceContent(document.root);this.modelSlot=null;this.ready=false;
-   if(!document){this.syncVisibility();return;}
-   if(document.mode==='below')this.model.after(this.host);else this.anchor.before(this.host);
-   this.selectionBar=element('aside','adaptive-selection');this.selectionBar.hidden=true;this.selectionBar.setAttribute('aria-live','polite');this.host.append(this.selectionBar);
-   const root=this.build(document.root);if(hasWorkspaceContent(document.root))this.host.append(root);
-   if(document.aside)this.aside.append(this.build(document.aside));
-   if(this.modelSlot)this.modelSlot.append(this.model);
-   this.previousStates=null;
+   const old=this.nodes;this.previousNodes=sameTask?old:null;this.nodes=new Map();
+   this.sameDatasets=JSON.stringify(this.document?.datasets)===JSON.stringify(document?.datasets);
+   this.key=key;this.dataKey=null;this.generation++;this.document=document;this.host.hidden=!document||!hasWorkspaceContent(document.root);this.modelSlot=null;this.ready=false;
+   if(document){
+    if(!this.selectionBar){this.selectionBar=element('aside','adaptive-selection');this.selectionBar.hidden=true;this.selectionBar.setAttribute('aria-live','polite');}
+    const root=this.build(document.root);
+    reconcile(this.host,[this.selectionBar,...(hasWorkspaceContent(document.root)?[root]:[])]);
+    reconcile(this.aside,document.aside?[this.build(document.aside)]:[]);
+    if(this.modelSlot){if(this.model.parentNode!==this.modelSlot)this.modelSlot.append(this.model);}
+    else this.restoreModel();
+    if(document.mode==='below'&&this.model.parentNode===this.anchor.parentNode&&this.model.nextSibling!==this.host)this.model.after(this.host);
+    else if(document.mode!=='below'&&this.host.nextSibling!==this.anchor)this.anchor.before(this.host);
+   }else{this.restoreModel();this.host.replaceChildren();this.aside.replaceChildren();}
+   for(const [id,e] of old)if(e.body&&this.nodes.get(id)!==e)this.resizeObserver.unobserve(e.body);
+   this.previousStates=null;this.previousNodes=null;
   }
   this.syncVisibility();if(!document)return;this.syncSelection();
   for(const entry of this.nodes.values()){
+   const directive=entry.pendingModelState&&entry.node.state;
+   const needsFields=directive&&['field','compareField','time'].some(k=>Object.hasOwn(directive,k));
+   if(directive&&context.modelReady&&(!needsFields||context.savedFieldsReady||directive.view&&directive.view!==context.state.view)){
+    entry.pendingModelState=false;
+    entry.action=Promise.resolve().then(()=>{
+     if(this.nodes.get(entry.node.id)===entry)return this.onAction({type:'view',state:entry.node.state});
+    }).then(()=>{entry.error=null;this.observe();},error=>this.showError(entry,error));
+   }
    if(entry.node.type==='evidence')this.renderEvidence(entry);
    if(entry.node.evidence?.length)this.renderEvidence(entry,true);
    if(entry.node.type==='controls'&&entry.node.placement==='inline')this.renderControls(entry);
@@ -63,7 +86,7 @@ export class AdaptiveUI{
    if(matching)entry.selectTab(matching.id);
    else if(visible.length)entry.selectTab(visible.some(n=>n.id===entry.activeTab)?entry.activeTab:visible[0].id);
   }
-  const dataKey=JSON.stringify([context.dataKey,context.parameters]);if(dataKey!==this.dataKey){this.dataKey=dataKey;void this.renderData();}
+  const dataKey=JSON.stringify([context.dataKey,context.viewIndex,context.parameters]);if(dataKey!==this.dataKey){this.dataKey=dataKey;void this.renderData();}
   this.applyInteractions();this.syncVisibility();
  }
  applyInteractions(){
@@ -90,12 +113,29 @@ export class AdaptiveUI{
   else{this.restoreModel();if(this.active&&this.model.nextSibling!==this.host)this.model.after(this.host);}
   this.model.hidden=!!this.context?.modelHidden;
  }
- build(node){
-  const wrapper=element('section',containers.has(node.type)?'adaptive-layout adaptive-'+(node.type==='tabs'?'tab-layout':node.type):node.type==='button'?'adaptive-button':'adaptive-card');wrapper.dataset.uiNode=node.id;wrapper.dataset.uiType=node.type;
+ build(node,inTab=false){
+  const old=this.previousNodes?.get(node.id),sources=[node.source,...(node.series||[]).map(s=>s.source)];
+  const dataIdentity=JSON.stringify([node.source,node.series?.map(s=>({source:s.source,x:s.x,y:s.y,xLow:s.xLow,xHigh:s.xHigh,yLow:s.yLow,yHigh:s.yHigh})),sources.map(s=>this.document?.datasets?.[s?.dataset])]);
+  const canReuse=old&&old.inTab===inTab&&old.node.type===node.type;
+  if(canReuse&&node.type==='tabs'&&this.sameDatasets&&JSON.stringify(old.node)===JSON.stringify(node)){
+   const restore=child=>{
+    const entry=this.previousNodes.get(child.id);this.nodes.set(child.id,entry);
+    if(child.type==='model')this.modelSlot=entry.body;
+    child.children?.forEach(restore);
+   };
+   restore(node);return old.element;
+  }
+  if(canReuse&&!containers.has(node.type)&&old.dataIdentity===dataIdentity&&JSON.stringify(old.node)===JSON.stringify(node)){
+   this.nodes.set(node.id,old);if(node.type==='model')this.modelSlot=old.body;return old.element;
+  }
+  const reuseLayout=canReuse&&containers.has(node.type)&&node.type!=='tabs';
+  const wrapper=reuseLayout?old.element:element('section',containers.has(node.type)?'adaptive-layout adaptive-'+(node.type==='tabs'?'tab-layout':node.type):node.type==='button'?'adaptive-button':'adaptive-card');wrapper.dataset.uiNode=node.id;wrapper.dataset.uiType=node.type;
   const previous=this.previousStates?.get(node.id),retained=previous?.type===node.type?previous:null;
-  const dataIdentity=JSON.stringify([node.source,node.series?.map(s=>({source:s.source,x:s.x,y:s.y,xLow:s.xLow,xHigh:s.xHigh,yLow:s.yLow,yHigh:s.yHigh})),this.document?.datasets]);
   const entry={node,element:wrapper,visible:Object.hasOwn(node,'visible')?compileExpression(node.visible):null,page:retained?.page||0,query:retained?.query||'',sort:retained&&retained.declaredSort===JSON.stringify(node.sort)?retained.sort:node.sort||null,error:null,visibilityError:null,dataIdentity};this.nodes.set(node.id,entry);
-  if(node.title&&node.type!=='model')wrapper.append(element('h2','adaptive-title',node.title));
+  entry.inTab=inTab;
+  if(reuseLayout&&!inTab)wrapper.hidden=false;
+  const heading=node.title&&node.type!=='model'&&!(inTab&&containers.has(node.type))?element('h2','adaptive-title',node.title):null;
+  if(heading&&!reuseLayout)wrapper.append(heading);
   if(containers.has(node.type)){
    if(node.type==='grid'){wrapper.dataset.columns=String(node.columns||2);wrapper.dataset.chartGrid=String(node.children.some(n=>CHART_TYPES.has(n.type)));wrapper.dataset.metricGrid=String(node.children.every(n=>n.type==='metric'));}
    if(node.type==='tabs'){
@@ -107,8 +147,12 @@ export class AdaptiveUI{
      if(view&&view!==this.context.state.view)return this.selectLinked({view},entry);
      select(id);
     };
-    for(const child of node.children){const panel=this.build(child);if(!hasWorkspaceContent(child))continue;if(containers.has(child.type))panel.querySelector(':scope>.adaptive-title')?.remove();const b=element('button','',child.title||child.id);b.type='button';b.id='adaptive-tab-'+child.id;b.dataset.target=child.id;b.setAttribute('role','tab');b.setAttribute('aria-controls','adaptive-panel-'+child.id);if(entry.caseTabs?.has(child.id))b.dataset.selectView=entry.caseTabs.get(child.id);b.addEventListener('click',()=>entry.activateTab(child.id));b.addEventListener('keydown',event=>{if(!['ArrowRight','ArrowLeft','Home','End'].includes(event.key))return;event.preventDefault();const buttons=[...nav.children].filter(x=>!x.hidden),index=buttons.indexOf(b),next=event.key==='Home'?0:event.key==='End'?buttons.length-1:(index+(event.key==='ArrowRight'?1:buttons.length-1))%buttons.length;entry.activateTab(buttons[next].dataset.target);buttons[next].focus();});nav.append(b);panel.id='adaptive-panel-'+child.id;panel.setAttribute('role','tabpanel');panel.setAttribute('aria-labelledby',b.id);content.append(panel);}select(current);
-   }else for(const child of node.children){const panel=this.build(child);if(hasWorkspaceContent(child))wrapper.append(panel);}
+    for(const child of node.children){const panel=this.build(child,true);if(!hasWorkspaceContent(child))continue;if(containers.has(child.type))panel.querySelector(':scope>.adaptive-title')?.remove();const b=element('button','',child.title||child.id);b.type='button';b.id='adaptive-tab-'+child.id;b.dataset.target=child.id;b.setAttribute('role','tab');b.setAttribute('aria-controls','adaptive-panel-'+child.id);if(entry.caseTabs?.has(child.id))b.dataset.selectView=entry.caseTabs.get(child.id);b.addEventListener('click',()=>entry.activateTab(child.id));b.addEventListener('keydown',event=>{if(!['ArrowRight','ArrowLeft','Home','End'].includes(event.key))return;event.preventDefault();const buttons=[...nav.children].filter(x=>!x.hidden),index=buttons.indexOf(b),next=event.key==='Home'?0:event.key==='End'?buttons.length-1:(index+(event.key==='ArrowRight'?1:buttons.length-1))%buttons.length;entry.activateTab(buttons[next].dataset.target);buttons[next].focus();});nav.append(b);panel.id='adaptive-panel-'+child.id;panel.setAttribute('role','tabpanel');panel.setAttribute('aria-labelledby',b.id);content.append(panel);}select(current);
+   }else{
+    const children=heading?[heading]:[];
+    for(const child of node.children){const panel=this.build(child);if(hasWorkspaceContent(child))children.push(panel);}
+    reconcile(wrapper,children);
+   }
    return wrapper;
   }
   entry.body=element('div','adaptive-body');entry.body.dataset.uiBody=node.id;wrapper.append(entry.body);
@@ -130,17 +174,23 @@ export class AdaptiveUI{
   if(node.type==='model'){
    wrapper.classList.add('adaptive-model');this.modelSlot=entry.body;
    entry.modelDirective=JSON.stringify(node.state);
-   if(node.state&&entry.modelDirective!==retained?.modelDirective)entry.action=Promise.resolve().then(()=>{if(this.nodes.get(node.id)===entry)return this.onAction({type:'view',state:node.state});}).catch(error=>this.showError(entry,error));
+   entry.pendingModelState=!!node.state&&(entry.modelDirective!==retained?.modelDirective||old?.pendingModelState);
   }else if(node.type==='text')entry.body.append(element('p','adaptive-text',node.text));
   else if(node.type==='evidence')this.renderEvidence(entry);
   else if(node.type==='image'){
    const figure=element('figure','adaptive-image'),img=element('img');img.alt=node.alt;img.src=this.context.imageURL(node.file);img.addEventListener('load',()=>{entry.error=null;this.observe();});img.addEventListener('error',()=>this.showError(entry,new Error('图片未能载入')));figure.append(img);if(node.caption)figure.append(element('figcaption','',node.caption));entry.body.append(figure);
   }
   else if(node.type==='button'){
-   const button=element('button','adaptive-action',node.label);button.type='button';if(node.action.type==='view'&&node.action.state.view){button.dataset.selectView=node.action.state.view;if(Object.keys(node.action.state).length===1)button.dataset.caseSwitch='true';}button.addEventListener('click',async()=>{button.disabled=true;try{await this.onAction(node.action);entry.error=null;}catch(error){this.showError(entry,error);}finally{button.disabled=false;this.observe();}});entry.body.append(button);
+   const button=element('button','adaptive-action',node.label);button.type='button';if(node.action.type==='view'&&node.action.state.view){button.dataset.selectView=node.action.state.view;if(Object.keys(node.action.state).length===1)button.dataset.caseSwitch='true';}
+   button.addEventListener('click',async()=>{
+    button.disabled=true;entry.body.querySelector('[role=alert]')?.remove();
+    try{await this.onAction(node.action);entry.error=null;}
+    catch(error){this.showError(entry,error);const note=element('p','adaptive-error',entry.error);note.setAttribute('role','alert');entry.body.append(note);}
+    finally{button.disabled=false;this.observe();}
+   });entry.body.append(button);
   }else if(node.type==='controls'){
    entry.body.addEventListener('input',e=>this.onControlInput(e));entry.body.addEventListener('change',e=>this.onControlChange(e));
-  }else{
+  }else if(node.type!=='probeSummary'){
    const actions=element('div','adaptive-exports'),csv=element('button','','CSV');csv.type='button';csv.disabled=true;entry.exports=actions;csv.addEventListener('click',()=>{if(entry.table)download(new Blob([tableCSV(entry.table)],{type:'text/csv;charset=utf-8'}),(node.title||node.id)+'.csv');});actions.append(csv);
    if(CHART_TYPES.has(node.type)){const png=element('button','','PNG');png.type='button';png.addEventListener('click',async()=>{try{const svg=entry.body.querySelector('svg');if(!svg)return;const canvas=document.createElement('canvas'),box=svg.getBoundingClientRect();canvas.width=Math.round(box.width*2);canvas.height=Math.round(box.height*2)+70;const c=canvas.getContext('2d');c.fillStyle=this.theme().panel;c.fillRect(0,0,canvas.width,canvas.height);c.fillStyle=this.theme().ink;c.font='24px "Workbench CJK",system-ui';c.fillText(node.title||'分析图',28,38);await paintSVG(c,svg,0,65,canvas.width,canvas.height-70);canvas.toBlob(blob=>{if(blob)download(blob,(node.title||node.id)+'.png');});}catch(error){this.showError(entry,error);}});actions.append(png);const menu=element('details','adaptive-chart-export');menu.append(element('summary','','导出'),actions);entry.tools.append(menu);}else wrapper.append(actions);
   }
@@ -182,9 +232,9 @@ export class AdaptiveUI{
  }
  theme(){const s=getComputedStyle(this.host),get=(key,fallback)=>s.getPropertyValue(key).trim()||fallback;return{ink:get('--ink','#17171a'),accent:get('--accent','#4f46e5'),line:get('--line','#e5e5e8'),panel:get('--panel','#ffffff')};}
  paintChart(entry,series){
-  if(!series)return;entry.series=series;entry.chartWidth=Math.round(entry.body.clientWidth);const node=document.fullscreenElement===entry.element?{...entry.node,height:Math.max(300,window.innerHeight-170)}:entry.node;entry.body.innerHTML=chartSVG(node,series,this.theme(),entry.chartWidth||720,entry.interaction||{});entry.interaction?.afterPaint();this.syncSelection();
+  if(!series)return;entry.series=series;entry.chartWidth=Math.round(entry.body.clientWidth);const node=document.fullscreenElement===entry.element?{...entry.node,height:Math.max(300,window.innerHeight-170)}:entry.node;entry.body.innerHTML=chartSVG(node,series,this.theme(),entry.chartWidth||720,entry.interaction||{});for(const note of new Set(series.map(s=>scientificNote(s.table,[s.x,s.y,s.xLow,s.xHigh,s.yLow,s.yHigh,node.x,node.y,node.value])).filter(Boolean)))entry.body.append(element('p','adaptive-caption',note));entry.interaction?.afterPaint();this.syncSelection();
  }
- async selectRun(id,openModel=false){if(!this.context?.study?.runs.some(r=>r.id===id))return;try{await this.onRun?.(id,{openModel});this.syncSelection();}catch(error){this.onSelectError=String(error.message||error);}}
+ async selectRun(id,openModel=false){if(id?.startsWith('app:')&&this.context.selectAppRun){this.context.selectAppRun(id.slice(4));return;}if(!this.context?.study?.runs.some(r=>r.id===id))return;try{await this.onRun?.(id,{openModel});this.syncSelection();}catch(error){this.onSelectError=String(error.message||error);}}
  async selectLinked(selection,entry){if(!selection)return;try{await this.onAction({type:'selection',selection});this.syncSelection();}catch(error){this.showError(entry,error);}}
  syncSelection(){
   for(const host of [this.host,this.aside])for(const button of host.querySelectorAll('[data-select-view]:not([role=tab])'))button.setAttribute('aria-pressed',String(button.dataset.selectView===this.context.state.view));
@@ -200,7 +250,7 @@ export class AdaptiveUI{
   renderParameterPanel(entry.body,controls,c=>c.parameter?this.context.parameters[c.id]:c.id==='view'?this.context.state.view:this.context.state[c.id],'adaptive-'+entry.node.id+'-');
  }
  async dataset(id,context){
-  const key=JSON.stringify([context.taskId,context.uiRevision,context.deliveryVersion,id,this.document?.datasets?.[id]]);
+  const key=JSON.stringify([context.taskId,context.uiRevision,context.deliveryVersion,context.viewIndex,id,this.document?.datasets?.[id]]);
   if(!this.datasetCache.has(key)){this.datasetCache.set(key,context.getDataset(id).catch(error=>{this.datasetCache.delete(key);throw error;}));while(this.datasetCache.size>8)this.datasetCache.delete(this.datasetCache.keys().next().value);}
   return this.datasetCache.get(key);
  }
@@ -208,7 +258,9 @@ export class AdaptiveUI{
   const generation=++this.generation,context=this.context;this.ready=false;
   const sourceContext={...context,getDataset:id=>this.dataset(id,context)};
   const actions=[...this.nodes.values()].filter(e=>e.action).map(e=>e.action);
-  await Promise.all([...actions,...[...this.nodes.values()].filter(e=>e.node.source||e.node.series).map(async entry=>{
+  const renderKey=JSON.stringify([this.dataKey,this.theme()]);
+  await Promise.all([...actions,...[...this.nodes.values()].filter(e=>(e.node.source||e.node.series)&&e.renderKey!==renderKey).map(async entry=>{
+   entry.renderKey=null;
    entry.element.setAttribute('aria-busy','true');for(const button of entry.exports?.children||[])button.disabled=true;
    try{
     const node=entry.node;
@@ -220,25 +272,28 @@ export class AdaptiveUI{
      entry.table=chartDataTable(series);
     }else{
      const table=await resolveSource(node.source,sourceContext);if(generation!==this.generation)return;entry.table=table;
-     if(node.type==='metric'){
+     entry.probe=probeRecord(table,table.probe?.timeUnit===context.timeUnit?context.time:undefined);
+     if(node.type==='probeSummary'){
+      entry.body.replaceChildren(element('p','adaptive-text',probeDescription(entry.probe)));
+     }else if(node.type==='metric'){
       const column=node.column||'value';if(!table.columns.some(c=>c.id===column))throw new Error('指标引用不存在的数据列：'+column);
       const values=table.rows.map(r=>r[column]).filter(v=>typeof v==='number'&&Number.isFinite(v));
       const kind=node.reducer||'last',value=!values.length?null:kind==='last'?values.at(-1):kind==='mean'?values.reduce((a,b)=>a+b,0)/values.length:values.reduce((a,b)=>kind==='min'?Math.min(a,b):Math.max(a,b));
       const unit=node.unit??table.columns.find(c=>c.id===column)?.unit??'';entry.body.replaceChildren(element('strong','adaptive-metric',values.length?format(value):'—'),element('span','adaptive-unit',values.length?unit:'暂无有效值'));
      }else this.renderTable(entry);
     }
-    entry.error=null;for(const button of entry.exports?.children||[])button.disabled=false;
+    entry.renderKey=renderKey;entry.error=null;for(const button of entry.exports?.children||[])button.disabled=false;
    }catch(error){if(generation===this.generation)this.showError(entry,error);}
    finally{if(generation===this.generation)entry.element.setAttribute('aria-busy','false');}
   })]);
-  if(generation===this.generation){this.syncSelection();this.ready=true;this.observe();this.onRendered?.();}
+  if(generation===this.generation){this.syncSelection();this.ready=![...this.nodes.values()].some(e=>e.pendingModelState);this.observe();this.onRendered?.();}
  }
  renderTable(entry){
   const table=entry.table;if(!table)return;const columns=tableColumns(table,entry.node),rows=tableRows(table,{query:entry.query,sort:entry.sort}),count=entry.node.pageSize||100;
   entry.page=Math.min(entry.page,Math.max(0,Math.ceil(rows.length/count)-1));const start=entry.page*count,rule=entry.node.highlight,valid=rule?table.rows.map(r=>r[rule.column]).filter(v=>typeof v==='number'&&Number.isFinite(v)):[],best=valid.length?(rule.mode==='min'?Math.min(...valid):Math.max(...valid)):null;
   entry.renderedRows=rows.slice(start,start+count);
   entry.body.innerHTML=`<div class="adaptive-table-scroll"><table><thead><tr>${columns.map(c=>`<th aria-sort="${entry.sort?.column===c.id?(entry.sort.direction==='asc'?'ascending':'descending'):'none'}"><button type="button" data-sort-column="${escape(c.id)}">${escape(c.label||c.id)}${c.unit?' ['+escape(c.unit)+']':''}${entry.sort?.column===c.id?(entry.sort.direction==='asc'?' ↑':' ↓'):''}</button></th>`).join('')}</tr></thead><tbody>${entry.renderedRows.map((r,i)=>`<tr${r.selection?` data-linked-row="${i}" data-linked-view="${escape(r.selection.view)}"${r.selection.time!==undefined?` data-linked-time="${r.selection.time}"`:''} tabindex="0"`:this.context?.study?.runs.some(run=>run.id===r.runId)?` data-chart-run="${escape(r.runId)}" tabindex="0"`:""}${rule&&best!==null&&r[rule.column]===best?' class="adaptive-row-best"':''}>${columns.map(c=>`<td style="text-align:${c.align||'right'}">${escape(formatCell(r[c.id],c))}</td>`).join('')}</tr>`).join('')}</tbody></table></div>`;
-  const nav=element('div','adaptive-pagination'),previous=element('button','','上一页'),next=element('button','','下一页');previous.disabled=entry.page===0;next.disabled=start+count>=rows.length;previous.addEventListener('click',()=>{entry.page--;this.renderTable(entry);});next.addEventListener('click',()=>{entry.page++;this.renderTable(entry);});nav.append(previous,element('span','',rows.length?`${start+1}–${Math.min(start+count,rows.length)} / ${rows.length}`:'没有匹配数据'),next);entry.body.append(nav);this.syncSelection();
+  const nav=element('div','adaptive-pagination'),previous=element('button','','上一页'),next=element('button','','下一页');previous.disabled=entry.page===0;next.disabled=start+count>=rows.length;previous.addEventListener('click',()=>{entry.page--;this.renderTable(entry);});next.addEventListener('click',()=>{entry.page++;this.renderTable(entry);});nav.append(previous,element('span','',rows.length?`${start+1}–${Math.min(start+count,rows.length)} / ${rows.length}`:'没有匹配数据'),next);entry.body.append(nav);if(scientificNote(table,columns.map(c=>c.id)))entry.body.append(element('p','adaptive-caption',table.scientificNote));this.syncSelection();
  }
 
  showError(entry,error){entry.error=String(error.message||error).slice(0,500);if(entry.body&&!['model','controls','button'].includes(entry.node.type))entry.body.replaceChildren(element('p','adaptive-error',entry.error));this.observe();}

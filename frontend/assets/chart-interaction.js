@@ -43,7 +43,10 @@ export class ChartInteraction{
  afterPaint(){this.tip=null;this.pointLocations=[...this.entry.body.querySelectorAll('[data-chart-point][data-point-x]')].map(element=>({element,x:Number(element.dataset.pointX),y:Number(element.dataset.pointY)}));if(this.brushButton)this.brushButton.disabled=!this.domain();}
  pointAt(event){
   const direct=event.target.closest('[data-chart-point]'),matrix=this.svg?.getScreenCTM();
-  if(!event.clientX||!matrix||!this.pointLocations?.length)return direct;
+  // Keyboard activation has no pointer position. For a physical click the
+  // transparent SVG hit circles overlap; use the sample nearest the cursor.
+  if(!Number.isFinite(event.clientX)||(!event.clientX&&!event.clientY&&!event.detail)||!matrix||!this.pointLocations?.length||this.entry.node.type==='heatmapChart')return direct;
+  if(direct&&event.target.matches?.('rect,path')&&direct.contains(event.target))return direct;
   const p=new DOMPoint(event.clientX,event.clientY).matrixTransform(matrix.inverse());
   return nearestChartPoint(this.pointLocations,p.x,p.y)?.element||direct;
  }
